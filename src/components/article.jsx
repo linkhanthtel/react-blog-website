@@ -4,7 +4,7 @@ import image3 from '../images/image3.jpg'
 
 function Article() {
   return (
-    <div className='my-5 mx-3 flex flex-col md:flex-row p-5 bg-white shadow-lg shadow-gray-300 hover:shadow-gray-500' onClick={() => alert("Single Post")}>
+    <div className='my-5 mx-3 flex flex-col md:flex-row p-5 bg-white shadow-lg shadow-gray-300 hover:shadow-gray-500'>
       <div className='flex justify-center items-center'>
         <img src={image3} alt="Image" className='w-56 h-48 md:w-[70%] md:h-84' />
       </div>
@@ -14,7 +14,7 @@ function Article() {
             <p>Lin</p>
             <p>1hr ago</p>
         </div>
-        <Link className='px-5 py-3 text-sm md:px-2'>Read More</Link>
+        <Link to="/blogs/singlepost" className='px-5 py-3 text-sm md:px-2'>Read More</Link>
       </div>
     </div>
   )

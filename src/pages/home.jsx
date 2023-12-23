@@ -12,7 +12,10 @@ function Home() {
       </div>
       <div className='flex justify-between'>
         <Post />
-        <Sidebar title={"Trending"} />
+        <div className='w-1/4'>
+          <Sidebar title={"Trending"} />
+          <Sidebar title={"Best places to chill"} />
+        </div>
       </div>
     </div>
   )

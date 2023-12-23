@@ -12,11 +12,9 @@ function Navbar() {
       </div>
       <div className='hidden md:flex'>
         <Link to="/" className='px-3 hover:bg-white hover:text-blue-500'>Home</Link>
-        <Link to="/about" className='px-3 hover:bg-white hover:text-blue-500'>About</Link>
         <Link to="/blogs" className='px-3 hover:bg-white hover:text-blue-500'>Blogs</Link>
         <Link to="/join" className='px-3 hover:bg-white hover:text-blue-500'>Join</Link>
         <Link to="/contact" className='px-3 hover:bg-white hover:text-blue-500'>Contact</Link>
-        <Link to="/support" className='px-3 hover:bg-white hover:text-blue-500'>Support</Link>
       </div>
       <div className='hidden md:flex'>
         <div className='flex px-4'>

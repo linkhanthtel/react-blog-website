@@ -6,7 +6,7 @@ import { FaYoutube } from "react-icons/fa";
 
 function Sidebar({title}) {
   return (
-    <div className='w-[25%] h-fit mx-4 hidden md:flex flex-col border-2 p-3 my-4'>
+    <div className='h-fit mx-4 hidden md:flex flex-col border-2 p-3 my-4'>
       <h1 className='text-xl text-center border-b-2 border-black'>{title}</h1>
       <img src={image2} alt="Image" className='w-50 h-60 py-5 object-contain' />
       <div className='flex flex-col'>
