@@ -6,6 +6,7 @@ import Blogs from "./pages/blogs";
 import Join from "./pages/join";
 import Contact from "./pages/contact";
 import SinglePost from "./pages/singlepost";
+import Footer from "./components/footer";
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
           <Route path="/join" element={<Join />} />
           <Route path="/contact" element={<Contact />} />
         </Routes>
+      <Footer />
       </BrowserRouter>
     </div>
   );

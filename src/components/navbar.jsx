@@ -8,7 +8,7 @@ function Navbar() {
   return (
     <div className='p-4 bg-blue-500 text-white flex justify-around'>
       <div>
-        <Link>Blog</Link>
+        <Link to="/">WanderLuxe Ventures</Link>
       </div>
       <div className='hidden md:flex'>
         <Link to="/" className='px-3 hover:bg-white hover:text-blue-500'>Home</Link>
