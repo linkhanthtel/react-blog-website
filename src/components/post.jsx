@@ -4,7 +4,7 @@ import SinglePost from '../pages/singlepost'
 
 function Post() {
   return (
-    <div className='border-2 my-2 mx-2'>
+    <div className='my-2 mx-2'>
       <h1 className='text-center text-3xl my-3'>Posts</h1>
       <div>
         <Article title={"Top 10 Trips for 2024"} />
