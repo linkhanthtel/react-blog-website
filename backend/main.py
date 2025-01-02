@@ -4,6 +4,16 @@ from pydantic import BaseModel
 from typing import List, Optional
 from jose import JWTError, jwt
 from datetime import datetime, timedelta
+from sqlalchemy import create_engine, Column, Integer, String, Table, MetaData
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker, Session
+
+# Database configuration
+DATABASE_URL = "postgresql://postgres:A!edutech038082@localhost:5432/blog_posts"
+
+engine = create_engine(DATABASE_URL)
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+Base = declarative_base()
 
 # Secret key to encode and decode JWT tokens
 SECRET_KEY = "your_secret_key"
@@ -14,8 +24,15 @@ app = FastAPI()
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
-class BlogPost(BaseModel):
-    id: int
+class BlogPost(Base):
+    __tablename__ = "blog_posts"
+    id = Column(Integer, primary_key=True, index=True)
+    title = Column(String, index=True)
+    content = Column(String)
+    author = Column(String)
+    tags = Column(String)
+
+class BlogPostCreate(BaseModel):
     title: str
     content: str
     author: str
@@ -32,8 +49,7 @@ class User(BaseModel):
     username: str
     password: str
 
-# In-memory storage for blog posts and users, needs to be replaced with a database
-blog_posts = []
+# In-memory storage for users, needs to be replaced with a database
 users_db = {
     "user1": {
         "username": "user1",
@@ -91,37 +107,44 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
     )
     return {"access_token": access_token, "token_type": "bearer"}
 
-@app.get("/posts", response_model=List[BlogPost])
-def get_posts():
-    return blog_posts
+@app.get("/posts", response_model=List[BlogPostCreate])
+def get_posts(db: Session = Depends(SessionLocal)):
+    return db.query(BlogPost).all()
 
-@app.get("/posts/{post_id}", response_model=BlogPost)
-def get_post(post_id: int):
-    for post in blog_posts:
-        if post.id == post_id:
-            return post
-    raise HTTPException(status_code=404, detail="Post not found")
-
-@app.post("/posts", response_model=BlogPost)
-def create_post(post: BlogPost, current_user: User = Depends(get_current_user)):
-    blog_posts.append(post)
+@app.get("/posts/{post_id}", response_model=BlogPostCreate)
+def get_post(post_id: int, db: Session = Depends(SessionLocal)):
+    post = db.query(BlogPost).filter(BlogPost.id == post_id).first()
+    if post is None:
+        raise HTTPException(status_code=404, detail="Post not found")
     return post
 
-@app.put("/posts/{post_id}", response_model=BlogPost)
-def update_post(post_id: int, updated_post: BlogPost, current_user: User = Depends(get_current_user)):
-    for index, post in enumerate(blog_posts):
-        if post.id == post_id:
-            blog_posts[index] = updated_post
-            return updated_post
-    raise HTTPException(status_code=404, detail="Post not found")
+@app.post("/posts", response_model=BlogPostCreate)
+def create_post(post: BlogPostCreate, db: Session = Depends(SessionLocal), current_user: User = Depends(get_current_user)):
+    db_post = BlogPost(**post.dict())
+    db.add(db_post)
+    db.commit()
+    db.refresh(db_post)
+    return db_post
 
-@app.delete("/posts/{post_id}", response_model=BlogPost)
-def delete_post(post_id: int, current_user: User = Depends(get_current_user)):
-    for index, post in enumerate(blog_posts):
-        if post.id == post_id:
-            deleted_post = blog_posts.pop(index)
-            return deleted_post
-    raise HTTPException(status_code=404, detail="Post not found")
+@app.put("/posts/{post_id}", response_model=BlogPostCreate)
+def update_post(post_id: int, updated_post: BlogPostCreate, db: Session = Depends(SessionLocal), current_user: User = Depends(get_current_user)):
+    post = db.query(BlogPost).filter(BlogPost.id == post_id).first()
+    if post is None:
+        raise HTTPException(status_code=404, detail="Post not found")
+    for key, value in updated_post.dict().items():
+        setattr(post, key, value)
+    db.commit()
+    db.refresh(post)
+    return post
+
+@app.delete("/posts/{post_id}", response_model=BlogPostCreate)
+def delete_post(post_id: int, db: Session = Depends(SessionLocal), current_user: User = Depends(get_current_user)):
+    post = db.query(BlogPost).filter(BlogPost.id == post_id).first()
+    if post is None:
+        raise HTTPException(status_code=404, detail="Post not found")
+    db.delete(post)
+    db.commit()
+    return post
 
 if __name__ == "__main__":
     import uvicorn
