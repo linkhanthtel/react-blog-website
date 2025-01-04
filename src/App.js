@@ -7,10 +7,12 @@ import Join from "./pages/join";
 import Contact from "./pages/contact";
 import SinglePost from "./pages/singlepost";
 import Footer from "./components/footer";
+import { ThemeProvider } from "./context/themeContext";
 
 function App() {
   return (
     <div>
+      <ThemeProvider>
       <BrowserRouter>
       <Navbar />
         <Routes>
@@ -22,6 +24,7 @@ function App() {
         </Routes>
       <Footer />
       </BrowserRouter>
+      </ThemeProvider>
     </div>
   );
 }
