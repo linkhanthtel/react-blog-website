@@ -4,44 +4,49 @@ from pydantic import BaseModel
 from typing import List, Optional
 from jose import JWTError, jwt
 from datetime import datetime, timedelta
-from sqlalchemy import create_engine, Column, Integer, String, Table, MetaData
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker, Session
+from passlib.context import CryptContext
 from dotenv import load_dotenv
 import os
 
 # Load environment variables from .env file
 load_dotenv()
 
-# Database configuration
-DATABASE_URL = os.getenv("DATABASE_URL")
-
-engine = create_engine(DATABASE_URL)
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-Base = declarative_base()
-
 # Secret key to encode and decode JWT tokens
-SECRET_KEY = os.getenv("SECRET_KEY")
+SECRET_KEY = os.getenv("SECRET_KEY", "your-secret-key")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
+# Initialize FastAPI app
 app = FastAPI()
 
+# Password hashing context
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+# OAuth2 scheme
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
-class BlogPost(Base):
-    __tablename__ = "blog_posts"
-    id = Column(Integer, primary_key=True, index=True)
-    title = Column(String, index=True)
-    content = Column(String)
-    author = Column(String)
-    tags = Column(String)
+# In-memory data stores
+users_db = {
+    "user1": {
+        "username": "user1",
+        "hashed_password": pwd_context.hash("password1"),
+    }
+}
+blog_posts = []
+
+# Pydantic models
+class BlogPost(BaseModel):
+    id: int
+    title: str
+    content: str
+    author: str
+    tags: Optional[List[str]] = []
 
 class BlogPostCreate(BaseModel):
     title: str
     content: str
     author: str
-    tags: Optional[List[str]] = None
+    tags: Optional[List[str]] = []
 
 class Token(BaseModel):
     access_token: str
@@ -54,29 +59,21 @@ class User(BaseModel):
     username: str
     password: str
 
-# In-memory storage for users, needs to be replaced with a database
-users_db = {
-    "user1": {
-        "username": "user1",
-        "password": "password1"
-    }
-}
+# Utility functions
+def verify_password(plain_password: str, hashed_password: str) -> bool:
+    return pwd_context.verify(plain_password, hashed_password)
 
 def authenticate_user(username: str, password: str):
     user = users_db.get(username)
-    if user and user["password"] == password:
+    if user and verify_password(password, user["hashed_password"]):
         return user
     return None
 
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     to_encode = data.copy()
-    if expires_delta:
-        expire = datetime.utcnow() + expires_delta
-    else:
-        expire = datetime.utcnow() + timedelta(minutes=15)
+    expire = datetime.utcnow() + (expires_delta or timedelta(minutes=15))
     to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
-    return encoded_jwt
+    return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
 async def get_current_user(token: str = Depends(oauth2_scheme)):
     credentials_exception = HTTPException(
@@ -97,6 +94,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
         raise credentials_exception
     return user
 
+# Endpoints
 @app.post("/token", response_model=Token)
 async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
     user = authenticate_user(form_data.username, form_data.password)
@@ -108,47 +106,44 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
         )
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
-        data={"sub": user["username"]}, expires_delta=access_token_expires
+        data={"sub": form_data.username}, expires_delta=access_token_expires
     )
     return {"access_token": access_token, "token_type": "bearer"}
 
-@app.get("/posts", response_model=List[BlogPostCreate])
-def get_posts(db: Session = Depends(SessionLocal)):
-    return db.query(BlogPost).all()
+@app.get("/posts", response_model=List[BlogPost])
+async def get_posts():
+    return blog_posts
 
-@app.get("/posts/{post_id}", response_model=BlogPostCreate)
-def get_post(post_id: int, db: Session = Depends(SessionLocal)):
-    post = db.query(BlogPost).filter(BlogPost.id == post_id).first()
-    if post is None:
+@app.get("/posts/{post_id}", response_model=BlogPost)
+async def get_post(post_id: int):
+    post = next((post for post in blog_posts if post.id == post_id), None)
+    if not post:
         raise HTTPException(status_code=404, detail="Post not found")
     return post
 
-@app.post("/posts", response_model=BlogPostCreate)
-def create_post(post: BlogPostCreate, db: Session = Depends(SessionLocal), current_user: User = Depends(get_current_user)):
-    db_post = BlogPost(**post.dict())
-    db.add(db_post)
-    db.commit()
-    db.refresh(db_post)
-    return db_post
+@app.post("/posts", response_model=BlogPost)
+async def create_post(post: BlogPostCreate, current_user: User = Depends(get_current_user)):
+    new_post = BlogPost(id=len(blog_posts) + 1, **post.dict())
+    blog_posts.append(new_post)
+    return new_post
 
-@app.put("/posts/{post_id}", response_model=BlogPostCreate)
-def update_post(post_id: int, updated_post: BlogPostCreate, db: Session = Depends(SessionLocal), current_user: User = Depends(get_current_user)):
-    post = db.query(BlogPost).filter(BlogPost.id == post_id).first()
-    if post is None:
+@app.put("/posts/{post_id}", response_model=BlogPost)
+async def update_post(post_id: int, updated_post: BlogPostCreate, current_user: User = Depends(get_current_user)):
+    post = next((post for post in blog_posts if post.id == post_id), None)
+    if not post:
         raise HTTPException(status_code=404, detail="Post not found")
-    for key, value in updated_post.dict().items():
-        setattr(post, key, value)
-    db.commit()
-    db.refresh(post)
+    post.title = updated_post.title
+    post.content = updated_post.content
+    post.author = updated_post.author
+    post.tags = updated_post.tags
     return post
 
-@app.delete("/posts/{post_id}", response_model=BlogPostCreate)
-def delete_post(post_id: int, db: Session = Depends(SessionLocal), current_user: User = Depends(get_current_user)):
-    post = db.query(BlogPost).filter(BlogPost.id == post_id).first()
-    if post is None:
+@app.delete("/posts/{post_id}", response_model=BlogPost)
+async def delete_post(post_id: int, current_user: User = Depends(get_current_user)):
+    post = next((post for post in blog_posts if post.id == post_id), None)
+    if not post:
         raise HTTPException(status_code=404, detail="Post not found")
-    db.delete(post)
-    db.commit()
+    blog_posts.remove(post)
     return post
 
 if __name__ == "__main__":
