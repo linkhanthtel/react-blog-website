@@ -5,6 +5,10 @@ import { useTheme } from '../context/themeContext';
 import image7 from '../images/image7.jpg';
 import image8 from '../images/image8.jpg';
 import image9 from '../images/image9.jpg';
+import image12 from '../images/image12.jpg';
+import image13 from '../images/image13.jpg';
+import image14 from '../images/image14.jpg';
+import image15 from '../images/image15.jpg';
 
 const Destination = () => {
   const { darkMode } = useTheme();
@@ -21,10 +25,10 @@ const Destination = () => {
   }, []);
 
   const featuredDestinations = [
-    { name: 'Bali', image: 'https://source.unsplash.com/800x600/?bali' },
-    { name: 'Paris', image: 'https://source.unsplash.com/800x600/?paris' },
-    { name: 'New York', image: 'https://source.unsplash.com/800x600/?newyork' },
-    { name: 'Tokyo', image: 'https://source.unsplash.com/800x600/?tokyo' },
+    { name: 'Bali', image: image12 },
+    { name: 'Paris', image: image15 },
+    { name: 'New York', image: image13 },
+    { name: 'Tokyo', image: image14 },
   ];
 
   const categories = [
