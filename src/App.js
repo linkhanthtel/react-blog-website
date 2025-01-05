@@ -8,6 +8,8 @@ import Contact from "./pages/contact";
 import SinglePost from "./pages/singlepost";
 import Footer from "./components/footer";
 import { ThemeProvider } from "./context/themeContext";
+import About from "./pages/about";
+import Destination from "./pages/destination";
 
 function App() {
   return (
@@ -17,7 +19,9 @@ function App() {
       <Navbar />
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/about" element={<About />} />
           <Route path="/blogs" element={<Blogs />} />
+          <Route path="/destinations" element={<Destination />} />
           <Route path="/blogs/singlepost" element={<SinglePost />} />
           <Route path="/join" element={<Join />} />
           <Route path="/contact" element={<Contact />} />

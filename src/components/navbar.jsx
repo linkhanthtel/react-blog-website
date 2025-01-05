@@ -32,7 +32,7 @@ function Navbar() {
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center">
             <Link to="/" className="flex-shrink-0">
-              <span className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+              <span className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-blue-300'}`}>
                 WanderLuxe Ventures
               </span>
             </Link>
@@ -46,7 +46,7 @@ function Navbar() {
                   className={`px-3 py-2 rounded-md text-sm font-medium transition duration-300 ${
                     darkMode 
                       ? 'text-gray-300 hover:bg-gray-700 hover:text-white' 
-                      : 'text-gray-900 hover:bg-gray-200 hover:text-gray-900'
+                      : 'text-blue-400 hover:bg-gray-200 hover:text-gray-900'
                   }`}
                 >
                   {item}
@@ -55,12 +55,12 @@ function Navbar() {
             </div>
           </div>
           <div className="hidden md:flex items-center space-x-4">
-            <button className={`p-1 rounded-full ${darkMode ? 'text-gray-300 hover:text-white' : 'text-gray-900 hover:text-gray-600'}`}>
+            <button className={`p-1 rounded-full ${darkMode ? 'text-gray-300 hover:text-white' : 'text-blue-500 hover:text-blue-700'}`}>
               <FaSearch className="h-5 w-5" />
             </button>
             <button 
               onClick={toggleDarkMode} 
-              className={`p-1 rounded-full ${darkMode ? 'text-gray-300 hover:text-white' : 'text-gray-900 hover:text-gray-600'}`}
+              className={`p-1 rounded-full ${darkMode ? 'text-gray-300 hover:text-white' : 'text-blue-500 hover:text-blue-700'}`}
             >
               {darkMode ? <FaSun className="h-5 w-5" /> : <FaMoon className="h-5 w-5" />}
             </button>
@@ -68,7 +68,7 @@ function Navbar() {
               <a 
                 key={index} 
                 href="#" 
-                className={`${darkMode ? 'text-gray-300 hover:text-white' : 'text-gray-900 hover:text-gray-600'} transition duration-300`}
+                className={`${darkMode ? 'text-gray-300 hover:text-white' : 'text-blue-500 hover:text-blue-800'} transition duration-300`}
               >
                 <Icon className="h-5 w-5" />
               </a>
@@ -107,7 +107,7 @@ function Navbar() {
                 className={`block px-3 py-2 rounded-md text-base font-medium ${
                   darkMode 
                     ? 'text-gray-300 hover:bg-gray-700 hover:text-white' 
-                    : 'text-gray-900 hover:bg-gray-200 hover:text-gray-900'
+                    : 'text-blue-500 hover:bg-gray-200 hover:text-gray-900'
                 }`}
               >
                 {item}
