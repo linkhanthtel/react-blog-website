@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSpring, animated } from 'react-spring';
-import { FaFire, FaHeart, FaComments, FaShare, FaChevronDown } from 'react-icons/fa';
+import { FaFire, FaHeart, FaComments, FaShare, FaChevronDown, FaPlane, FaHotel, FaUmbrellaBeach, FaSearch, FaMapMarkerAlt, FaCalendarAlt } from 'react-icons/fa';
 import Sidebar from '../components/sidebar';
 import Post from '../components/post';
 import { useTheme } from '../context/themeContext';
@@ -9,14 +9,26 @@ import image10 from '../images/image10.jpg';
 import image11 from '../images/image11.jpg';
 import image3 from '../images/image3.jpg';
 
-const images = [
-  image10,image11,image3
+const images = [image10, image11, image3];
+
+const headings = [
+  "Welcome to WanderLuxe Ventures",
+  "Explore Exotic Destinations",
+  "Experience Luxury Travel"
+];
+
+const subheadings = [
+  "Discover the world's hidden gems",
+  "Unforgettable journeys await",
+  "Indulge in extraordinary adventures"
 ];
 
 function Home() {
   const [scrollY, setScrollY] = useState(0);
   const { darkMode } = useTheme();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [currentTextIndex, setCurrentTextIndex] = useState(0);
+  const [currentTime, setCurrentTime] = useState(new Date());
 
   useEffect(() => {
     const handleScroll = () => setScrollY(window.scrollY);
@@ -27,7 +39,9 @@ function Home() {
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentImageIndex((prevIndex) => (prevIndex + 1) % images.length);
-    }, 10000);
+      setCurrentTextIndex((prevIndex) => (prevIndex + 1) % headings.length);
+      setCurrentTime(new Date());
+    }, 5000);
     return () => clearInterval(interval);
   }, []);
 
@@ -60,29 +74,74 @@ function Home() {
           </motion.div>
         </AnimatePresence>
         <div className="absolute inset-0 bg-black opacity-40"></div>
-        <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <motion.h1 
-            className="font-serif text-center text-white text-4xl md:text-6xl font-bold mb-4"
-            initial="hidden"
-            animate="visible"
-            variants={headerVariants}
+        <div className="absolute inset-0 flex flex-col items-center justify-center px-4">
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="text-white text-lg md:text-xl mb-4"
           >
-            Welcome to WanderLuxe Ventures
-          </motion.h1>
-          <motion.p
-            className="text-white text-xl md:text-2xl mb-8"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.5, duration: 0.8 }}
+            {currentTime.toLocaleTimeString()}
+          </motion.div>
+          <AnimatePresence mode="wait">
+            <motion.h1 
+              key={currentTextIndex}
+              className="font-serif text-center text-white text-4xl md:text-6xl font-bold mb-4"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.5 }}
+            >
+              {headings[currentTextIndex]}
+            </motion.h1>
+          </AnimatePresence>
+          <AnimatePresence mode="wait">
+            <motion.p
+              key={currentTextIndex}
+              className="text-white text-xl md:text-2xl mb-8 text-center"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+            >
+              {subheadings[currentTextIndex]}
+            </motion.p>
+          </AnimatePresence>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.4 }}
+            className="flex flex-wrap justify-center gap-4"
           >
-            Discover the world's hidden gems
-          </motion.p>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="bg-blue-600 text-white px-6 py-3 rounded-full font-semibold flex items-center"
+            >
+              <FaSearch className="mr-2" /> Search Destinations
+            </motion.button>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="bg-green-600 text-white px-6 py-3 rounded-full font-semibold flex items-center"
+            >
+              <FaMapMarkerAlt className="mr-2" /> Plan Your Trip
+            </motion.button>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="bg-purple-600 text-white px-6 py-3 rounded-full font-semibold flex items-center"
+            >
+              <FaCalendarAlt className="mr-2" /> Book Now
+            </motion.button>
+          </motion.div>
           <motion.div
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 1, duration: 0.8 }}
+            className="mt-12"
           >
-            <a href="#content" className="text-white text-4xl animate-bounce">
+            <a href="#content" className="text-white text-4xl animate-bounce block">
               <FaChevronDown />
             </a>
           </motion.div>
@@ -97,6 +156,7 @@ function Home() {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5 }}
           >
+            <FeaturedDestinations darkMode={darkMode} />
             <Post />
             <TrendingPosts darkMode={darkMode} />
           </motion.div>
@@ -111,6 +171,33 @@ function Home() {
             <Newsletter darkMode={darkMode} />
           </motion.div>
         </div>
+      </div>
+    </div>
+  );
+}
+
+function FeaturedDestinations({ darkMode }) {
+  const destinations = [
+    { name: "Bali", icon: FaUmbrellaBeach },
+    { name: "Paris", icon: FaPlane },
+    { name: "New York", icon: FaHotel },
+  ];
+
+  return (
+    <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-lg shadow-md p-6 mb-8`}>
+      <h2 className="text-2xl font-bold mb-4">Featured Destinations</h2>
+      <div className="grid grid-cols-3 gap-4">
+        {destinations.map((dest, index) => (
+          <motion.div
+            key={dest.name}
+            className={`${darkMode ? 'bg-gray-700' : 'bg-gray-100'} p-4 rounded-lg text-center`}
+            whileHover={{ scale: 1.05 }}
+            transition={{ type: "spring", stiffness: 300 }}
+          >
+            <dest.icon className={`text-3xl mb-2 ${darkMode ? 'text-blue-400' : 'text-blue-600'}`} />
+            <h3 className="font-semibold">{dest.name}</h3>
+          </motion.div>
+        ))}
       </div>
     </div>
   );

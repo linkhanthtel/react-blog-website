@@ -22,16 +22,22 @@ function Navbar() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  const handleLinkClick = (e) => {
+    e.preventDefault();
+    const href = e.currentTarget.getAttribute('href');
+    window.location.href = href;
+  };
+
   return (
     <nav className={`fixed w-full z-10 transition-all duration-300 ${
       isScrolled 
         ? (darkMode ? 'bg-gray-900 shadow-lg' : 'bg-white shadow-lg') 
-        : (darkMode ? 'bg-transparent' : 'bg-tansparent')
+        : (darkMode ? 'bg-transparent' : 'bg-transparent')
     }`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center">
-            <Link to="/" className="flex-shrink-0">
+            <Link to="/" onClick={handleLinkClick} className="flex-shrink-0">
               <span className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-blue-300'}`}>
                 WanderLuxe Ventures
               </span>
@@ -43,6 +49,7 @@ function Navbar() {
                 <Link 
                   key={item} 
                   to={item === 'Home' ? '/' : `/${item.toLowerCase()}`} 
+                  onClick={handleLinkClick}
                   className={`px-3 py-2 rounded-md text-sm font-medium transition duration-300 ${
                     darkMode 
                       ? 'text-gray-300 hover:bg-gray-700 hover:text-white' 
@@ -104,6 +111,7 @@ function Navbar() {
               <Link
                 key={item}
                 to={item === 'Home' ? '/' : `/${item.toLowerCase()}`}
+                onClick={handleLinkClick}
                 className={`block px-3 py-2 rounded-md text-base font-medium ${
                   darkMode 
                     ? 'text-gray-300 hover:bg-gray-700 hover:text-white' 
