@@ -1,15 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSpring, animated } from 'react-spring';
-import { FaFire, FaHeart, FaComments, FaShare, FaChevronDown, FaPlane, FaHotel, FaUmbrellaBeach, FaSearch, FaMapMarkerAlt, FaCalendarAlt } from 'react-icons/fa';
+import { FaFire, FaHeart, FaComments, FaShare, FaChevronDown, FaPlane, FaHotel, FaUmbrellaBeach, FaSearch, FaMapMarkerAlt, FaCalendarAlt, FaStar, FaSun, FaGlobe } from 'react-icons/fa';
 import Sidebar from '../components/sidebar';
 import Post from '../components/post';
 import { useTheme } from '../context/themeContext';
-import image10 from '../images/image10.jpg';
-import image11 from '../images/image11.jpg';
-import image3 from '../images/image3.jpg';
+import image4 from '../images/image4.jpg';
+import image9 from '../images/image9.jpg';
+import image12 from '../images/image12.jpg';
 
-const images = [image10, image11, image3];
+const images = [
+  image4,image9,image12
+];
 
 const headings = [
   "Welcome to WanderLuxe Ventures",
@@ -25,10 +27,12 @@ const subheadings = [
 
 function Home() {
   const [scrollY, setScrollY] = useState(0);
-  const { darkMode } = useTheme();
+  const { darkMode, toggleDarkMode } = useTheme();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [currentTextIndex, setCurrentTextIndex] = useState(0);
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [weatherData, setWeatherData] = useState(null);
+  const [isWeatherLoading, setIsWeatherLoading] = useState(true);
 
   useEffect(() => {
     const handleScroll = () => setScrollY(window.scrollY);
@@ -45,10 +49,28 @@ function Home() {
     return () => clearInterval(interval);
   }, []);
 
-  const headerVariants = {
-    hidden: { opacity: 0, y: -50 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: "easeOut" } }
-  };
+  useEffect(() => {
+    const fetchWeatherData = async () => {
+      setIsWeatherLoading(true);
+      try {
+        // This is a mock API call. In a real application, you would call an actual weather API.
+        const response = await new Promise(resolve => 
+          setTimeout(() => resolve({ 
+            temperature: 25, 
+            condition: 'Sunny', 
+            location: 'Paradise City' 
+          }), 1000)
+        );
+        setWeatherData(response);
+      } catch (error) {
+        console.error('Error fetching weather data:', error);
+      } finally {
+        setIsWeatherLoading(false);
+      }
+    };
+
+    fetchWeatherData();
+  }, []);
 
   const imageSpring = useSpring({
     opacity: 1,
@@ -156,9 +178,11 @@ function Home() {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5 }}
           >
+            <WeatherWidget weatherData={weatherData} isLoading={isWeatherLoading} darkMode={darkMode} />
             <FeaturedDestinations darkMode={darkMode} />
             <Post />
             <TrendingPosts darkMode={darkMode} />
+            <VirtualTourSection darkMode={darkMode} />
           </motion.div>
           <motion.div 
             className="w-full lg:w-1/3"
@@ -169,9 +193,33 @@ function Home() {
             <Sidebar title="Trending" />
             <Sidebar title="Best places to chill" />
             <Newsletter darkMode={darkMode} />
+            <TravelQuiz darkMode={darkMode} />
           </motion.div>
         </div>
       </div>
+      <FloatingActionButton darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
+    </div>
+  );
+}
+
+function WeatherWidget({ weatherData, isLoading, darkMode }) {
+  return (
+    <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-lg shadow-md p-6 mb-8`}>
+      <h2 className="text-2xl font-bold mb-4">Current Weather</h2>
+      {isLoading ? (
+        <p>Loading weather data...</p>
+      ) : weatherData ? (
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-3xl font-bold">{weatherData.temperature}°C</p>
+            <p>{weatherData.condition}</p>
+            <p>{weatherData.location}</p>
+          </div>
+          <FaSun className="text-5xl text-yellow-400" />
+        </div>
+      ) : (
+        <p>Failed to load weather data</p>
+      )}
     </div>
   );
 }
@@ -267,6 +315,130 @@ function Newsletter({ darkMode }) {
         </motion.button>
       </form>
     </div>
+  );
+}
+
+function VirtualTourSection({ darkMode }) {
+  return (
+    <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-lg shadow-md p-6 mt-8`}>
+      <h2 className="text-2xl font-bold mb-4 flex items-center">
+        <FaGlobe className="text-blue-500 mr-2" /> Virtual Tours
+      </h2>
+      <p className={`mb-4 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+        Experience destinations from the comfort of your home with our immersive virtual tours.
+      </p>
+      <div className="grid grid-cols-2 gap-4">
+        {['Paris', 'Tokyo', 'New York', 'Rome'].map((city) => (
+          <motion.div
+            key={city}
+            className={`${darkMode ? 'bg-gray-700' : 'bg-gray-100'} p-4 rounded-lg text-center cursor-pointer`}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            <h3 className="font-semibold mb-2">{city}</h3>
+            <button className={`${darkMode ? 'bg-blue-600' : 'bg-blue-500'} text-white px-4 py-2 rounded-full`}>
+              Start Tour
+            </button>
+          </motion.div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function TravelQuiz({ darkMode }) {
+  const [currentQuestion, setCurrentQuestion] = useState(0);
+  const [score, setScore] = useState(0);
+  const [showResult, setShowResult] = useState(false);
+
+  const questions = [
+    {
+      question: "What is the capital of France?",
+      options: ["London", "Berlin", "Paris", "Madrid"],
+      correctAnswer: "Paris"
+    },
+    {
+      question: "Which continent is Egypt in?",
+      options: ["Africa", "Asia", "Europe", "South America"],
+      correctAnswer: "Africa"
+    },
+    {
+      question: "What is the currency of Japan?",
+      options: ["Yuan", "Won", "Yen", "Ringgit"],
+      correctAnswer: "Yen"
+    }
+  ];
+
+  const handleAnswer = (answer) => {
+    if (answer === questions[currentQuestion].correctAnswer) {
+      setScore(score + 1);
+    }
+
+    const nextQuestion = currentQuestion + 1;
+    if (nextQuestion < questions.length) {
+      setCurrentQuestion(nextQuestion);
+    } else {
+      setShowResult(true);
+    }
+  };
+
+  const resetQuiz = () => {
+    setCurrentQuestion(0);
+    setScore(0);
+    setShowResult(false);
+  };
+
+  return (
+    <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-lg shadow-md p-6 mt-8`}>
+      <h2 className="text-2xl font-bold mb-4">Travel Quiz</h2>
+      {showResult ? (
+        <div>
+          <p className="text-xl mb-4">Your score: {score} out of {questions.length}</p>
+          <motion.button
+            onClick={resetQuiz}
+            className={`${darkMode ? 'bg-blue-600' : 'bg-blue-500'} text-white px-4 py-2 rounded-full`}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            Try Again
+          </motion.button>
+        </div>
+      ) : (
+        <div>
+          <p className="mb-4">{questions[currentQuestion].question}</p>
+          <div className="space-y-2">
+            {questions[currentQuestion].options.map((option) => (
+              <motion.button
+                key={option}
+                onClick={() => handleAnswer(option)}
+                className={`w-full text-left p-2 rounded ${
+                  darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-100 hover:bg-gray-200'
+                }`}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                {option}
+              </motion.button>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function FloatingActionButton({ darkMode, toggleDarkMode }) {
+  return (
+    <motion.button
+      className={`fixed bottom-4 right-4 p-4 rounded-full shadow-lg ${
+        darkMode ? 'bg-yellow-400 text-gray-900' : 'bg-gray-800 text-yellow-400'
+      }`}
+      onClick={toggleDarkMode}
+      whileHover={{ scale: 1.1 }}
+      whileTap={{ scale: 0.9 }}
+    >
+      {darkMode ? '🌞' : '🌙'}
+    </motion.button>
   );
 }
 

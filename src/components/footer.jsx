@@ -32,7 +32,7 @@ function Footer() {
 
     return (
         <motion.footer 
-            className={`relative ${darkMode ? 'bg-gray-900 text-gray-200' : 'bg-blue-600 text-white'} flex flex-col`}
+            className={`relative ${darkMode ? 'bg-slate-950 text-gray-200' : 'bg-blue-600 text-white'} flex flex-col`}
             variants={containerVariants}
             initial="hidden"
             animate="visible"
