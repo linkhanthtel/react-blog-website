@@ -1,20 +1,29 @@
-from sqlalchemy import Table, Column, Integer, String, MetaData
+from sqlalchemy import Column, Integer, String, ForeignKey, Text, DateTime
+from datetime import datetime
+from sqlalchemy.orm import relationship
+from sqlalchemy.sql import func
+from app.database import Base
 
-metadata = MetaData()
+class User(Base):
+    __tablename__ = "users"
+    id = Column(Integer, primary_key=True, index=True)
+    username = Column(String, unique=True, index=True)
+    email = Column(String, unique=True, index=True)
+    hashed_password = Column(String)
 
-users_table = Table(
-    "users",
-    metadata,
-    Column("id", Integer, primary_key=True, index=True),
-    Column("username", String, unique=True, nullable=False),
-    Column("hashed_password", String, nullable=False),
-)
+    posts = relationship("Post", back_populates="owner")
 
-posts_table = Table(
-    "posts",
-    metadata,
-    Column("id", Integer, primary_key=True, index=True),
-    Column("title", String, nullable=False),
-    Column("content", String, nullable=False),
-    Column("author", String, nullable=False),
-)
+
+class Post(Base):
+    __tablename__ = "posts"
+
+    id = Column(Integer, primary_key=True, index=True)
+    title = Column(String, nullable=False)
+    content = Column(String, nullable=False)
+    likes = Column(Integer, default=0)
+    comments = Column(Integer, default=0)
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+    owner_id = Column(Integer, ForeignKey("users.id"))
+
+    owner = relationship("User", back_populates="posts")

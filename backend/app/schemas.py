@@ -1,21 +1,39 @@
 from pydantic import BaseModel
 from typing import Optional
+from datetime import datetime
 
-class BlogPost(BaseModel):
+class PostBase(BaseModel):
+    title: str
+    content: str
+
+class PostCreate(PostBase):
+    pass
+
+class PostUpdate(PostBase):
+    title: Optional[str] = None
+    content: Optional[str] = None
+
+class Post(PostBase):
     id: int
-    title: str
-    content: str
-    author: str
+    owner_id: int
+    likes: int
+    comments: int
+    created_at: datetime
+    updated_at: Optional[datetime]
 
-class BlogPostCreate(BaseModel):
-    title: str
-    content: str
-    author: str
+    class Config:
+        orm_mode = True
 
-class UserCreate(BaseModel):
+class UserBase(BaseModel):
     username: str
+    email: str
+
+class UserCreate(UserBase):
     password: str
 
-class Token(BaseModel):
-    access_token: str
-    token_type: str
+class User(UserBase):
+    id: int
+    posts: list[Post] = []
+
+    class Config:
+        orm_mode = True

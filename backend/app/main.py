@@ -1,26 +1,17 @@
 from fastapi import FastAPI
-from app.database import database, engine, metadata
-from app import auth, crud
+from app.routers import users, posts
+from app.database import Base, engine
 
+# Initialize database
+Base.metadata.create_all(bind=engine)
+
+# Create FastAPI app
 app = FastAPI()
 
-# Create tables if they don't exist
-metadata.create_all(engine)
+# Include routers
+app.include_router(users.router, prefix="/users", tags=["Users"])
+app.include_router(posts.router, prefix="/posts", tags=["Posts"])
 
-# Routers
-app.include_router(auth.router, prefix="/auth", tags=["Authentication"])
-app.include_router(crud.router, prefix="/posts", tags=["Posts"])
-
-@app.on_event("startup")
-async def startup():
-    try:
-        await database.connect()
-    except Exception as e:
-        print(f"Error connecting to the database: {e}")
-
-@app.on_event("shutdown")
-async def shutdown():
-    try:
-        await database.disconnect()
-    except Exception as e:
-        print(f"Error disconnecting from the database: {e}")
+@app.get("/")
+def root():
+    return {"message": "Wanderluxe Ventures API"}
