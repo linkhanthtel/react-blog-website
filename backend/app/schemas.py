@@ -1,10 +1,13 @@
 from pydantic import BaseModel
-from typing import Optional
+from typing import List, Optional
 from datetime import datetime
 
 class PostBase(BaseModel):
     title: str
     content: str
+    description: Optional[str] = None
+    image: Optional[str] = None
+    author: str
 
 class PostCreate(PostBase):
     pass
@@ -33,7 +36,7 @@ class UserCreate(UserBase):
 
 class User(UserBase):
     id: int
-    posts: list[Post] = []
+    posts: List[Post] = []
 
     class Config:
         orm_mode = True
