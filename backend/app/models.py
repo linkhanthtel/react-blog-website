@@ -1,6 +1,7 @@
-from sqlalchemy import Column, Integer, String, Text, ForeignKey
+from sqlalchemy import Column, Integer, String, Text, ForeignKey, DateTime
 from sqlalchemy.orm import relationship
 from app.database import Base
+from datetime import datetime
 
 class Post(Base):
     __tablename__ = 'posts'
@@ -12,6 +13,11 @@ class Post(Base):
     image = Column(String)  # URL or path to the image
     author = Column(String)  # Author name
     owner_id = Column(Integer, ForeignKey('users.id'))
+    likes = Column(Integer, default=0)
+    comments = Column(Integer, default=0)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
 
     owner = relationship("User", back_populates="posts")
 
