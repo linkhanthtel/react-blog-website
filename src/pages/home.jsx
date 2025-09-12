@@ -197,7 +197,6 @@ function Home() {
           </motion.div>
         </div>
       </div>
-      <FloatingActionButton darkMode={darkMode} toggleDarkMode={toggleDarkMode} />
     </div>
   );
 }
@@ -427,19 +426,5 @@ function TravelQuiz({ darkMode }) {
   );
 }
 
-function FloatingActionButton({ darkMode, toggleDarkMode }) {
-  return (
-    <motion.button
-      className={`fixed bottom-4 right-4 p-4 rounded-full shadow-lg ${
-        darkMode ? 'bg-yellow-400 text-gray-900' : 'bg-gray-800 text-yellow-400'
-      }`}
-      onClick={toggleDarkMode}
-      whileHover={{ scale: 1.1 }}
-      whileTap={{ scale: 0.9 }}
-    >
-      {darkMode ? '🌞' : '🌙'}
-    </motion.button>
-  );
-}
 
 export default Home;
