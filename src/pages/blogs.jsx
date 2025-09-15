@@ -1,26 +1,32 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FiSearch } from 'react-icons/fi';
+import { FiSearch, FiRefreshCw } from 'react-icons/fi';
 import ArticleCard from '../components/articlecard';
 import Sidebar from '../components/sidebar';
 import { useTheme } from '../context/themeContext';
-
-const blogPosts = [
-  { id: 1, title: "Popular Destinations" },
-  { id: 2, title: "Healthy Diet for Vegetarians" },
-  { id: 3, title: "Tips for Purchasing Smartphones" },
-  { id: 4, title: "Famous Places in Asia" },
-  { id: 5, title: "How to Make a Delicious Curry" },
-  { id: 6, title: "Things You Should Know Before 30" },
-];
+import { usePosts } from '../context/postsContext';
 
 const Blogs = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const { darkMode } = useTheme();
+  const { posts, loading, error, fetchPosts } = usePosts();
 
-  const filteredPosts = blogPosts.filter(post =>
-    post.title.toLowerCase().includes(searchTerm.toLowerCase())
+  // Filter posts based on search term
+  const filteredPosts = posts.filter(post =>
+    post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    post.author.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    post.content.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  // Handle search
+  const handleSearch = (e) => {
+    setSearchTerm(e.target.value);
+  };
+
+  // Refresh posts
+  const handleRefresh = () => {
+    fetchPosts();
+  };
 
   return (
     <motion.div 
@@ -46,52 +52,113 @@ const Blogs = () => {
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.3, duration: 0.5 }}
             >
-              <div className="relative">
-                <input
-                  type="text"
-                  placeholder="Search articles..."
-                  className={`w-full p-3 pl-10 pr-4 ${
+              <div className="flex gap-2">
+                <div className="relative flex-1">
+                  <input
+                    type="text"
+                    placeholder="Search articles..."
+                    className={`w-full p-3 pl-10 pr-4 ${
+                      darkMode 
+                        ? 'bg-gray-800 text-gray-100 border-gray-700 focus:border-blue-500' 
+                        : 'bg-white text-gray-700 border-gray-300 focus:border-blue-400'
+                    } border rounded-md focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-40`}
+                    value={searchTerm}
+                    onChange={handleSearch}
+                  />
+                  <FiSearch className={`absolute left-3 top-3 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`} />
+                </div>
+                <button
+                  onClick={handleRefresh}
+                  disabled={loading}
+                  className={`px-4 py-3 rounded-md ${
                     darkMode 
-                      ? 'bg-gray-800 text-gray-100 border-gray-700 focus:border-blue-500' 
-                      : 'bg-white text-gray-700 border-gray-300 focus:border-blue-400'
-                  } border rounded-md focus:outline-none focus:ring focus:ring-blue-300 focus:ring-opacity-40`}
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-                <FiSearch className={`absolute left-3 top-3 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`} />
+                      ? 'bg-gray-700 hover:bg-gray-600 text-gray-300' 
+                      : 'bg-gray-200 hover:bg-gray-300 text-gray-700'
+                  } transition-colors duration-200 disabled:opacity-50`}
+                >
+                  <FiRefreshCw className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`} />
+                </button>
               </div>
             </motion.div>
-            <AnimatePresence>
+            {/* Error State */}
+            {error && (
               <motion.div 
-                className="grid gap-6 md:grid-cols-2"
-                initial="hidden"
-                animate="visible"
-                variants={{
-                  visible: { transition: { staggerChildren: 0.1 } }
-                }}
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className={`p-4 rounded-md mb-6 ${
+                  darkMode ? 'bg-red-900 text-red-200' : 'bg-red-100 text-red-800'
+                }`}
               >
-                {filteredPosts.map((post) => (
-                  <motion.div
-                    key={post.id}
-                    variants={{
-                      hidden: { y: 20, opacity: 0 },
-                      visible: { y: 0, opacity: 1, transition: { duration: 0.5 } }
-                    }}
-                  >
-                    <ArticleCard title={post.title} />
-                  </motion.div>
-                ))}
+                <p>Error loading posts: {error}</p>
+                <button
+                  onClick={handleRefresh}
+                  className="mt-2 text-sm underline hover:no-underline"
+                >
+                  Try again
+                </button>
               </motion.div>
-            </AnimatePresence>
-            {filteredPosts.length === 0 && (
-              <motion.p 
+            )}
+
+            {/* Loading State */}
+            {loading && (
+              <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="text-center py-8"
+              >
+                <FiRefreshCw className={`w-8 h-8 mx-auto mb-4 animate-spin ${darkMode ? 'text-gray-400' : 'text-gray-600'}`} />
+                <p className={darkMode ? 'text-gray-400' : 'text-gray-600'}>Loading posts...</p>
+              </motion.div>
+            )}
+
+            {/* Posts Grid */}
+            {!loading && !error && (
+              <AnimatePresence>
+                <motion.div 
+                  className="grid gap-6 md:grid-cols-2"
+                  initial="hidden"
+                  animate="visible"
+                  variants={{
+                    visible: { transition: { staggerChildren: 0.1 } }
+                  }}
+                >
+                  {filteredPosts.map((post) => (
+                    <motion.div
+                      key={post.id}
+                      variants={{
+                        hidden: { y: 20, opacity: 0 },
+                        visible: { y: 0, opacity: 1, transition: { duration: 0.5 } }
+                      }}
+                    >
+                      <ArticleCard 
+                        title={post.title} 
+                        image={post.image || '/api/placeholder/400/300'} 
+                        author={post.author} 
+                        date={new Date(post.created_at).toLocaleDateString()} 
+                      />
+                    </motion.div>
+                  ))}
+                </motion.div>
+              </AnimatePresence>
+            )}
+
+            {/* No Posts State */}
+            {!loading && !error && filteredPosts.length === 0 && (
+              <motion.div 
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.5 }}
-                className={`text-center mt-8 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}
+                className="text-center py-12"
               >
-                No articles found matching your search.
-              </motion.p>
+                <p className={`text-lg ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                  {searchTerm ? 'No articles found matching your search.' : 'No posts available yet.'}
+                </p>
+                {!searchTerm && (
+                  <p className={`text-sm mt-2 ${darkMode ? 'text-gray-500' : 'text-gray-500'}`}>
+                    Be the first to create a post!
+                  </p>
+                )}
+              </motion.div>
             )}
           </div>
           <motion.div 

@@ -1,18 +1,37 @@
 import React from 'react'
 import Article from './article'
-import SinglePost from '../pages/singlepost'
+import { usePosts } from '../context/postsContext'
 
 function Post() {
+  const { posts, loading } = usePosts()
+
+  // Show only first 5 posts for the home page
+  const displayPosts = posts.slice(0, 5)
+
   return (
     <div className='my-2 mx-2'>
-      <h1 className='text-center text-3xl my-3'>Posts</h1>
-      <div>
-        <Article title={"Top 10 Trips for 2024"} author={"Lin"} publishedAt={"Dec 2024"} />
-        <Article title={"Things you should know before 30"} author={"David"} publishedAt={"Dec 2024"} />
-        <Article title={"Tips to buy hats"} author={"Khant"} publishedAt={"Dec 2024"} />
-        <Article title={"Popular places in Africa"} author={"Lin"} publishedAt={"Dec 2024"} />
-        <Article title={"How to plan a budget trip"} author={"David"} publishedAt={"Dec 2024"} />
-      </div>
+      <h1 className='text-center text-3xl my-3'>Latest Posts</h1>
+      {loading ? (
+        <div className="text-center py-8">
+          <p className="text-gray-500">Loading posts...</p>
+        </div>
+      ) : displayPosts.length > 0 ? (
+        <div>
+          {displayPosts.map((post) => (
+            <Article 
+              key={post.id}
+              title={post.title} 
+              author={post.author} 
+              publishedAt={new Date(post.created_at).toLocaleDateString()}
+              image={post.image || '/api/placeholder/400/300'}
+            />
+          ))}
+        </div>
+      ) : (
+        <div className="text-center py-8">
+          <p className="text-gray-500">No posts available yet.</p>
+        </div>
+      )}
     </div>
   )
 }

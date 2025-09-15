@@ -1,13 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { FaFacebook, FaYoutube, FaBars, FaTimes, FaMoon, FaSun, FaSearch } from "react-icons/fa";
+import { FaFacebook, FaYoutube, FaBars, FaTimes, FaMoon, FaSun, FaSearch, FaUser, FaSignOutAlt } from "react-icons/fa";
 import { AiFillInstagram } from "react-icons/ai";
 import { useTheme } from '../context/themeContext';
+import { useAuth } from '../context/authContext';
+import AuthModal from './authModal';
 
 function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
   const { darkMode, toggleDarkMode } = useTheme();
+  const { user, logout, isAuthenticated } = useAuth();
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
@@ -71,6 +75,35 @@ function Navbar() {
             >
               {darkMode ? <FaSun className="h-5 w-5" /> : <FaMoon className="h-5 w-5" />}
             </button>
+            
+            {/* Authentication Section */}
+            {isAuthenticated ? (
+              <div className="flex items-center space-x-2">
+                <span className={`text-sm ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                  Welcome, {user?.username}
+                </span>
+                <button
+                  onClick={logout}
+                  className={`p-2 rounded-full ${darkMode ? 'text-gray-300 hover:text-white hover:bg-gray-700' : 'text-blue-500 hover:text-blue-700 hover:bg-gray-100'}`}
+                  title="Logout"
+                >
+                  <FaSignOutAlt className="h-4 w-4" />
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => setShowAuthModal(true)}
+                className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium ${
+                  darkMode 
+                    ? 'text-gray-300 hover:bg-gray-700 hover:text-white' 
+                    : 'text-blue-500 hover:bg-gray-100 hover:text-blue-700'
+                }`}
+              >
+                <FaUser className="h-4 w-4" />
+                <span>Login</span>
+              </button>
+            )}
+            
             {[FaFacebook, AiFillInstagram, FaYoutube].map((Icon, index) => (
               <a 
                 key={index} 
@@ -150,6 +183,12 @@ function Navbar() {
           </div>
         </div>
       )}
+      
+      {/* Auth Modal */}
+      <AuthModal 
+        isOpen={showAuthModal} 
+        onClose={() => setShowAuthModal(false)} 
+      />
     </nav>
   );
 }

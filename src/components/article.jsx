@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { FaUser, FaClock, FaArrowRight } from 'react-icons/fa';
 import { useTheme } from '../context/themeContext';
 
-const Article = ({ title, image, author, publishedAt }) => {
+const Article = ({ title, image = "/api/placeholder/400/300", author = "Unknown", publishedAt = "Recently" }) => {
   const { darkMode } = useTheme();
 
   return (
