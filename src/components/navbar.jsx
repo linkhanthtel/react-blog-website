@@ -79,6 +79,16 @@ function Navbar() {
             {/* Authentication Section */}
             {isAuthenticated ? (
               <div className="flex items-center space-x-2">
+                <Link
+                  to="/manage-blogs"
+                  className={`px-3 py-2 rounded-md text-sm font-medium ${
+                    darkMode 
+                      ? 'text-gray-300 hover:bg-gray-700 hover:text-white' 
+                      : 'text-blue-500 hover:bg-gray-100 hover:text-blue-700'
+                  }`}
+                >
+                  Manage Blogs
+                </Link>
                 <span className={`text-sm ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                   Welcome, {user?.username}
                 </span>
@@ -156,6 +166,20 @@ function Navbar() {
             ))}
           </div>
           <div className="px-4 py-3">
+            {isAuthenticated && (
+              <div className="mb-4">
+                <Link
+                  to="/manage-blogs"
+                  className={`block px-3 py-2 rounded-md text-base font-medium ${
+                    darkMode 
+                      ? 'text-gray-300 hover:bg-gray-700 hover:text-white' 
+                      : 'text-blue-500 hover:bg-gray-200 hover:text-gray-900'
+                  }`}
+                >
+                  Manage Blogs
+                </Link>
+              </div>
+            )}
             <div className="flex justify-between items-center">
               <div className="flex space-x-4">
                 {[FaFacebook, AiFillInstagram, FaYoutube].map((Icon, index) => (

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiSearch, FiRefreshCw } from 'react-icons/fi';
 import ArticleCard from '../components/articlecard';
@@ -131,10 +131,15 @@ const Blogs = () => {
                       }}
                     >
                       <ArticleCard 
+                        id={post.id}
                         title={post.title} 
-                        image={post.image || '/api/placeholder/400/300'} 
+                        image={post.image} 
                         author={post.author} 
-                        date={new Date(post.created_at).toLocaleDateString()} 
+                        date={new Date(post.created_at).toLocaleDateString()}
+                        description={post.description}
+                        content={post.content}
+                        likes={post.likes}
+                        comments={post.comments}
                       />
                     </motion.div>
                   ))}

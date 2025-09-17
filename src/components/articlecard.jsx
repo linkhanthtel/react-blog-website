@@ -1,10 +1,20 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { FiArrowRight, FiClock, FiUser } from 'react-icons/fi';
+import { FiArrowRight, FiClock, FiUser, FiHeart, FiMessageCircle } from 'react-icons/fi';
 import { useTheme } from '../context/themeContext';
 
-function ArticleCard({ title, image, author, date }) {
+function ArticleCard({ 
+  id, 
+  title, 
+  image, 
+  author, 
+  date, 
+  description, 
+  content, 
+  likes = 0, 
+  comments = 0 
+}) {
   const { darkMode } = useTheme();
 
   return (
@@ -20,13 +30,21 @@ function ArticleCard({ title, image, author, date }) {
       <div className="relative">
         <img 
           className="h-48 w-full object-cover" 
-          src={image} 
+          src={image || '/api/placeholder/400/300'} 
           alt={title} 
+          onError={(e) => {
+            e.target.src = '/api/placeholder/400/300';
+          }}
         />
         <div className={`absolute top-0 left-0 m-2 px-2 py-1 rounded-full ${
           darkMode ? 'bg-gray-700 text-gray-300' : 'bg-gray-200 text-gray-700'
         }`}>
           <span className="text-xs font-semibold">Travel</span>
+        </div>
+        <div className={`absolute top-0 right-0 m-2 px-2 py-1 rounded-full ${
+          darkMode ? 'bg-gray-700 text-gray-300' : 'bg-gray-200 text-gray-700'
+        }`}>
+          <span className="text-xs font-semibold">#{id}</span>
         </div>
       </div>
       <div className="p-6">
@@ -36,22 +54,38 @@ function ArticleCard({ title, image, author, date }) {
         <p className={`mb-4 ${
           darkMode ? 'text-gray-300' : 'text-gray-600'
         }`}>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+          {description || (content ? content.substring(0, 120) + '...' : 'No description available')}
         </p>
         <div className={`flex justify-between items-center mb-4 ${
           darkMode ? 'text-gray-400' : 'text-gray-500'
         }`}>
           <div className="flex items-center">
             <FiUser className="mr-2" />
-            <span className="text-sm">{author}</span>
+            <span className="text-sm">{author || 'Unknown Author'}</span>
           </div>
           <div className="flex items-center">
             <FiClock className="mr-2" />
-            <span className="text-sm">{date}</span>
+            <span className="text-sm">{date || 'No date'}</span>
+          </div>
+        </div>
+        
+        {/* Engagement Stats */}
+        <div className={`flex items-center justify-between mb-4 ${
+          darkMode ? 'text-gray-400' : 'text-gray-500'
+        }`}>
+          <div className="flex items-center space-x-4">
+            <div className="flex items-center">
+              <FiHeart className="mr-1" />
+              <span className="text-sm">{likes}</span>
+            </div>
+            <div className="flex items-center">
+              <FiMessageCircle className="mr-1" />
+              <span className="text-sm">{comments}</span>
+            </div>
           </div>
         </div>
         <Link 
-          to="/blogs/singlepost" 
+          to={`/blogs/singlepost/${id}`} 
           className={`inline-flex items-center ${
             darkMode 
               ? 'text-blue-400 hover:text-blue-300' 
