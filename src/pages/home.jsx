@@ -5,6 +5,7 @@ import { FaFire, FaHeart, FaComments, FaShare, FaChevronDown, FaPlane, FaHotel, 
 import Sidebar from '../components/sidebar';
 import Post from '../components/post';
 import { useTheme } from '../context/themeContext';
+import { usePosts } from '../context/postsContext';
 import image4 from '../images/image4.jpg';
 import image9 from '../images/image9.jpg';
 import image12 from '../images/image12.jpg';
@@ -28,6 +29,7 @@ const subheadings = [
 function Home() {
   const [scrollY, setScrollY] = useState(0);
   const { darkMode, toggleDarkMode } = useTheme();
+  const { posts } = usePosts();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [currentTextIndex, setCurrentTextIndex] = useState(0);
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -190,8 +192,16 @@ function Home() {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
           >
-            <Sidebar title="Trending" />
-            <Sidebar title="Best places to chill" />
+            <Sidebar 
+              title="Trending" 
+              posts={posts.slice(0, 3)}
+              content="Check out our most popular and trending posts that are capturing everyone's attention."
+            />
+            <Sidebar 
+              title="Best places to chill" 
+              posts={posts.slice(3, 6)}
+              content="Discover the most relaxing and peaceful destinations for your next getaway."
+            />
             <Newsletter darkMode={darkMode} />
             <TravelQuiz darkMode={darkMode} />
           </motion.div>

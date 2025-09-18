@@ -4,7 +4,7 @@ import { FaFacebook, FaYoutube, FaHashtag } from "react-icons/fa";
 import { AiFillInstagram } from "react-icons/ai";
 import { useTheme } from '../context/themeContext';
 
-function Sidebar({ title, image }) {
+function Sidebar({ title, image, content, posts = [] }) {
   const { darkMode } = useTheme();
 
   const containerVariants = {
@@ -62,8 +62,34 @@ function Sidebar({ title, image }) {
       </motion.div>
       <motion.div className='flex flex-col space-y-4' variants={itemVariants}>
         <motion.p className={`${darkMode ? 'text-gray-300' : 'text-gray-600'} text-sm`}>
-          Lorem ipsum, dolor sit amet consectetur adipisicing elit. Quos ipsa ad alias accusantium delectus eum ducimus, minus harum tempore consectetur culpa numquam eligendi nam totam tempora natus eius, adipisci debitis.
+          {content || "Discover amazing content and stay updated with our latest posts and insights."}
         </motion.p>
+        
+        {posts.length > 0 && (
+          <motion.div className='space-y-2' variants={itemVariants}>
+            <h3 className={`font-semibold ${darkMode ? 'text-gray-200' : 'text-gray-700'}`}>
+              Recent Posts
+            </h3>
+            {posts.slice(0, 3).map((post, index) => (
+              <motion.div 
+                key={post.id || index}
+                className={`${
+                  darkMode 
+                    ? 'bg-gray-700 text-gray-200 hover:bg-gray-600' 
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                } p-3 rounded-lg text-sm transition-colors duration-200 cursor-pointer`}
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <h4 className="font-medium mb-1 line-clamp-2">{post.title}</h4>
+                <p className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                  by {post.author} • {new Date(post.created_at).toLocaleDateString()}
+                </p>
+              </motion.div>
+            ))}
+          </motion.div>
+        )}
+        
         <motion.ul className='space-y-2'>
           {['Lifestyle', 'Travel', 'Education'].map((item, index) => (
             <motion.li 

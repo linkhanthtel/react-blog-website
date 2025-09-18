@@ -5,6 +5,7 @@ import { FaRegEdit, FaBookmark, FaShare, FaHeart, FaComment, FaArrowLeft, FaUser
 import { MdDelete } from "react-icons/md";
 import { useTheme } from '../context/themeContext';
 import { useAuth } from '../context/authContext';
+import { usePosts } from '../context/postsContext';
 import apiService from '../services/api';
 import Sidebar from '../components/sidebar';
 import { getImageAlt } from '../utils/imageUtils';
@@ -15,11 +16,11 @@ function SinglePost() {
   const navigate = useNavigate();
   const { darkMode } = useTheme();
   const { user, isAuthenticated } = useAuth();
+  const { posts } = usePosts();
   const [post, setPost] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showComments, setShowComments] = useState(false);
-  const [relatedPosts, setRelatedPosts] = useState([]);
   const [liked, setLiked] = useState(false);
 
   // Fetch the specific post
@@ -43,21 +44,6 @@ function SinglePost() {
     }
   }, [id]);
 
-  // Fetch related posts
-  useEffect(() => {
-    const fetchRelatedPosts = async () => {
-      try {
-        const response = await apiService.getPosts(0, 4);
-        // Filter out the current post and get up to 3 related posts
-        const related = response.posts.filter(p => p.id !== parseInt(id)).slice(0, 3);
-        setRelatedPosts(related);
-      } catch (err) {
-        console.error('Error fetching related posts:', err);
-      }
-    };
-
-    fetchRelatedPosts();
-  }, [id]);
 
   const handleLike = async () => {
     if (!post) return;
@@ -134,21 +120,27 @@ function SinglePost() {
   return (
     <div className={`pt-20 min-h-screen transition-colors duration-300 ${darkMode ? 'bg-gray-900 text-gray-100' : 'bg-gray-100 text-gray-900'}`}>
       <div className="container mx-auto px-4 py-8">
-        <div className="flex flex-col lg:flex-row justify-between">
+        <div className="flex flex-col lg:flex-row gap-8">
+          {/* Sidebar with Recommended Posts */}
           <motion.div
             initial={{ opacity: 0, x: -50 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5 }}
-            className="lg:w-1/4 mb-8 lg:mb-0"
+            className="lg:w-1/4 order-2 lg:order-1"
           >
-            <Sidebar title="Related Posts" />
+            <Sidebar 
+              title="Recommended Posts" 
+              posts={posts.filter(p => p.id !== parseInt(id)).slice(0, 4)}
+              content="Discover more amazing content and stories from our blog."
+            />
           </motion.div>
           
+          {/* Main Content */}
           <motion.div
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="lg:w-2/3"
+            className="lg:w-3/4 order-1 lg:order-2"
           >
             <div className={`p-6 rounded-lg shadow-lg ${darkMode ? 'bg-gray-800' : 'bg-white'}`}>
               {/* Back Button */}
@@ -317,46 +309,6 @@ function SinglePost() {
               </AnimatePresence>
             </div>
 
-            {/* Related Posts */}
-            {relatedPosts.length > 0 && (
-              <motion.div
-                initial={{ opacity: 0, y: 50 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.6, duration: 0.5 }}
-                className={`mt-8 p-6 rounded-lg shadow-lg ${darkMode ? 'bg-gray-800' : 'bg-white'}`}
-              >
-                <h2 className="text-2xl font-bold mb-4">Related Posts</h2>
-                <div className="space-y-4">
-                  {relatedPosts.map((relatedPost) => (
-                    <motion.div
-                      key={relatedPost.id}
-                      whileHover={{ scale: 1.03 }}
-                      className={`p-4 rounded-lg ${darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-100 hover:bg-gray-200'} transition-colors duration-300`}
-                    >
-                      <Link 
-                        to={`/blogs/singlepost/${relatedPost.id}`} 
-                        className="font-semibold hover:underline block mb-2"
-                      >
-                        {relatedPost.title}
-                      </Link>
-                      <div className="flex items-center justify-between text-sm text-gray-500">
-                        <span>By {relatedPost.author}</span>
-                        <div className="flex items-center space-x-4">
-                          <span className="flex items-center">
-                            <FaHeart className="mr-1" />
-                            {relatedPost.likes}
-                          </span>
-                          <span className="flex items-center">
-                            <FaComment className="mr-1" />
-                            {relatedPost.comments}
-                          </span>
-                        </div>
-                      </div>
-                    </motion.div>
-                  ))}
-                </div>
-              </motion.div>
-            )}
           </motion.div>
         </div>
       </div>

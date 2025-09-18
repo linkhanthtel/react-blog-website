@@ -20,10 +20,13 @@ function Post() {
           {displayPosts.map((post) => (
             <Article 
               key={post.id}
+              id={post.id}
               title={post.title} 
               author={post.author} 
               publishedAt={new Date(post.created_at).toLocaleDateString()}
               image={post.image || '/api/placeholder/400/300'}
+              content={post.content}
+              description={post.description}
             />
           ))}
         </div>

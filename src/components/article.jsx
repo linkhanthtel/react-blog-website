@@ -4,7 +4,15 @@ import { motion } from 'framer-motion';
 import { FaUser, FaClock, FaArrowRight } from 'react-icons/fa';
 import { useTheme } from '../context/themeContext';
 
-const Article = ({ title, image = "/api/placeholder/400/300", author = "Unknown", publishedAt = "Recently" }) => {
+const Article = ({ 
+  title, 
+  image = "/api/placeholder/400/300", 
+  author = "Unknown", 
+  publishedAt = "Recently",
+  content = "",
+  description = "",
+  id
+}) => {
   const { darkMode } = useTheme();
 
   return (
@@ -39,7 +47,7 @@ const Article = ({ title, image = "/api/placeholder/400/300", author = "Unknown"
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3, duration: 0.5 }}
           >
-            Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eaque a amet atque quas alias et laboriosam quae minima rerum ipsum? Natus neque ex cumque recusandae pariatur possimus iste vero veritatis! Lorem ipsum dolor, sit amet consectetur adipisicing elit. Autem, laborum architecto nostrum qui sequi dolor magni repellendus laboriosam? Culpa reprehenderit eos eum repellat. Laboriosam dolorem saepe provident eaque earum expedita.
+            {description || (content ? content.substring(0, 200) + '...' : 'No description available')}
           </motion.p>
           <motion.div 
             className={`flex justify-between items-center text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'} mb-4`}
@@ -62,7 +70,7 @@ const Article = ({ title, image = "/api/placeholder/400/300", author = "Unknown"
             transition={{ delay: 0.5, duration: 0.5 }}
           >
             <Link 
-              to="/blogs/singlepost" 
+              to={`/blogs/singlepost/${id || ''}`} 
               className={`inline-flex items-center ${
                 darkMode 
                   ? 'text-blue-400 hover:text-blue-300' 

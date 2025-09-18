@@ -172,8 +172,16 @@ const Blogs = () => {
             animate={{ x: 0, opacity: 1 }}
             transition={{ delay: 0.4, duration: 0.5 }}
           >
-            <Sidebar title="Popular Destinations" />
-            <Sidebar title="Shopping" />
+            <Sidebar 
+              title="Popular Destinations" 
+              posts={posts.slice(0, 3)}
+              content="Explore the most popular travel destinations that our community loves and recommends."
+            />
+            <Sidebar 
+              title="Shopping" 
+              posts={posts.slice(3, 6)}
+              content="Find the best shopping spots and deals from our travel experts and community members."
+            />
           </motion.div>
         </div>
       </div>
