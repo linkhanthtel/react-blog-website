@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { FaUpload, FaImage, FaTimes, FaSpinner } from 'react-icons/fa';
+import { useTheme } from '../context/themeContext';
 import apiService from '../services/api';
 
 const ImageUpload = ({ 
@@ -10,6 +11,7 @@ const ImageUpload = ({
   maxSize = 5 * 1024 * 1024, // 5MB default
   acceptedTypes = "image/*"
 }) => {
+  const { darkMode } = useTheme();
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState(null);
   const [preview, setPreview] = useState(value);
@@ -105,7 +107,7 @@ const ImageUpload = ({
           <img
             src={getImageUrl(preview)}
             alt="Preview"
-            className="w-full h-48 object-cover rounded-lg border-2 border-gray-300"
+            className={`w-full h-48 object-cover rounded-lg border-2 ${darkMode ? 'border-gray-600' : 'border-gray-300'}`}
             onError={(e) => {
               e.target.src = 'http://127.0.0.1:8000/api/placeholder/400/300';
             }}
@@ -125,21 +127,24 @@ const ImageUpload = ({
           onDrop={handleDrop}
           onDragOver={handleDragOver}
           className={`
-            border-2 border-dashed border-gray-300 rounded-lg p-8 text-center cursor-pointer
-            hover:border-blue-400 hover:bg-blue-50 transition-colors
+            border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors
+            ${darkMode 
+              ? 'border-gray-600 hover:border-blue-400 hover:bg-gray-700' 
+              : 'border-gray-300 hover:border-blue-400 hover:bg-blue-50'
+            }
             ${uploading ? 'opacity-50 cursor-not-allowed' : ''}
           `}
         >
           {uploading ? (
             <div className="flex flex-col items-center">
               <FaSpinner className="w-8 h-8 text-blue-500 animate-spin mb-2" />
-              <p className="text-gray-600">Uploading image...</p>
+              <p className={`${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>Uploading image...</p>
             </div>
           ) : (
             <div className="flex flex-col items-center">
-              <FaUpload className="w-8 h-8 text-gray-400 mb-2" />
-              <p className="text-gray-600 mb-1">{placeholder}</p>
-              <p className="text-sm text-gray-500">
+              <FaUpload className={`w-8 h-8 mb-2 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`} />
+              <p className={`mb-1 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>{placeholder}</p>
+              <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
                 PNG, JPG, GIF up to {Math.round(maxSize / 1024 / 1024)}MB
               </p>
             </div>
@@ -148,13 +153,13 @@ const ImageUpload = ({
       )}
 
       {error && (
-        <div className="mt-2 p-2 bg-red-100 border border-red-400 text-red-700 rounded text-sm">
+        <div className={`mt-2 p-2 rounded text-sm border ${darkMode ? 'bg-red-900 border-red-700 text-red-200' : 'bg-red-100 border-red-400 text-red-700'}`}>
           {error}
         </div>
       )}
 
       {preview && !uploading && (
-        <div className="mt-2 text-sm text-gray-600">
+        <div className={`mt-2 text-sm ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
           <FaImage className="inline mr-1" />
           Image uploaded successfully
         </div>
