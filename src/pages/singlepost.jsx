@@ -7,6 +7,8 @@ import { useTheme } from '../context/themeContext';
 import { useAuth } from '../context/authContext';
 import apiService from '../services/api';
 import Sidebar from '../components/sidebar';
+import { getImageAlt } from '../utils/imageUtils';
+import ImageWithFallback from '../components/ImageWithFallback';
 
 function SinglePost() {
   const { id } = useParams();
@@ -172,13 +174,11 @@ function SinglePost() {
                 transition={{ duration: 0.5 }}
                 className="mb-6"
               >
-                <img 
-                  src={post.image || '/api/placeholder/800/400'} 
-                  alt={post.title} 
+                <ImageWithFallback
+                  src={post.image}
+                  alt={getImageAlt(post.image, post.title)}
                   className="w-full h-64 md:h-96 object-cover rounded-lg"
-                  onError={(e) => {
-                    e.target.src = '/api/placeholder/800/400';
-                  }}
+                  fallbackSrc="http://127.0.0.1:8000/api/placeholder/800/400"
                 />
               </motion.div>
 
