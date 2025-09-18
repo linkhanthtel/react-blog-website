@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { FiArrowRight, FiClock, FiUser, FiHeart, FiMessageCircle } from 'react-icons/fi';
 import { useTheme } from '../context/themeContext';
+import { getImageAlt } from '../utils/imageUtils';
+import ImageWithFallback from './ImageWithFallback';
 
 function ArticleCard({ 
   id, 
@@ -28,13 +30,12 @@ function ArticleCard({
       whileHover={{ y: -5 }}
     >
       <div className="relative">
-        <img 
-          className="h-48 w-full object-cover" 
-          src={image || '/api/placeholder/400/300'} 
-          alt={title} 
-          onError={(e) => {
-            e.target.src = '/api/placeholder/400/300';
-          }}
+        <ImageWithFallback
+          src={image}
+          alt={getImageAlt(image, title)}
+          className="h-48 w-full object-cover"
+          fallbackSrc="http://127.0.0.1:8000/api/placeholder/400/300"
+          showPixabayMessage={false}
         />
         <div className={`absolute top-0 left-0 m-2 px-2 py-1 rounded-full ${
           darkMode ? 'bg-gray-700 text-gray-300' : 'bg-gray-200 text-gray-700'
