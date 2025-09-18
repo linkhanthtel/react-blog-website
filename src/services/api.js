@@ -140,6 +140,27 @@ class ApiService {
     return this.request(`/posts/user/${userId}?${params.toString()}`);
   }
 
+  // Image upload
+  async uploadImage(file) {
+    const formData = new FormData();
+    formData.append('file', file);
+    
+    const response = await fetch(`${this.baseURL}/upload-image`, {
+      method: 'POST',
+      headers: {
+        'Authorization': this.token ? `Bearer ${this.token}` : '',
+      },
+      body: formData,
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+    }
+
+    return await response.json();
+  }
+
   // Health check
   async healthCheck() {
     return this.request('/health');
