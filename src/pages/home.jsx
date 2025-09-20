@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSpring, animated } from 'react-spring';
-import { FaFire, FaHeart, FaComments, FaShare, FaChevronDown, FaPlane, FaHotel, FaUmbrellaBeach, FaSearch, FaMapMarkerAlt, FaCalendarAlt, FaStar, FaSun, FaGlobe } from 'react-icons/fa';
-import Sidebar from '../components/sidebar';
+import { FaFire, FaHeart, FaComments, FaShare, FaChevronDown, FaPlane, FaHotel, FaUmbrellaBeach, FaSearch, FaMapMarkerAlt, FaCalendarAlt, FaSun, FaGlobe, FaUser, FaComment, FaLeaf } from 'react-icons/fa';
+import { Link } from 'react-router-dom';
 import Post from '../components/post';
 import { useTheme } from '../context/themeContext';
 import { usePosts } from '../context/postsContext';
+import { getImageAlt } from '../utils/imageUtils';
+import ImageWithFallback from '../components/ImageWithFallback';
 import image4 from '../images/image4.jpg';
 import image9 from '../images/image9.jpg';
 import image12 from '../images/image12.jpg';
@@ -187,21 +189,308 @@ function Home() {
             <VirtualTourSection darkMode={darkMode} />
           </motion.div>
           <motion.div 
-            className="w-full lg:w-1/3"
+            className="w-full lg:w-1/3 space-y-6"
             initial={{ opacity: 0, x: 50 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
           >
-            <Sidebar 
-              title="Trending" 
-              posts={posts.slice(0, 3)}
-              content="Check out our most popular and trending posts that are capturing everyone's attention."
-            />
-            <Sidebar 
-              title="Best places to chill" 
-              posts={posts.slice(3, 6)}
-              content="Discover the most relaxing and peaceful destinations for your next getaway."
-            />
+            {/* Trending Sidebar */}
+            <div className={`sticky top-24 space-y-6 ${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-2xl shadow-xl p-6`}>
+              {/* Header */}
+              <div className="text-center">
+                <motion.div
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+                  className={`inline-flex items-center justify-center w-12 h-12 rounded-full mb-4 ${
+                    darkMode ? 'bg-red-600' : 'bg-red-500'
+                  }`}
+                >
+                  <FaFire className="text-white text-xl" />
+                </motion.div>
+                <h2 className={`text-2xl font-bold mb-2 ${darkMode ? 'text-gray-100' : 'text-gray-800'}`}>
+                  Trending Now
+                </h2>
+                <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                  Hot posts everyone's talking about
+                </p>
+              </div>
+
+              {/* Trending Posts */}
+              <div className="space-y-4">
+                {posts.slice(0, 3).map((post, index) => (
+                  <motion.div
+                    key={post.id}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.3 + index * 0.1, duration: 0.5 }}
+                    whileHover={{ scale: 1.02, x: 5 }}
+                    className={`group relative overflow-hidden rounded-xl ${
+                      darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-50 hover:bg-gray-100'
+                    } transition-all duration-300 cursor-pointer`}
+                  >
+                    <Link to={`/blogs/singlepost/${post.id}`} className="block">
+                      <div className="flex gap-4 p-4">
+                        {/* Post Image */}
+                        <div className="relative flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden">
+                          <ImageWithFallback
+                            src={post.image}
+                            alt={getImageAlt(post.image, post.title)}
+                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                            fallbackSrc="http://127.0.0.1:8000/api/placeholder/80/80"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                          {/* Trending Badge */}
+                          <div className="absolute top-1 left-1">
+                            <div className={`px-2 py-1 rounded-full text-xs font-bold ${
+                              darkMode ? 'bg-red-600 text-white' : 'bg-red-500 text-white'
+                            }`}>
+                              #{index + 1}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Post Content */}
+                        <div className="flex-1 min-w-0">
+                          <h3 className={`font-bold text-sm mb-2 line-clamp-2 group-hover:text-red-600 transition-colors duration-300 ${
+                            darkMode ? 'text-gray-100' : 'text-gray-800'
+                          }`}>
+                            {post.title}
+                          </h3>
+                          
+                          {post.description && (
+                            <p className={`text-xs mb-2 line-clamp-2 ${
+                              darkMode ? 'text-gray-400' : 'text-gray-600'
+                            }`}>
+                              {post.description}
+                            </p>
+                          )}
+
+                          {/* Post Meta */}
+                          <div className="flex items-center justify-between text-xs">
+                            <div className="flex items-center space-x-2">
+                              <FaUser className={`${darkMode ? 'text-gray-500' : 'text-gray-400'}`} />
+                              <span className={`${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                                {post.author}
+                              </span>
+                            </div>
+                            <div className="flex items-center space-x-3">
+                              <div className="flex items-center">
+                                <FaHeart className={`mr-1 ${darkMode ? 'text-red-400' : 'text-red-500'}`} />
+                                <span className={`${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                                  {post.likes}
+                                </span>
+                              </div>
+                              <div className="flex items-center">
+                                <FaComment className={`mr-1 ${darkMode ? 'text-blue-400' : 'text-blue-500'}`} />
+                                <span className={`${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                                  {post.comments}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Date Badge */}
+                          <div className="mt-2">
+                            <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${
+                              darkMode ? 'bg-gray-600 text-gray-300' : 'bg-gray-200 text-gray-600'
+                            }`}>
+                              {new Date(post.created_at).toLocaleDateString('en-US', { 
+                                month: 'short', 
+                                day: 'numeric' 
+                              })}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Hover Effect Line */}
+                      <div className={`absolute bottom-0 left-0 h-1 w-0 group-hover:w-full transition-all duration-300 ${
+                        darkMode ? 'bg-red-500' : 'bg-red-600'
+                      }`} />
+                    </Link>
+                  </motion.div>
+                ))}
+              </div>
+
+              {/* View All Button */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.7, duration: 0.5 }}
+                className="pt-4"
+              >
+                <Link
+                  to="/blogs"
+                  className={`block w-full text-center py-3 px-4 rounded-xl font-semibold transition-all duration-300 ${
+                    darkMode 
+                      ? 'bg-gray-700 hover:bg-gray-600 text-gray-200 hover:text-white' 
+                      : 'bg-gray-100 hover:bg-gray-200 text-gray-700 hover:text-gray-900'
+                  }`}
+                >
+                  View All Trending
+                </Link>
+              </motion.div>
+            </div>
+
+            {/* Best Places to Chill Sidebar */}
+            <div className={`sticky top-24 space-y-6 ${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-2xl shadow-xl p-6`}>
+              {/* Header */}
+              <div className="text-center">
+                <motion.div
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+                  className={`inline-flex items-center justify-center w-12 h-12 rounded-full mb-4 ${
+                    darkMode ? 'bg-green-600' : 'bg-green-500'
+                  }`}
+                >
+                  <FaLeaf className="text-white text-xl" />
+                </motion.div>
+                <h2 className={`text-2xl font-bold mb-2 ${darkMode ? 'text-gray-100' : 'text-gray-800'}`}>
+                  Best Places to Chill
+                </h2>
+                <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                  Relaxing destinations for your soul
+                </p>
+              </div>
+
+              {/* Chill Posts */}
+              <div className="space-y-4">
+                {posts.slice(3, 6).map((post, index) => (
+                  <motion.div
+                    key={post.id}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.3 + index * 0.1, duration: 0.5 }}
+                    whileHover={{ scale: 1.02, x: 5 }}
+                    className={`group relative overflow-hidden rounded-xl ${
+                      darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-50 hover:bg-gray-100'
+                    } transition-all duration-300 cursor-pointer`}
+                  >
+                    <Link to={`/blogs/singlepost/${post.id}`} className="block">
+                      <div className="flex gap-4 p-4">
+                        {/* Post Image */}
+                        <div className="relative flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden">
+                          <ImageWithFallback
+                            src={post.image}
+                            alt={getImageAlt(post.image, post.title)}
+                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                            fallbackSrc="http://127.0.0.1:8000/api/placeholder/80/80"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                        </div>
+
+                        {/* Post Content */}
+                        <div className="flex-1 min-w-0">
+                          <h3 className={`font-bold text-sm mb-2 line-clamp-2 group-hover:text-green-600 transition-colors duration-300 ${
+                            darkMode ? 'text-gray-100' : 'text-gray-800'
+                          }`}>
+                            {post.title}
+                          </h3>
+                          
+                          {post.description && (
+                            <p className={`text-xs mb-2 line-clamp-2 ${
+                              darkMode ? 'text-gray-400' : 'text-gray-600'
+                            }`}>
+                              {post.description}
+                            </p>
+                          )}
+
+                          {/* Post Meta */}
+                          <div className="flex items-center justify-between text-xs">
+                            <div className="flex items-center space-x-2">
+                              <FaUser className={`${darkMode ? 'text-gray-500' : 'text-gray-400'}`} />
+                              <span className={`${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                                {post.author}
+                              </span>
+                            </div>
+                            <div className="flex items-center space-x-3">
+                              <div className="flex items-center">
+                                <FaHeart className={`mr-1 ${darkMode ? 'text-red-400' : 'text-red-500'}`} />
+                                <span className={`${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                                  {post.likes}
+                                </span>
+                              </div>
+                              <div className="flex items-center">
+                                <FaComment className={`mr-1 ${darkMode ? 'text-blue-400' : 'text-blue-500'}`} />
+                                <span className={`${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                                  {post.comments}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Date Badge */}
+                          <div className="mt-2">
+                            <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${
+                              darkMode ? 'bg-gray-600 text-gray-300' : 'bg-gray-200 text-gray-600'
+                            }`}>
+                              {new Date(post.created_at).toLocaleDateString('en-US', { 
+                                month: 'short', 
+                                day: 'numeric' 
+                              })}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Hover Effect Line */}
+                      <div className={`absolute bottom-0 left-0 h-1 w-0 group-hover:w-full transition-all duration-300 ${
+                        darkMode ? 'bg-green-500' : 'bg-green-600'
+                      }`} />
+                    </Link>
+                  </motion.div>
+                ))}
+              </div>
+
+              {/* View All Button */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.7, duration: 0.5 }}
+                className="pt-4"
+              >
+                <Link
+                  to="/blogs"
+                  className={`block w-full text-center py-3 px-4 rounded-xl font-semibold transition-all duration-300 ${
+                    darkMode 
+                      ? 'bg-gray-700 hover:bg-gray-600 text-gray-200 hover:text-white' 
+                      : 'bg-gray-100 hover:bg-gray-200 text-gray-700 hover:text-gray-900'
+                  }`}
+                >
+                  View All Chill Spots
+                </Link>
+              </motion.div>
+
+              {/* Stats Section */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.8, duration: 0.5 }}
+                className={`pt-4 border-t ${darkMode ? 'border-gray-700' : 'border-gray-200'}`}
+              >
+                <div className="grid grid-cols-2 gap-4 text-center">
+                  <div>
+                    <div className={`text-2xl font-bold ${darkMode ? 'text-green-400' : 'text-green-600'}`}>
+                      {posts.length}
+                    </div>
+                    <div className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                      Total Posts
+                    </div>
+                  </div>
+                  <div>
+                    <div className={`text-2xl font-bold ${darkMode ? 'text-red-400' : 'text-red-600'}`}>
+                      {posts.reduce((sum, post) => sum + post.likes, 0)}
+                    </div>
+                    <div className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                      Total Likes
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            </div>
+
             <Newsletter darkMode={darkMode} />
             <TravelQuiz darkMode={darkMode} />
           </motion.div>
