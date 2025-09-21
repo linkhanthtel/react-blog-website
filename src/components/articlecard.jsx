@@ -1,10 +1,11 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { FiArrowRight, FiClock, FiUser, FiHeart, FiMessageCircle } from 'react-icons/fi';
+import { FiArrowRight, FiClock, FiUser, FiMessageCircle } from 'react-icons/fi';
 import { useTheme } from '../context/themeContext';
 import { getImageAlt } from '../utils/imageUtils';
 import ImageWithFallback from './ImageWithFallback';
+import LikeButton from './LikeButton';
 
 function ArticleCard({ 
   id, 
@@ -75,10 +76,12 @@ function ArticleCard({
           darkMode ? 'text-gray-400' : 'text-gray-500'
         }`}>
           <div className="flex items-center space-x-4">
-            <div className="flex items-center">
-              <FiHeart className="mr-1" />
-              <span className="text-sm">{likes}</span>
-            </div>
+            <LikeButton 
+              postId={id} 
+              initialLikes={likes} 
+              size="sm" 
+              showCount={true}
+            />
             <div className="flex items-center">
               <FiMessageCircle className="mr-1" />
               <span className="text-sm">{comments}</span>
