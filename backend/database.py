@@ -3,6 +3,9 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 import os
 
+# Import all models to ensure they are registered
+from models import User, Post, Comment
+
 # Database URL - using SQLite for development
 DATABASE_URL = "sqlite:///./blog.db"
 
