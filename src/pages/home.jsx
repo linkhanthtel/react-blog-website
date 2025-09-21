@@ -8,6 +8,7 @@ import { useTheme } from '../context/themeContext';
 import { usePosts } from '../context/postsContext';
 import { getImageAlt } from '../utils/imageUtils';
 import ImageWithFallback from '../components/ImageWithFallback';
+import LikeButton from '../components/LikeButton';
 import image4 from '../images/image4.jpg';
 import image9 from '../images/image9.jpg';
 import image12 from '../images/image12.jpg';
@@ -275,12 +276,12 @@ function Home() {
                               </span>
                             </div>
                             <div className="flex items-center space-x-3">
-                              <div className="flex items-center">
-                                <FaHeart className={`mr-1 ${darkMode ? 'text-red-400' : 'text-red-500'}`} />
-                                <span className={`${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                                  {post.likes}
-                                </span>
-                              </div>
+                              <LikeButton 
+                                postId={post.id} 
+                                initialLikes={post.likes} 
+                                size="sm" 
+                                showCount={true}
+                              />
                               <div className="flex items-center">
                                 <FaComment className={`mr-1 ${darkMode ? 'text-blue-400' : 'text-blue-500'}`} />
                                 <span className={`${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
@@ -406,12 +407,12 @@ function Home() {
                               </span>
                             </div>
                             <div className="flex items-center space-x-3">
-                              <div className="flex items-center">
-                                <FaHeart className={`mr-1 ${darkMode ? 'text-red-400' : 'text-red-500'}`} />
-                                <span className={`${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                                  {post.likes}
-                                </span>
-                              </div>
+                              <LikeButton 
+                                postId={post.id} 
+                                initialLikes={post.likes} 
+                                size="sm" 
+                                showCount={true}
+                              />
                               <div className="flex items-center">
                                 <FaComment className={`mr-1 ${darkMode ? 'text-blue-400' : 'text-blue-500'}`} />
                                 <span className={`${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>

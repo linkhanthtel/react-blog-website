@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { FaRegEdit, FaBookmark, FaShare, FaHeart, FaComment, FaArrowLeft, FaUser, FaClock } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
 import { useTheme } from '../context/themeContext';
@@ -9,6 +9,8 @@ import { usePosts } from '../context/postsContext';
 import apiService from '../services/api';
 import { getImageAlt } from '../utils/imageUtils';
 import ImageWithFallback from '../components/ImageWithFallback';
+import LikeButton from '../components/LikeButton';
+import CommentsSection from '../components/CommentsSection';
 
 function SinglePost() {
   const { id } = useParams();
@@ -19,8 +21,6 @@ function SinglePost() {
   const [post, setPost] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [showComments, setShowComments] = useState(false);
-  const [liked, setLiked] = useState(false);
 
   // Fetch the specific post
   useEffect(() => {
@@ -44,17 +44,6 @@ function SinglePost() {
   }, [id]);
 
 
-  const handleLike = async () => {
-    if (!post) return;
-    
-    try {
-      const updatedPost = await apiService.likePost(post.id);
-      setPost(updatedPost);
-      setLiked(true);
-    } catch (err) {
-      console.error('Error liking post:', err);
-    }
-  };
 
   const handleDelete = async () => {
     if (!post || !isAuthenticated || user?.id !== post.owner_id) return;
@@ -361,7 +350,7 @@ function SinglePost() {
                         title="Edit Post"
                       >
                         <FaRegEdit className="text-xl" />
-                      </motion.button>
+                  </motion.button>
                       <motion.button 
                         whileHover={{ scale: 1.1 }} 
                         whileTap={{ scale: 0.9 }}
@@ -370,7 +359,7 @@ function SinglePost() {
                         title="Delete Post"
                       >
                         <MdDelete className="text-xl" />
-                      </motion.button>
+                  </motion.button>
                     </>
                   )}
                   <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
@@ -408,58 +397,22 @@ function SinglePost() {
               {/* Engagement Section */}
               <div className="mt-8 flex flex-col md:flex-row justify-between items-center gap-4">
                 <div className="flex items-center space-x-6">
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={handleLike}
-                    className={`flex items-center space-x-2 px-4 py-2 rounded-full ${
-                      liked 
-                        ? 'bg-red-500 text-white' 
-                        : darkMode 
-                          ? 'bg-gray-700 hover:bg-gray-600 text-gray-300' 
-                          : 'bg-gray-200 hover:bg-gray-300 text-gray-700'
-                    } transition-colors duration-300`}
-                  >
-                    <FaHeart className={liked ? 'text-red-500' : ''} />
-                    <span>{post.likes}</span>
-                  </motion.button>
+                  <LikeButton 
+                    postId={post.id} 
+                    initialLikes={post.likes} 
+                    size="md" 
+                    showCount={true}
+                  />
                   
                   <div className="flex items-center space-x-2 text-gray-500">
                     <FaComment />
                     <span>{post.comments}</span>
-                  </div>
-                </div>
-
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => setShowComments(!showComments)}
-                  className={`px-4 py-2 rounded-full ${darkMode ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-500 hover:bg-blue-600'} text-white transition-colors duration-300`}
-                >
-                  {showComments ? 'Hide Comments' : 'Show Comments'}
-                </motion.button>
+                        </div>
+                      </div>
               </div>
 
               {/* Comments Section */}
-              <AnimatePresence>
-                {showComments && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: 'auto' }}
-                    exit={{ opacity: 0, height: 0 }}
-                    transition={{ duration: 0.3 }}
-                    className="mt-4"
-                  >
-                    <h3 className="text-xl font-semibold mb-4">Comments</h3>
-                    <div className="space-y-4">
-                      <div className={`p-4 rounded-lg ${darkMode ? 'bg-gray-700' : 'bg-gray-100'}`}>
-                        <p className="text-sm text-gray-500 mb-2">Comments feature coming soon!</p>
-                        <p className="text-sm">This is where comments will be displayed when the feature is implemented.</p>
-                      </div>
-                    </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
+              <CommentsSection postId={post.id} postAuthor={post.author} />
             </div>
 
           </motion.div>

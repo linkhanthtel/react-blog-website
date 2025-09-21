@@ -10,6 +10,7 @@ import Footer from "./components/footer";
 import { ThemeProvider } from "./context/themeContext";
 import { AuthProvider } from "./context/authContext";
 import { PostsProvider } from "./context/postsContext";
+import { CommentsProvider } from "./context/commentsContext";
 import About from "./pages/about";
 import Destination from "./pages/destination";
 import BlogManagement from "./pages/blogManagement";
@@ -21,7 +22,8 @@ function App() {
       <ThemeProvider>
         <AuthProvider>
           <PostsProvider>
-            <BrowserRouter>
+            <CommentsProvider>
+              <BrowserRouter>
               <Navbar />
               <Routes>
                 <Route path="/" element={<Home />} />
@@ -41,7 +43,8 @@ function App() {
                 />
               </Routes>
               <Footer />
-            </BrowserRouter>
+              </BrowserRouter>
+            </CommentsProvider>
           </PostsProvider>
         </AuthProvider>
       </ThemeProvider>

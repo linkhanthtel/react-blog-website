@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiSearch, FiRefreshCw } from 'react-icons/fi';
-import { FaHeart, FaUser, FaComment, FaChartLine, FaShoppingBag } from 'react-icons/fa';
+import { FaUser, FaComment, FaChartLine } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 import ArticleCard from '../components/articlecard';
 import { useTheme } from '../context/themeContext';
 import { usePosts } from '../context/postsContext';
 import { getImageAlt } from '../utils/imageUtils';
 import ImageWithFallback from '../components/ImageWithFallback';
+import LikeButton from '../components/LikeButton';
 
 const Blogs = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -248,12 +249,12 @@ const Blogs = () => {
                               </span>
                             </div>
                             <div className="flex items-center space-x-3">
-                              <div className="flex items-center">
-                                <FaHeart className={`mr-1 ${darkMode ? 'text-red-400' : 'text-red-500'}`} />
-                                <span className={`${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                                  {post.likes}
-                                </span>
-                              </div>
+                              <LikeButton 
+                                postId={post.id} 
+                                initialLikes={post.likes} 
+                                size="sm" 
+                                showCount={true}
+                              />
                               <div className="flex items-center">
                                 <FaComment className={`mr-1 ${darkMode ? 'text-blue-400' : 'text-blue-500'}`} />
                                 <span className={`${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>

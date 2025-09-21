@@ -131,6 +131,29 @@ class ApiService {
     });
   }
 
+  // Comment endpoints
+  async getComments(postId, skip = 0, limit = 10) {
+    const params = new URLSearchParams({
+      skip: skip.toString(),
+      limit: limit.toString(),
+    });
+
+    return this.request(`/posts/${postId}/comments?${params.toString()}`);
+  }
+
+  async createComment(postId, commentData) {
+    return this.request(`/posts/${postId}/comments`, {
+      method: 'POST',
+      body: JSON.stringify(commentData),
+    });
+  }
+
+  async deleteComment(postId, commentId) {
+    return this.request(`/posts/${postId}/comments/${commentId}`, {
+      method: 'DELETE',
+    });
+  }
+
   async getUserPosts(userId, skip = 0, limit = 10) {
     const params = new URLSearchParams({
       skip: skip.toString(),
