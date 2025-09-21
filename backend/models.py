@@ -36,3 +36,22 @@ class Post(Base):
     
     # Relationship with user
     owner = relationship("User", back_populates="posts")
+    
+    # Relationship with comments
+    comments_rel = relationship("Comment", back_populates="post")
+
+class Comment(Base):
+    __tablename__ = "comments"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    content = Column(Text, nullable=False)
+    author = Column(String(100), nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    
+    # Foreign keys
+    post_id = Column(Integer, ForeignKey("posts.id"), nullable=False)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    
+    # Relationships
+    post = relationship("Post", back_populates="comments_rel")
+    user = relationship("User")
