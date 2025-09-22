@@ -144,10 +144,10 @@ const BlogManagement = () => {
   }
 
   return (
-    <div className={`min-h-screen py-8 ${darkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
+    <div className={`min-h-screen py-40 ${darkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
       <div className="max-w-6xl mx-auto px-4">
         <div className="mb-8">
-          <h1 className={`text-3xl font-bold mb-2 ${darkMode ? 'text-gray-100' : 'text-gray-800'}`}>Blog Management</h1>
+          <h1 className={`text-3xl font-bold mb-2 ${darkMode ? 'text-gray-100' : 'text-gray-800'}`}>Blogs</h1>
           <p className={`${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>Manage your blog posts - create, edit, and delete</p>
         </div>
 
