@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { FaFacebook, FaYoutube, FaBars, FaTimes, FaMoon, FaSun, FaSearch, FaUser, FaSignOutAlt } from "react-icons/fa";
-import { AiFillInstagram } from "react-icons/ai";
+import { FaBars, FaTimes, FaMoon, FaSun, FaUser, FaSignOutAlt } from "react-icons/fa";
 import { useTheme } from '../context/themeContext';
 import { useAuth } from '../context/authContext';
 import AuthModal from './authModal';
@@ -33,16 +32,16 @@ function Navbar() {
   };
 
   return (
-    <nav className={`fixed w-full z-10 transition-all duration-300 ${
+    <nav className={`fixed w-full z-50 transition-all duration-300 ${
       isScrolled 
-        ? (darkMode ? 'bg-gray-900 shadow-lg' : 'bg-white shadow-lg') 
+        ? (darkMode ? 'bg-gray-900/95 backdrop-blur-sm shadow-lg' : 'bg-white/95 backdrop-blur-sm shadow-lg') 
         : (darkMode ? 'bg-transparent' : 'bg-transparent')
     }`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center">
             <Link to="/" onClick={handleLinkClick} className="flex-shrink-0">
-              <span className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-blue-300'}`}>
+              <span className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
                 WanderLuxe Ventures
               </span>
             </Link>
@@ -56,8 +55,8 @@ function Navbar() {
                   onClick={handleLinkClick}
                   className={`px-3 py-2 rounded-md text-sm font-medium transition duration-300 ${
                     darkMode 
-                      ? 'text-gray-300 hover:bg-gray-700 hover:text-white' 
-                      : 'text-blue-400 hover:bg-gray-200 hover:text-gray-900'
+                      ? 'text-gray-200 hover:bg-gray-700 hover:text-white' 
+                      : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
                   }`}
                 >
                   {item}
@@ -66,12 +65,13 @@ function Navbar() {
             </div>
           </div>
           <div className="hidden md:flex items-center space-x-4">
-            <button className={`p-1 rounded-full ${darkMode ? 'text-gray-300 hover:text-white' : 'text-blue-500 hover:text-blue-700'}`}>
-              <FaSearch className="h-5 w-5" />
-            </button>
             <button 
               onClick={toggleDarkMode} 
-              className={`p-1 rounded-full ${darkMode ? 'text-gray-300 hover:text-white' : 'text-blue-500 hover:text-blue-700'}`}
+              className={`p-2 rounded-full transition duration-300 ${
+                darkMode 
+                  ? 'text-gray-200 hover:text-white hover:bg-gray-700' 
+                  : 'text-gray-700 hover:text-gray-900 hover:bg-gray-100'
+              }`}
             >
               {darkMode ? <FaSun className="h-5 w-5" /> : <FaMoon className="h-5 w-5" />}
             </button>
@@ -81,20 +81,24 @@ function Navbar() {
               <div className="flex items-center space-x-2">
                 <Link
                   to="/manage-blogs"
-                  className={`px-3 py-2 rounded-md text-sm font-medium ${
+                  className={`px-3 py-2 rounded-md text-sm font-medium transition duration-300 ${
                     darkMode 
-                      ? 'text-gray-300 hover:bg-gray-700 hover:text-white' 
-                      : 'text-blue-500 hover:bg-gray-100 hover:text-blue-700'
+                      ? 'text-gray-200 hover:bg-gray-700 hover:text-white' 
+                      : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
                   }`}
                 >
                   Manage Blogs
                 </Link>
-                <span className={`text-sm ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                <span className={`text-sm font-medium ${darkMode ? 'text-gray-200' : 'text-gray-700'}`}>
                   Welcome, {user?.username}
                 </span>
                 <button
                   onClick={logout}
-                  className={`p-2 rounded-full ${darkMode ? 'text-gray-300 hover:text-white hover:bg-gray-700' : 'text-blue-500 hover:text-blue-700 hover:bg-gray-100'}`}
+                  className={`p-2 rounded-full transition duration-300 ${
+                    darkMode 
+                      ? 'text-gray-200 hover:text-white hover:bg-gray-700' 
+                      : 'text-gray-700 hover:text-gray-900 hover:bg-gray-100'
+                  }`}
                   title="Logout"
                 >
                   <FaSignOutAlt className="h-4 w-4" />
@@ -103,35 +107,25 @@ function Navbar() {
             ) : (
               <button
                 onClick={() => setShowAuthModal(true)}
-                className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium ${
+                className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition duration-300 ${
                   darkMode 
-                    ? 'text-gray-300 hover:bg-gray-700 hover:text-white' 
-                    : 'text-blue-500 hover:bg-gray-100 hover:text-blue-700'
+                    ? 'text-gray-200 hover:bg-gray-700 hover:text-white' 
+                    : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
                 }`}
               >
                 <FaUser className="h-4 w-4" />
                 <span>Login</span>
               </button>
             )}
-            
-            {[FaFacebook, AiFillInstagram, FaYoutube].map((Icon, index) => (
-              <a 
-                key={index} 
-                href="#" 
-                className={`${darkMode ? 'text-gray-300 hover:text-white' : 'text-blue-500 hover:text-blue-800'} transition duration-300`}
-              >
-                <Icon className="h-5 w-5" />
-              </a>
-            ))}
           </div>
           <div className="-mr-2 flex md:hidden">
             <button
               onClick={toggleMenu}
               type="button"
-              className={`inline-flex items-center justify-center p-2 rounded-md ${
+              className={`inline-flex items-center justify-center p-2 rounded-md transition duration-300 ${
                 darkMode 
-                  ? 'text-gray-400 hover:text-white hover:bg-gray-700' 
-                  : 'text-gray-900 hover:text-gray-900 hover:bg-gray-200'
+                  ? 'text-gray-200 hover:text-white hover:bg-gray-700' 
+                  : 'text-gray-700 hover:text-gray-900 hover:bg-gray-100'
               } focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white`}
               aria-controls="mobile-menu"
               aria-expanded="false"
@@ -155,10 +149,10 @@ function Navbar() {
                 key={item}
                 to={item === 'Home' ? '/' : `/${item.toLowerCase()}`}
                 onClick={handleLinkClick}
-                className={`block px-3 py-2 rounded-md text-base font-medium ${
+                className={`block px-3 py-2 rounded-md text-base font-medium transition duration-300 ${
                   darkMode 
-                    ? 'text-gray-300 hover:bg-gray-700 hover:text-white' 
-                    : 'text-blue-500 hover:bg-gray-200 hover:text-gray-900'
+                    ? 'text-gray-200 hover:bg-gray-700 hover:text-white' 
+                    : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
                 }`}
               >
                 {item}
@@ -170,10 +164,10 @@ function Navbar() {
               <div className="mb-4">
                 <Link
                   to="/manage-blogs"
-                  className={`block px-3 py-2 rounded-md text-base font-medium ${
+                  className={`block px-3 py-2 rounded-md text-base font-medium transition duration-300 ${
                     darkMode 
-                      ? 'text-gray-300 hover:bg-gray-700 hover:text-white' 
-                      : 'text-blue-500 hover:bg-gray-200 hover:text-gray-900'
+                      ? 'text-gray-200 hover:bg-gray-700 hover:text-white' 
+                      : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
                   }`}
                 >
                   Manage Blogs
@@ -181,28 +175,48 @@ function Navbar() {
               </div>
             )}
             <div className="flex justify-between items-center">
-              <div className="flex space-x-4">
-                {[FaFacebook, AiFillInstagram, FaYoutube].map((Icon, index) => (
-                  <a 
-                    key={index} 
-                    href="#" 
-                    className={`${darkMode ? 'text-gray-300 hover:text-white' : 'text-gray-900 hover:text-gray-600'} transition duration-300`}
+              <div className="flex items-center space-x-2">
+                {isAuthenticated ? (
+                  <>
+                    <span className={`text-sm font-medium ${darkMode ? 'text-gray-200' : 'text-gray-700'}`}>
+                      Welcome, {user?.username}
+                    </span>
+                    <button
+                      onClick={logout}
+                      className={`p-2 rounded-full transition duration-300 ${
+                        darkMode 
+                          ? 'text-gray-200 hover:text-white hover:bg-gray-700' 
+                          : 'text-gray-700 hover:text-gray-900 hover:bg-gray-100'
+                      }`}
+                      title="Logout"
+                    >
+                      <FaSignOutAlt className="h-4 w-4" />
+                    </button>
+                  </>
+                ) : (
+                  <button
+                    onClick={() => setShowAuthModal(true)}
+                    className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition duration-300 ${
+                      darkMode 
+                        ? 'text-gray-200 hover:bg-gray-700 hover:text-white' 
+                        : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
+                    }`}
                   >
-                    <Icon className="h-5 w-5" />
-                  </a>
-                ))}
+                    <FaUser className="h-4 w-4" />
+                    <span>Login</span>
+                  </button>
+                )}
               </div>
-              <div className="flex space-x-4">
-                <button className={`p-1 rounded-full ${darkMode ? 'text-gray-300 hover:text-white' : 'text-gray-900 hover:text-gray-600'}`}>
-                  <FaSearch className="h-5 w-5" />
-                </button>
-                <button 
-                  onClick={toggleDarkMode} 
-                  className={`p-1 rounded-full ${darkMode ? 'text-gray-300 hover:text-white' : 'text-gray-900 hover:text-gray-600'}`}
-                >
-                  {darkMode ? <FaSun className="h-5 w-5" /> : <FaMoon className="h-5 w-5" />}
-                </button>
-              </div>
+              <button 
+                onClick={toggleDarkMode} 
+                className={`p-2 rounded-full transition duration-300 ${
+                  darkMode 
+                    ? 'text-gray-200 hover:text-white hover:bg-gray-700' 
+                    : 'text-gray-700 hover:text-gray-900 hover:bg-gray-100'
+                }`}
+              >
+                {darkMode ? <FaSun className="h-5 w-5" /> : <FaMoon className="h-5 w-5" />}
+              </button>
             </div>
           </div>
         </div>
