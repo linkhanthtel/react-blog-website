@@ -11,6 +11,9 @@ from datetime import datetime
 from PIL import Image, ImageDraw, ImageFont
 import io
 
+# Import models to ensure they are registered with SQLAlchemy
+from models import User, Post, Comment
+
 # Create database tables
 Base.metadata.create_all(bind=engine)
 
