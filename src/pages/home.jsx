@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSpring, animated } from 'react-spring';
-import { FaFire, FaHeart, FaComments, FaShare, FaChevronDown, FaPlane, FaHotel, FaUmbrellaBeach, FaSearch, FaMapMarkerAlt, FaCalendarAlt, FaSun, FaGlobe, FaUser, FaComment, FaLeaf } from 'react-icons/fa';
+import { FaHeart, FaComments, FaShare, FaChevronDown, FaPlane, FaHotel, FaUmbrellaBeach, FaSearch, FaMapMarkerAlt, FaCalendarAlt, FaSun, FaUser, FaClock } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 import Post from '../components/post';
 import { useTheme } from '../context/themeContext';
@@ -10,28 +10,12 @@ import { getImageAlt } from '../utils/imageUtils';
 import ImageWithFallback from '../components/ImageWithFallback';
 import LikeButton from '../components/LikeButton';
 import image4 from '../images/image4.jpg';
-import image9 from '../images/image9.jpg';
-import image12 from '../images/image12.jpg';
 
-const images = [
-  image4,image9,image12
-];
-
-const headings = [
-  "Welcome to WanderLuxe Ventures",
-  "Explore Exotic Destinations",
-  "Experience Luxury Travel"
-];
-
-const subheadings = [
-  "Discover the world's hidden gems",
-  "Unforgettable journeys await",
-  "Indulge in extraordinary adventures"
-];
+// Dynamic content will be generated from backend data
 
 function Home() {
   const [scrollY, setScrollY] = useState(0);
-  const { darkMode, toggleDarkMode } = useTheme();
+  const { darkMode } = useTheme();
   const { posts } = usePosts();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [currentTextIndex, setCurrentTextIndex] = useState(0);
@@ -45,14 +29,23 @@ function Home() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Generate dynamic content from posts
+  const dynamicImages = posts.slice(0, 3).map(post => post.image).filter(Boolean);
+  const dynamicHeadings = posts.slice(0, 3).map(post => post.title);
+  const dynamicSubheadings = posts.slice(0, 3).map(post => post.description || "Discover amazing destinations and experiences");
+
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentImageIndex((prevIndex) => (prevIndex + 1) % images.length);
-      setCurrentTextIndex((prevIndex) => (prevIndex + 1) % headings.length);
+      if (dynamicImages.length > 0) {
+        setCurrentImageIndex((prevIndex) => (prevIndex + 1) % dynamicImages.length);
+      }
+      if (dynamicHeadings.length > 0) {
+        setCurrentTextIndex((prevIndex) => (prevIndex + 1) % dynamicHeadings.length);
+      }
       setCurrentTime(new Date());
     }, 5000);
     return () => clearInterval(interval);
-  }, []);
+  }, [dynamicImages.length, dynamicHeadings.length]);
 
   useEffect(() => {
     const fetchWeatherData = async () => {
@@ -96,7 +89,12 @@ function Home() {
             className="absolute inset-0"
           >
             <animated.div style={imageSpring} className="w-full h-full">
-              <img src={images[currentImageIndex]} alt="WanderLuxe Ventures" className="w-full h-full object-cover" />
+              <ImageWithFallback 
+                src={dynamicImages[currentImageIndex] || image4} 
+                alt="WanderLuxe Ventures" 
+                className="w-full h-full object-cover"
+                fallbackSrc="http://127.0.0.1:8000/api/placeholder/1200/600"
+              />
             </animated.div>
           </motion.div>
         </AnimatePresence>
@@ -119,7 +117,7 @@ function Home() {
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.5 }}
             >
-              {headings[currentTextIndex]}
+              {dynamicHeadings[currentTextIndex] || "Welcome to WanderLuxe Ventures"}
             </motion.h1>
           </AnimatePresence>
           <AnimatePresence mode="wait">
@@ -131,7 +129,7 @@ function Home() {
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.5, delay: 0.2 }}
             >
-              {subheadings[currentTextIndex]}
+              {dynamicSubheadings[currentTextIndex] || "Discover the world's hidden gems"}
             </motion.p>
           </AnimatePresence>
           <motion.div
@@ -184,316 +182,32 @@ function Home() {
             transition={{ duration: 0.5 }}
           >
             <WeatherWidget weatherData={weatherData} isLoading={isWeatherLoading} darkMode={darkMode} />
-            <FeaturedDestinations darkMode={darkMode} />
+            <FeaturedDestinations darkMode={darkMode} posts={posts} />
             <Post />
-            <TrendingPosts darkMode={darkMode} />
-            <VirtualTourSection darkMode={darkMode} />
+            <TrendingPosts darkMode={darkMode} posts={posts} />
           </motion.div>
           <motion.div 
-            className="w-full lg:w-1/3 space-y-6"
+            className="w-full lg:w-1/3 mt-8 lg:mt-0"
             initial={{ opacity: 0, x: 50 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
           >
-            {/* Trending Sidebar */}
-            <div className={`sticky top-24 space-y-6 ${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-2xl shadow-xl p-6`}>
-              {/* Header */}
-              <div className="text-center">
-                <motion.div
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-                  className={`inline-flex items-center justify-center w-12 h-12 rounded-full mb-4 ${
-                    darkMode ? 'bg-red-600' : 'bg-red-500'
-                  }`}
-                >
-                  <FaFire className="text-white text-xl" />
-                </motion.div>
-                <h2 className={`text-2xl font-bold mb-2 ${darkMode ? 'text-gray-100' : 'text-gray-800'}`}>
-                  Trending Now
-                </h2>
-                <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                  Hot posts everyone's talking about
-                </p>
-              </div>
 
-              {/* Trending Posts */}
-              <div className="space-y-4">
-                {posts.slice(0, 3).map((post, index) => (
-                  <motion.div
-                    key={post.id}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.3 + index * 0.1, duration: 0.5 }}
-                    whileHover={{ scale: 1.02, x: 5 }}
-                    className={`group relative overflow-hidden rounded-xl ${
-                      darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-50 hover:bg-gray-100'
-                    } transition-all duration-300 cursor-pointer`}
-                  >
-                    <Link to={`/blogs/singlepost/${post.id}`} className="block">
-                      <div className="flex gap-4 p-4">
-                        {/* Post Image */}
-                        <div className="relative flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden">
-                          <ImageWithFallback
-                            src={post.image}
-                            alt={getImageAlt(post.image, post.title)}
-                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                            fallbackSrc="http://127.0.0.1:8000/api/placeholder/80/80"
-                          />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                          {/* Trending Badge */}
-                          <div className="absolute top-1 left-1">
-                            <div className={`px-2 py-1 rounded-full text-xs font-bold ${
-                              darkMode ? 'bg-red-600 text-white' : 'bg-red-500 text-white'
-                            }`}>
-                              #{index + 1}
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Post Content */}
-                        <div className="flex-1 min-w-0">
-                          <h3 className={`font-bold text-sm mb-2 line-clamp-2 group-hover:text-red-600 transition-colors duration-300 ${
-                            darkMode ? 'text-gray-100' : 'text-gray-800'
-                          }`}>
-                            {post.title}
-                          </h3>
-                          
-                          {post.description && (
-                            <p className={`text-xs mb-2 line-clamp-2 ${
-                              darkMode ? 'text-gray-400' : 'text-gray-600'
-                            }`}>
-                              {post.description}
-                            </p>
-                          )}
-
-                          {/* Post Meta */}
-                          <div className="flex items-center justify-between text-xs">
-                            <div className="flex items-center space-x-2">
-                              <FaUser className={`${darkMode ? 'text-gray-500' : 'text-gray-400'}`} />
-                              <span className={`${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                                {post.author}
-                              </span>
-                            </div>
-                            <div className="flex items-center space-x-3">
-                              <LikeButton 
-                                postId={post.id} 
-                                initialLikes={post.likes} 
-                                size="sm" 
-                                showCount={true}
-                              />
-                              <div className="flex items-center">
-                                <FaComment className={`mr-1 ${darkMode ? 'text-blue-400' : 'text-blue-500'}`} />
-                                <span className={`${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                                  {post.comments}
-                                </span>
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* Date Badge */}
-                          <div className="mt-2">
-                            <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${
-                              darkMode ? 'bg-gray-600 text-gray-300' : 'bg-gray-200 text-gray-600'
-                            }`}>
-                              {new Date(post.created_at).toLocaleDateString('en-US', { 
-                                month: 'short', 
-                                day: 'numeric' 
-                              })}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Hover Effect Line */}
-                      <div className={`absolute bottom-0 left-0 h-1 w-0 group-hover:w-full transition-all duration-300 ${
-                        darkMode ? 'bg-red-500' : 'bg-red-600'
-                      }`} />
-                    </Link>
-                  </motion.div>
-                ))}
-              </div>
-
-              {/* View All Button */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.7, duration: 0.5 }}
-                className="pt-4"
-              >
-                <Link
-                  to="/blogs"
-                  className={`block w-full text-center py-3 px-4 rounded-xl font-semibold transition-all duration-300 ${
-                    darkMode 
-                      ? 'bg-gray-700 hover:bg-gray-600 text-gray-200 hover:text-white' 
-                      : 'bg-gray-100 hover:bg-gray-200 text-gray-700 hover:text-gray-900'
-                  }`}
-                >
-                  View All Trending
-                </Link>
-              </motion.div>
+            {/* Creative Blog Displays Container */}
+            <div className="space-y-6 relative z-10">
+              {/* Vertical Timeline Blog Display */}
+              <VerticalTimelineBlogs posts={posts} darkMode={darkMode} />
+              
+              {/* Masonry Grid Blog Display */}
+              <MasonryGridBlogs posts={posts} darkMode={darkMode} />
+              
+              {/* Category Tabs Blog Display */}
+              <CategoryTabsBlogs posts={posts} darkMode={darkMode} />
+              
+              {/* Interactive Reading Progress */}
+              <ReadingProgressBlogs posts={posts} darkMode={darkMode} />
             </div>
 
-            {/* Best Places to Chill Sidebar */}
-            <div className={`sticky top-24 space-y-6 ${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-2xl shadow-xl p-6`}>
-              {/* Header */}
-              <div className="text-center">
-                <motion.div
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-                  className={`inline-flex items-center justify-center w-12 h-12 rounded-full mb-4 ${
-                    darkMode ? 'bg-green-600' : 'bg-green-500'
-                  }`}
-                >
-                  <FaLeaf className="text-white text-xl" />
-                </motion.div>
-                <h2 className={`text-2xl font-bold mb-2 ${darkMode ? 'text-gray-100' : 'text-gray-800'}`}>
-                  Best Places to Chill
-                </h2>
-                <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                  Relaxing destinations for your soul
-                </p>
-              </div>
-
-              {/* Chill Posts */}
-              <div className="space-y-4">
-                {posts.slice(3, 6).map((post, index) => (
-                  <motion.div
-                    key={post.id}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.3 + index * 0.1, duration: 0.5 }}
-                    whileHover={{ scale: 1.02, x: 5 }}
-                    className={`group relative overflow-hidden rounded-xl ${
-                      darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-50 hover:bg-gray-100'
-                    } transition-all duration-300 cursor-pointer`}
-                  >
-                    <Link to={`/blogs/singlepost/${post.id}`} className="block">
-                      <div className="flex gap-4 p-4">
-                        {/* Post Image */}
-                        <div className="relative flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden">
-                          <ImageWithFallback
-                            src={post.image}
-                            alt={getImageAlt(post.image, post.title)}
-                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                            fallbackSrc="http://127.0.0.1:8000/api/placeholder/80/80"
-                          />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                        </div>
-
-                        {/* Post Content */}
-                        <div className="flex-1 min-w-0">
-                          <h3 className={`font-bold text-sm mb-2 line-clamp-2 group-hover:text-green-600 transition-colors duration-300 ${
-                            darkMode ? 'text-gray-100' : 'text-gray-800'
-                          }`}>
-                            {post.title}
-                          </h3>
-                          
-                          {post.description && (
-                            <p className={`text-xs mb-2 line-clamp-2 ${
-                              darkMode ? 'text-gray-400' : 'text-gray-600'
-                            }`}>
-                              {post.description}
-                            </p>
-                          )}
-
-                          {/* Post Meta */}
-                          <div className="flex items-center justify-between text-xs">
-                            <div className="flex items-center space-x-2">
-                              <FaUser className={`${darkMode ? 'text-gray-500' : 'text-gray-400'}`} />
-                              <span className={`${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                                {post.author}
-                              </span>
-                            </div>
-                            <div className="flex items-center space-x-3">
-                              <LikeButton 
-                                postId={post.id} 
-                                initialLikes={post.likes} 
-                                size="sm" 
-                                showCount={true}
-                              />
-                              <div className="flex items-center">
-                                <FaComment className={`mr-1 ${darkMode ? 'text-blue-400' : 'text-blue-500'}`} />
-                                <span className={`${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                                  {post.comments}
-                                </span>
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* Date Badge */}
-                          <div className="mt-2">
-                            <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${
-                              darkMode ? 'bg-gray-600 text-gray-300' : 'bg-gray-200 text-gray-600'
-                            }`}>
-                              {new Date(post.created_at).toLocaleDateString('en-US', { 
-                                month: 'short', 
-                                day: 'numeric' 
-                              })}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Hover Effect Line */}
-                      <div className={`absolute bottom-0 left-0 h-1 w-0 group-hover:w-full transition-all duration-300 ${
-                        darkMode ? 'bg-green-500' : 'bg-green-600'
-                      }`} />
-                    </Link>
-                  </motion.div>
-                ))}
-              </div>
-
-              {/* View All Button */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.7, duration: 0.5 }}
-                className="pt-4"
-              >
-                <Link
-                  to="/blogs"
-                  className={`block w-full text-center py-3 px-4 rounded-xl font-semibold transition-all duration-300 ${
-                    darkMode 
-                      ? 'bg-gray-700 hover:bg-gray-600 text-gray-200 hover:text-white' 
-                      : 'bg-gray-100 hover:bg-gray-200 text-gray-700 hover:text-gray-900'
-                  }`}
-                >
-                  View All Chill Spots
-                </Link>
-              </motion.div>
-
-              {/* Stats Section */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.8, duration: 0.5 }}
-                className={`pt-4 border-t ${darkMode ? 'border-gray-700' : 'border-gray-200'}`}
-              >
-                <div className="grid grid-cols-2 gap-4 text-center">
-                  <div>
-                    <div className={`text-2xl font-bold ${darkMode ? 'text-green-400' : 'text-green-600'}`}>
-                      {posts.length}
-                    </div>
-                    <div className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                      Total Posts
-                    </div>
-                  </div>
-                  <div>
-                    <div className={`text-2xl font-bold ${darkMode ? 'text-red-400' : 'text-red-600'}`}>
-                      {posts.reduce((sum, post) => sum + post.likes, 0)}
-                    </div>
-                    <div className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                      Total Likes
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
-            </div>
-
-            <Newsletter darkMode={darkMode} />
-            <TravelQuiz darkMode={darkMode} />
           </motion.div>
         </div>
       </div>
@@ -523,12 +237,14 @@ function WeatherWidget({ weatherData, isLoading, darkMode }) {
   );
 }
 
-function FeaturedDestinations({ darkMode }) {
-  const destinations = [
-    { name: "Bali", icon: FaUmbrellaBeach },
-    { name: "Paris", icon: FaPlane },
-    { name: "New York", icon: FaHotel },
-  ];
+function FeaturedDestinations({ darkMode, posts }) {
+  // Extract unique destinations from posts
+  const destinations = posts.slice(0, 3).map((post, index) => ({
+    name: post.title.split(' ').slice(0, 2).join(' '), // First two words of title
+    icon: [FaUmbrellaBeach, FaPlane, FaHotel][index % 3],
+    postId: post.id,
+    image: post.image
+  }));
 
   return (
     <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-lg shadow-md p-6 mb-8`}>
@@ -536,13 +252,15 @@ function FeaturedDestinations({ darkMode }) {
       <div className="grid grid-cols-3 gap-4">
         {destinations.map((dest, index) => (
           <motion.div
-            key={dest.name}
-            className={`${darkMode ? 'bg-gray-700' : 'bg-gray-100'} p-4 rounded-lg text-center`}
+            key={dest.postId}
+            className={`${darkMode ? 'bg-gray-700' : 'bg-gray-100'} p-4 rounded-lg text-center cursor-pointer`}
             whileHover={{ scale: 1.05 }}
             transition={{ type: "spring", stiffness: 300 }}
           >
+            <Link to={`/blogs/singlepost/${dest.postId}`}>
             <dest.icon className={`text-3xl mb-2 ${darkMode ? 'text-blue-400' : 'text-blue-600'}`} />
             <h3 className="font-semibold">{dest.name}</h3>
+            </Link>
           </motion.div>
         ))}
       </div>
@@ -550,25 +268,25 @@ function FeaturedDestinations({ darkMode }) {
   );
 }
 
-function TrendingPosts({ darkMode }) {
-  const posts = [
-    { id: 1, title: "10 Hidden Gems in Southeast Asia", likes: 1234, comments: 56 },
-    { id: 2, title: "Ultimate Guide to Budget Travel in Europe", likes: 987, comments: 43 },
-    { id: 3, title: "Top 5 Luxury Resorts for a Dreamy Getaway", likes: 2345, comments: 78 },
-  ];
+function TrendingPosts({ darkMode, posts }) {
+  // Sort posts by likes to get trending posts
+  const trendingPosts = [...posts]
+    .sort((a, b) => b.likes - a.likes)
+    .slice(0, 3);
 
   return (
     <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-lg shadow-md p-6 mt-8`}>
       <h2 className="text-2xl font-bold mb-4 flex items-center">
-        <FaFire className="text-red-500 mr-2" /> Trending Posts
+        <FaHeart className="text-red-500 mr-2" /> Trending Posts
       </h2>
-      {posts.map((post) => (
+      {trendingPosts.map((post) => (
         <motion.div 
           key={post.id}
           className={`border-b last:border-b-0 py-4 ${darkMode ? 'border-gray-700' : 'border-gray-200'}`}
           whileHover={{ scale: 1.02 }}
           transition={{ type: "spring", stiffness: 300 }}
         >
+          <Link to={`/blogs/singlepost/${post.id}`}>
           <h3 className="text-lg font-semibold mb-2">{post.title}</h3>
           <div className={`flex items-center ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
             <FaHeart className="mr-1" /> {post.likes}
@@ -581,63 +299,110 @@ function TrendingPosts({ darkMode }) {
               <FaShare />
             </motion.button>
           </div>
+          </Link>
         </motion.div>
       ))}
     </div>
   );
 }
 
-function Newsletter({ darkMode }) {
-  return (
-    <div className={`${darkMode ? 'bg-gray-800' : 'bg-blue-100'} rounded-lg shadow-md p-6 mt-8`}>
-      <h2 className="text-2xl font-bold mb-4">Subscribe to Our Newsletter</h2>
-      <p className={`mb-4 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>Get the latest travel tips and exclusive offers straight to your inbox!</p>
-      <form className="flex flex-col space-y-4">
-        <input 
-          type="email" 
-          placeholder="Your email address" 
-          className={`px-4 py-2 rounded-md border focus:outline-none focus:ring-2 focus:ring-blue-500 ${
-            darkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-gray-900'
-          }`}
-        />
-        <motion.button 
-          type="submit"
-          className={`${
-            darkMode 
-              ? 'bg-blue-600 hover:bg-blue-700 text-white' 
-              : 'bg-blue-500 hover:bg-blue-600 text-white'
-          } px-4 py-2 rounded-md transition duration-300`}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-        >
-          Subscribe
-        </motion.button>
-      </form>
-    </div>
-  );
-}
 
-function VirtualTourSection({ darkMode }) {
+
+
+
+// Creative Blog Display Components
+
+// 1. Vertical Timeline Blog Display
+function VerticalTimelineBlogs({ posts, darkMode }) {
+  const timelinePosts = posts.slice(0, 4);
+  
   return (
-    <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-lg shadow-md p-6 mt-8`}>
-      <h2 className="text-2xl font-bold mb-4 flex items-center">
-        <FaGlobe className="text-blue-500 mr-2" /> Virtual Tours
-      </h2>
-      <p className={`mb-4 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-        Experience destinations from the comfort of your home with our immersive virtual tours.
-      </p>
-      <div className="grid grid-cols-2 gap-4">
-        {['Paris', 'Tokyo', 'New York', 'Rome'].map((city) => (
+    <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-2xl shadow-xl p-6`}>
+      <div className="text-center mb-6">
+        <motion.div
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+          className={`inline-flex items-center justify-center w-12 h-12 rounded-full mb-4 ${
+            darkMode ? 'bg-purple-600' : 'bg-purple-500'
+          }`}
+        >
+          <FaCalendarAlt className="text-white text-xl" />
+        </motion.div>
+        <h2 className={`text-2xl font-bold mb-2 ${darkMode ? 'text-gray-100' : 'text-gray-800'}`}>
+          Latest Stories
+        </h2>
+        <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+          Follow our journey through time
+        </p>
+      </div>
+
+      <div className="relative">
+        {/* Timeline Line */}
+        <div className={`absolute left-6 top-0 bottom-0 w-0.5 ${darkMode ? 'bg-gray-600' : 'bg-gray-300'}`}></div>
+        
+        {timelinePosts.map((post, index) => (
           <motion.div
-            key={city}
-            className={`${darkMode ? 'bg-gray-700' : 'bg-gray-100'} p-4 rounded-lg text-center cursor-pointer`}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
+            key={post.id}
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.3 + index * 0.1, duration: 0.5 }}
+            className="relative flex items-start mb-8 last:mb-0"
           >
-            <h3 className="font-semibold mb-2">{city}</h3>
-            <button className={`${darkMode ? 'bg-blue-600' : 'bg-blue-500'} text-white px-4 py-2 rounded-full`}>
-              Start Tour
-            </button>
+            {/* Timeline Dot */}
+            <div className={`absolute left-4 w-4 h-4 rounded-full border-4 ${
+              darkMode ? 'bg-gray-800 border-purple-500' : 'bg-white border-purple-500'
+            } z-10`}></div>
+            
+            {/* Content Card */}
+            <div className={`ml-8 flex-1 group cursor-pointer ${
+              darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-50 hover:bg-gray-100'
+            } rounded-xl p-4 transition-all duration-300`}>
+              <Link to={`/blogs/singlepost/${post.id}`} className="block">
+                <div className="flex items-start gap-4">
+                  <div className="flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden">
+                    <ImageWithFallback
+                      src={post.image}
+                      alt={getImageAlt(post.image, post.title)}
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                      fallbackSrc="http://127.0.0.1:8000/api/placeholder/64/64"
+                    />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className={`font-bold text-sm mb-2 line-clamp-2 group-hover:text-purple-600 transition-colors duration-300 ${
+                      darkMode ? 'text-gray-100' : 'text-gray-800'
+                    }`}>
+                      {post.title}
+                    </h3>
+                    <p className={`text-xs mb-3 line-clamp-2 ${
+                      darkMode ? 'text-gray-400' : 'text-gray-600'
+                    }`}>
+                      {post.description || "Read more about this amazing destination..."}
+                    </p>
+                    <div className="flex items-center justify-between text-xs">
+                      <span className={`${darkMode ? 'text-gray-500' : 'text-gray-500'}`}>
+                        {new Date(post.created_at).toLocaleDateString('en-US', { 
+                          month: 'short', 
+                          day: 'numeric',
+                          year: 'numeric'
+                        })}
+                      </span>
+                      <div className="flex items-center space-x-2">
+                        <LikeButton 
+                          postId={post.id} 
+                          initialLikes={post.likes} 
+                          size="sm" 
+                          showCount={true}
+                        />
+                        <span className={`${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                          {post.comments} comments
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </Link>
+            </div>
           </motion.div>
         ))}
       </div>
@@ -645,86 +410,347 @@ function VirtualTourSection({ darkMode }) {
   );
 }
 
-function TravelQuiz({ darkMode }) {
-  const [currentQuestion, setCurrentQuestion] = useState(0);
-  const [score, setScore] = useState(0);
-  const [showResult, setShowResult] = useState(false);
-
-  const questions = [
-    {
-      question: "What is the capital of France?",
-      options: ["London", "Berlin", "Paris", "Madrid"],
-      correctAnswer: "Paris"
-    },
-    {
-      question: "Which continent is Egypt in?",
-      options: ["Africa", "Asia", "Europe", "South America"],
-      correctAnswer: "Africa"
-    },
-    {
-      question: "What is the currency of Japan?",
-      options: ["Yuan", "Won", "Yen", "Ringgit"],
-      correctAnswer: "Yen"
-    }
-  ];
-
-  const handleAnswer = (answer) => {
-    if (answer === questions[currentQuestion].correctAnswer) {
-      setScore(score + 1);
-    }
-
-    const nextQuestion = currentQuestion + 1;
-    if (nextQuestion < questions.length) {
-      setCurrentQuestion(nextQuestion);
-    } else {
-      setShowResult(true);
-    }
-  };
-
-  const resetQuiz = () => {
-    setCurrentQuestion(0);
-    setScore(0);
-    setShowResult(false);
-  };
-
+// 2. Masonry Grid Blog Display
+function MasonryGridBlogs({ posts, darkMode }) {
+  const masonryPosts = posts.slice(0, 6);
+  
   return (
-    <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-lg shadow-md p-6 mt-8`}>
-      <h2 className="text-2xl font-bold mb-4">Travel Quiz</h2>
-      {showResult ? (
-        <div>
-          <p className="text-xl mb-4">Your score: {score} out of {questions.length}</p>
-          <motion.button
-            onClick={resetQuiz}
-            className={`${darkMode ? 'bg-blue-600' : 'bg-blue-500'} text-white px-4 py-2 rounded-full`}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
+    <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-2xl shadow-xl p-6`}>
+      <div className="text-center mb-6">
+        <motion.div
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+          className={`inline-flex items-center justify-center w-12 h-12 rounded-full mb-4 ${
+            darkMode ? 'bg-blue-600' : 'bg-blue-500'
+          }`}
+        >
+          <FaSearch className="text-white text-xl" />
+        </motion.div>
+        <h2 className={`text-2xl font-bold mb-2 ${darkMode ? 'text-gray-100' : 'text-gray-800'}`}>
+          Explore Grid
+      </h2>
+        <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+          Discover posts in a beautiful grid layout
+        </p>
+      </div>
+
+      <div className="columns-1 sm:columns-2 gap-4 space-y-4">
+        {masonryPosts.map((post, index) => (
+          <motion.div
+            key={post.id}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 + index * 0.1, duration: 0.5 }}
+            whileHover={{ scale: 1.02 }}
+            className={`group cursor-pointer break-inside-avoid ${
+              darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-50 hover:bg-gray-100'
+            } rounded-xl overflow-hidden transition-all duration-300`}
           >
-            Try Again
-          </motion.button>
-        </div>
-      ) : (
-        <div>
-          <p className="mb-4">{questions[currentQuestion].question}</p>
-          <div className="space-y-2">
-            {questions[currentQuestion].options.map((option) => (
-              <motion.button
-                key={option}
-                onClick={() => handleAnswer(option)}
-                className={`w-full text-left p-2 rounded ${
-                  darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-100 hover:bg-gray-200'
-                }`}
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-              >
-                {option}
-              </motion.button>
-            ))}
-          </div>
-        </div>
-      )}
+            <Link to={`/blogs/singlepost/${post.id}`} className="block">
+              <div className="relative">
+                <ImageWithFallback
+                  src={post.image}
+                  alt={getImageAlt(post.image, post.title)}
+                  className="w-full h-32 object-cover group-hover:scale-110 transition-transform duration-300"
+                  fallbackSrc="http://127.0.0.1:8000/api/placeholder/200/128"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                <div className="absolute top-2 right-2">
+                  <span className={`px-2 py-1 rounded-full text-xs font-bold ${
+                    darkMode ? 'bg-blue-600 text-white' : 'bg-blue-500 text-white'
+                  }`}>
+                    #{index + 1}
+                  </span>
+                </div>
+              </div>
+              <div className="p-4">
+                <h3 className={`font-bold text-sm mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors duration-300 ${
+                  darkMode ? 'text-gray-100' : 'text-gray-800'
+                }`}>
+                  {post.title}
+                </h3>
+                <p className={`text-xs mb-3 line-clamp-3 ${
+                  darkMode ? 'text-gray-400' : 'text-gray-600'
+                }`}>
+                  {post.description || "Discover more about this amazing destination..."}
+                </p>
+                <div className="flex items-center justify-between text-xs">
+                  <span className={`${darkMode ? 'text-gray-500' : 'text-gray-500'}`}>
+                    {post.author}
+                  </span>
+                  <div className="flex items-center space-x-2">
+                    <FaHeart className={`${darkMode ? 'text-red-400' : 'text-red-500'}`} />
+                    <span className={`${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                      {post.likes}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </Link>
+          </motion.div>
+        ))}
+      </div>
     </div>
   );
 }
 
+// 3. Category Tabs Blog Display
+function CategoryTabsBlogs({ posts, darkMode }) {
+  const [activeTab, setActiveTab] = useState('all');
+  
+  // Create categories from post titles
+  const categories = ['all', 'travel', 'adventure', 'culture', 'food'];
+  
+  const filteredPosts = activeTab === 'all' 
+    ? posts.slice(0, 4)
+    : posts.filter(post => 
+        post.title.toLowerCase().includes(activeTab) || 
+        post.description?.toLowerCase().includes(activeTab)
+      ).slice(0, 4);
+
+  return (
+    <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-2xl shadow-xl p-6`}>
+      <div className="text-center mb-6">
+        <motion.div
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+          className={`inline-flex items-center justify-center w-12 h-12 rounded-full mb-4 ${
+            darkMode ? 'bg-green-600' : 'bg-green-500'
+          }`}
+        >
+          <FaUser className="text-white text-xl" />
+        </motion.div>
+        <h2 className={`text-2xl font-bold mb-2 ${darkMode ? 'text-gray-100' : 'text-gray-800'}`}>
+          Category Explorer
+        </h2>
+        <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+          Browse posts by category
+        </p>
+      </div>
+
+      {/* Category Tabs */}
+      <div className="flex flex-wrap gap-2 mb-6">
+        {categories.map((category) => (
+          <motion.button
+            key={category}
+            onClick={() => setActiveTab(category)}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
+              activeTab === category
+                ? darkMode 
+                  ? 'bg-green-600 text-white' 
+                  : 'bg-green-500 text-white'
+                : darkMode 
+                  ? 'bg-gray-700 text-gray-300 hover:bg-gray-600' 
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+            }`}
+          >
+            {category.charAt(0).toUpperCase() + category.slice(1)}
+          </motion.button>
+        ))}
+        </div>
+
+      {/* Posts Grid */}
+      <div className="grid grid-cols-1 gap-4">
+        {filteredPosts.map((post, index) => (
+          <motion.div
+            key={post.id}
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.3 + index * 0.1, duration: 0.5 }}
+            whileHover={{ scale: 1.02, x: 5 }}
+            className={`group cursor-pointer ${
+              darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-50 hover:bg-gray-100'
+            } rounded-xl p-4 transition-all duration-300`}
+          >
+            <Link to={`/blogs/singlepost/${post.id}`} className="block">
+              <div className="flex items-center gap-4">
+                <div className="flex-shrink-0 w-12 h-12 rounded-lg overflow-hidden">
+                  <ImageWithFallback
+                    src={post.image}
+                    alt={getImageAlt(post.image, post.title)}
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                    fallbackSrc="http://127.0.0.1:8000/api/placeholder/48/48"
+                  />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h3 className={`font-bold text-sm mb-1 line-clamp-1 group-hover:text-green-600 transition-colors duration-300 ${
+                    darkMode ? 'text-gray-100' : 'text-gray-800'
+                  }`}>
+                    {post.title}
+                  </h3>
+                  <p className={`text-xs mb-2 line-clamp-1 ${
+                    darkMode ? 'text-gray-400' : 'text-gray-600'
+                  }`}>
+                    {post.description || "Read more..."}
+                  </p>
+                  <div className="flex items-center justify-between text-xs">
+                    <span className={`${darkMode ? 'text-gray-500' : 'text-gray-500'}`}>
+                      {post.author}
+                    </span>
+                    <div className="flex items-center space-x-2">
+                      <LikeButton 
+                        postId={post.id} 
+                        initialLikes={post.likes} 
+                        size="sm" 
+                        showCount={true}
+                      />
+                      <span className={`${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                        {post.comments}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </Link>
+          </motion.div>
+            ))}
+          </div>
+        </div>
+  );
+}
+
+// 4. Interactive Reading Progress Blog Display
+function ReadingProgressBlogs({ posts, darkMode }) {
+  const [readingProgress, setReadingProgress] = useState({});
+  
+  const progressPosts = posts.slice(0, 3);
+  
+  const getReadingProgress = (postId) => {
+    return readingProgress[postId] || 0;
+  };
+
+  const simulateReadingProgress = (postId) => {
+    const interval = setInterval(() => {
+      setReadingProgress(prev => {
+        const current = prev[postId] || 0;
+        if (current >= 100) {
+          clearInterval(interval);
+          return prev;
+        }
+        return { ...prev, [postId]: current + Math.random() * 10 };
+      });
+    }, 1000);
+  };
+
+  return (
+    <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-2xl shadow-xl p-6`}>
+      <div className="text-center mb-6">
+        <motion.div
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+          className={`inline-flex items-center justify-center w-12 h-12 rounded-full mb-4 ${
+            darkMode ? 'bg-orange-600' : 'bg-orange-500'
+          }`}
+        >
+          <FaClock className="text-white text-xl" />
+        </motion.div>
+        <h2 className={`text-2xl font-bold mb-2 ${darkMode ? 'text-gray-100' : 'text-gray-800'}`}>
+          Reading Progress
+        </h2>
+        <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+          Track your reading journey
+        </p>
+      </div>
+
+      <div className="space-y-4">
+        {progressPosts.map((post, index) => {
+          const progress = getReadingProgress(post.id);
+          
+          return (
+            <motion.div
+              key={post.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 + index * 0.1, duration: 0.5 }}
+              whileHover={{ scale: 1.02 }}
+              className={`group cursor-pointer ${
+                darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-50 hover:bg-gray-100'
+              } rounded-xl p-4 transition-all duration-300`}
+            >
+              <Link to={`/blogs/singlepost/${post.id}`} className="block">
+                <div className="flex items-start gap-4">
+                  <div className="flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden">
+                    <ImageWithFallback
+                      src={post.image}
+                      alt={getImageAlt(post.image, post.title)}
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                      fallbackSrc="http://127.0.0.1:8000/api/placeholder/64/64"
+                    />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className={`font-bold text-sm mb-2 line-clamp-2 group-hover:text-orange-600 transition-colors duration-300 ${
+                      darkMode ? 'text-gray-100' : 'text-gray-800'
+                    }`}>
+                      {post.title}
+                    </h3>
+                    
+                    {/* Reading Progress Bar */}
+                    <div className="mb-3">
+                      <div className={`w-full h-2 rounded-full ${
+                        darkMode ? 'bg-gray-600' : 'bg-gray-200'
+                      }`}>
+                        <motion.div
+                          className="h-2 rounded-full bg-gradient-to-r from-orange-500 to-orange-600"
+                          initial={{ width: 0 }}
+                          animate={{ width: `${Math.min(progress, 100)}%` }}
+                          transition={{ duration: 0.5 }}
+                        />
+                      </div>
+                      <div className="flex justify-between items-center mt-1">
+                        <span className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                          {Math.round(progress)}% read
+                        </span>
+                        <motion.button
+                          onClick={(e) => {
+                            e.preventDefault();
+                            simulateReadingProgress(post.id);
+                          }}
+                          whileHover={{ scale: 1.1 }}
+                          whileTap={{ scale: 0.9 }}
+                          className={`text-xs px-2 py-1 rounded ${
+                            darkMode 
+                              ? 'bg-orange-600 hover:bg-orange-700 text-white' 
+                              : 'bg-orange-500 hover:bg-orange-600 text-white'
+                          }`}
+                        >
+                          Start Reading
+                        </motion.button>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between text-xs">
+                      <span className={`${darkMode ? 'text-gray-500' : 'text-gray-500'}`}>
+                        {post.author} • {new Date(post.created_at).toLocaleDateString('en-US', { 
+                          month: 'short', 
+                          day: 'numeric' 
+                        })}
+                      </span>
+                      <div className="flex items-center space-x-2">
+                        <LikeButton 
+                          postId={post.id} 
+                          initialLikes={post.likes} 
+                          size="sm" 
+                          showCount={true}
+                        />
+                        <span className={`${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                          {post.comments}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </Link>
+            </motion.div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
 
 export default Home;
