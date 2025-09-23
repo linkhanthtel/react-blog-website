@@ -1,0 +1,16 @@
+# Alternative requirements file for Render deployment
+# This version uses pre-compiled wheels to avoid Rust compilation issues
+
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+sqlalchemy==2.0.23
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+python-multipart==0.0.6
+pydantic==2.4.2
+python-dotenv==1.0.0
+Pillow==10.4.0
+
+# Additional dependencies that might be needed
+typing-extensions>=4.8.0
+annotated-types>=0.4.0
