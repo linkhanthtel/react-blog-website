@@ -1,6 +1,7 @@
 import React from 'react'
 import Article from './article'
 import { usePosts } from '../context/postsContext'
+import { getImageUrl } from '../utils/imageUtils'
 
 function Post() {
   const { posts, loading } = usePosts()
@@ -24,7 +25,7 @@ function Post() {
               title={post.title} 
               author={post.author} 
               publishedAt={new Date(post.created_at).toLocaleDateString()}
-              image={post.image || '/api/placeholder/400/300'}
+              image={getImageUrl(post.image, 400, 300)}
               content={post.content}
               description={post.description}
             />
