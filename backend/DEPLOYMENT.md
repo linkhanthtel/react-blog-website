@@ -12,11 +12,17 @@ Set these environment variables in your Render dashboard:
 
 ## Build Command
 
+**Recommended (minimal versions, no compilation):**
+```bash
+pip install -r requirements-minimal.txt
+```
+
+**Alternative:**
 ```bash
 pip install -r requirements.txt
 ```
 
-**Alternative (if you encounter Rust compilation issues):**
+**If you encounter Rust compilation issues:**
 ```bash
 pip install -r requirements-render.txt
 ```
@@ -29,8 +35,9 @@ uvicorn main:app --host 0.0.0.0 --port $PORT
 
 ## Notes
 
-- The app uses Python 3.11.7 (specified in runtime.txt)
-- Pillow version 10.4.0 is compatible with Python 3.11
+- The app uses Python 3.9.18 (specified in runtime.txt)
+- All packages use pre-compiled wheels (no Rust compilation needed)
+- Pydantic v1.10.12 is used for better compatibility
 - The app creates a SQLite database automatically
 - Static files are served from the `/uploads` directory
 

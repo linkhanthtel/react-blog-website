@@ -1,10 +1,9 @@
-fastapi==0.104.1
-uvicorn[standard]==0.24.0
-sqlalchemy==2.0.23
+fastapi==0.100.1
+uvicorn[standard]==0.23.2
+sqlalchemy==1.4.53
 python-jose[cryptography]==3.3.0
 passlib[bcrypt]==1.7.4
 python-multipart==0.0.6
-pydantic==2.4.2
-pydantic-core==2.10.1
+pydantic==1.10.12
 python-dotenv==1.0.0
-Pillow==10.4.0
+Pillow==10.0.1

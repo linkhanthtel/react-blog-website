@@ -16,7 +16,7 @@ class UserResponse(UserBase):
     created_at: datetime
     
     class Config:
-        from_attributes = True
+        orm_mode = True
 
 class UserLogin(BaseModel):
     username: str
@@ -49,7 +49,7 @@ class PostResponse(PostBase):
     owner_id: int
     
     class Config:
-        from_attributes = True
+        orm_mode = True
 
 class PostListResponse(BaseModel):
     posts: List[PostResponse]
@@ -79,7 +79,7 @@ class CommentResponse(CommentBase):
     created_at: datetime
     
     class Config:
-        from_attributes = True
+        orm_mode = True
 
 class CommentListResponse(BaseModel):
     comments: List[CommentResponse]
