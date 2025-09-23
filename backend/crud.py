@@ -19,15 +19,47 @@ def get_posts(db: Session, skip: int = 0, limit: int = 10, search: str = ""):
     posts = query.offset(skip).limit(limit).all()
     has_more = skip + limit < total
     
+    # Convert SQLAlchemy models to dictionaries for Pydantic v2
+    posts_dict = []
+    for post in posts:
+        posts_dict.append({
+            "id": post.id,
+            "title": post.title,
+            "content": post.content,
+            "description": post.description,
+            "author": post.author,
+            "image": post.image,
+            "created_at": post.created_at,
+            "updated_at": post.updated_at,
+            "likes": post.likes,
+            "comments": post.comments,
+            "owner_id": post.owner_id
+        })
+    
     return {
-        "posts": posts,
+        "posts": posts_dict,
         "total": total,
         "has_more": has_more
     }
 
-def get_post(db: Session, post_id: int) -> Optional[Post]:
+def get_post(db: Session, post_id: int) -> Optional[dict]:
     """Get a single post by ID"""
-    return db.query(Post).filter(Post.id == post_id).first()
+    post = db.query(Post).filter(Post.id == post_id).first()
+    if post:
+        return {
+            "id": post.id,
+            "title": post.title,
+            "content": post.content,
+            "description": post.description,
+            "author": post.author,
+            "image": post.image,
+            "created_at": post.created_at,
+            "updated_at": post.updated_at,
+            "likes": post.likes,
+            "comments": post.comments,
+            "owner_id": post.owner_id
+        }
+    return None
 
 def create_post(db: Session, post: PostCreate, owner_id: int) -> Post:
     """Create a new post"""

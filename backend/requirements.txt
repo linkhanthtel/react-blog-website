@@ -6,12 +6,4 @@ passlib[bcrypt]==1.7.4
 python-multipart==0.0.6
 pydantic==1.10.12
 python-dotenv==1.0.0
-<<<<<<< HEAD
-<<<<<<< HEAD
-Pillow==10.0.1
-=======
 Pillow==10.0.0
->>>>>>> parent of d101eb2 (Backend adjusted for render issues)
-=======
-Pillow==10.0.0
->>>>>>> parent of d101eb2 (Backend adjusted for render issues)
