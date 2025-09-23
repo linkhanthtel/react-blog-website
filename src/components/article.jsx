@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { FaUser, FaClock, FaArrowRight } from 'react-icons/fa';
 import { useTheme } from '../context/themeContext';
+import ImageWithFallback from './ImageWithFallback';
+import { getImageAlt } from '../utils/imageUtils';
 
 const Article = ({ 
   title, 
@@ -30,7 +32,12 @@ const Article = ({
           whileHover={{ scale: 1.05 }}
           transition={{ duration: 0.3 }}
         >
-          <img src={image} alt={title} className='w-full h-64 md:h-full object-cover' />
+          <ImageWithFallback
+            src={image}
+            alt={getImageAlt(image, title)}
+            className='w-full h-64 md:h-full object-cover'
+            fallbackSrc="http://127.0.0.1:8000/api/placeholder/400/300"
+          />
         </motion.div>
         <div className='md:w-3/5 p-6'>
           <motion.h1 
