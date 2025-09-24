@@ -31,7 +31,8 @@ app = FastAPI(
 # CORS middleware for React frontend
 import os
 allowed_origins = [
-    "http://localhost:3000",  # React dev server
+    "http://localhost:3000",
+    "https://react-blog-website-omega.vercel.app",  # React dev server
 ]
 
 # Add any additional origins from environment variable
