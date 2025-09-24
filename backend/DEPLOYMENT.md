@@ -30,6 +30,11 @@ pip install -r requirements-render.txt
 ## Start Command
 
 ```bash
+python3 main.py
+```
+
+**Alternative (if needed):**
+```bash
 uvicorn main:app --host 0.0.0.0 --port $PORT
 ```
 

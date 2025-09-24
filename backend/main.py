@@ -133,4 +133,11 @@ async def upload_image(file: UploadFile = File(...)):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="127.0.0.1", port=8000)
+    import os
+    
+    # Get port from environment variable (for Render) or default to 8000
+    port = int(os.environ.get("PORT", 8000))
+    # Bind to 0.0.0.0 for Render, 127.0.0.1 for local development
+    host = "0.0.0.0" if os.environ.get("RENDER") else "127.0.0.1"
+    
+    uvicorn.run(app, host=host, port=port)
