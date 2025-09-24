@@ -8,7 +8,7 @@ Set these environment variables in your Render dashboard:
 - `SECRET_KEY`: A secure random string for JWT tokens (generate with: `openssl rand -hex 32`)
 - `ALGORITHM`: `HS256`
 - `ACCESS_TOKEN_EXPIRE_MINUTES`: `30`
-- `ALLOWED_ORIGINS`: `http://localhost:3000,https://your-frontend-domain.onrender.com` (comma-separated list)
+- `ALLOWED_ORIGINS`: `http://localhost:3000,https://your-frontend-domain.onrender.com` (comma-separated list of allowed frontend domains)
 
 ## Build Command
 

@@ -52,21 +52,21 @@ npm start
 ## 📍 Access Points
 
 - **Frontend**: http://localhost:3000
-- **Backend API**: http://127.0.0.1:8000
-- **API Documentation**: http://127.0.0.1:8000/docs
+- **Backend API**: https://wanderluxe-ventures.onrender.com
+- **API Documentation**: https://wanderluxe-ventures.onrender.com/docs
 
 ## 🧪 Testing
 
 ### Test Backend API
 ```bash
 # Test health endpoint
-curl http://127.0.0.1:8000/health
+curl https://wanderluxe-ventures.onrender.com/health
 
 # Test root endpoint
-curl http://127.0.0.1:8000/
+curl https://wanderluxe-ventures.onrender.com/
 
 # Test posts endpoint
-curl http://127.0.0.1:8000/posts/
+curl https://wanderluxe-ventures.onrender.com/posts/
 ```
 
 ## 📁 Project Structure

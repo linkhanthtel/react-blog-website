@@ -24,11 +24,18 @@ A modern FastAPI backend for the WanderLuxe Ventures travel blog application.
    python main.py
    ```
 
-   The API will be available at `http://127.0.0.1:8000`
+   The API will be available at `https://wanderluxe-ventures.onrender.com` (local) or `https://wanderluxe-ventures.onrender.com` (production)
 
 3. **API Documentation**
-   - Interactive docs: `http://127.0.0.1:8000/docs`
-   - ReDoc: `http://127.0.0.1:8000/redoc`
+   - Interactive docs: `https://wanderluxe-ventures.onrender.com/docs` (local) or `https://wanderluxe-ventures.onrender.com/docs` (production)
+   - ReDoc: `https://wanderluxe-ventures.onrender.com/redoc` (local) or `https://wanderluxe-ventures.onrender.com/redoc` (production)
+
+## Production Deployment
+
+The API is deployed on Render and available at:
+- **Production URL**: `https://wanderluxe-ventures.onrender.com`
+- **Interactive docs**: `https://wanderluxe-ventures.onrender.com/docs`
+- **ReDoc**: `https://wanderluxe-ventures.onrender.com/redoc`
 
 ## API Endpoints
 
