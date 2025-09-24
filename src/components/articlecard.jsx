@@ -35,7 +35,7 @@ function ArticleCard({
           src={image}
           alt={getImageAlt(image, title)}
           className="h-48 w-full object-cover"
-          fallbackSrc="http://127.0.0.1:8000/api/placeholder/400/300"
+          fallbackSrc="https://wanderluxe-ventures.onrender.com/api/placeholder/400/300"
           showPixabayMessage={false}
         />
         <div className={`absolute top-0 left-0 m-2 px-2 py-1 rounded-full ${

@@ -2,12 +2,12 @@
 
 export const getImageUrl = (imageUrl, width = 400, height = 300) => {
   if (!imageUrl) {
-    return `http://127.0.0.1:8000/api/placeholder/${width}/${height}`;
+    return `https://wanderluxe-ventures.onrender.com/api/placeholder/${width}/${height}`;
   }
 
   // If it's a relative URL from our uploads, prepend the API base URL
   if (imageUrl.startsWith('/uploads/')) {
-    return `http://127.0.0.1:8000${imageUrl}`;
+    return `https://wanderluxe-ventures.onrender.com${imageUrl}`;
   }
 
   // If it's already a direct image URL (ends with common image extensions)
@@ -17,7 +17,7 @@ export const getImageUrl = (imageUrl, width = 400, height = 300) => {
 
   // If it's a Pixabay page URL, we can't directly use it as an image
   if (imageUrl.includes('pixabay.com')) {
-    return `http://127.0.0.1:8000/api/placeholder/${width}/${height}`;
+    return `https://wanderluxe-ventures.onrender.com/api/placeholder/${width}/${height}`;
   }
 
   // If it's an Unsplash URL, try to convert it to a usable format

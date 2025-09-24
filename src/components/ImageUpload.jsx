@@ -87,7 +87,7 @@ const ImageUpload = ({
     if (!url) return '';
     // If it's a relative URL, prepend the API base URL
     if (url.startsWith('/uploads/')) {
-      return `http://127.0.0.1:8000${url}`;
+      return `https://wanderluxe-ventures.onrender.com${url}`;
     }
     return url;
   };
@@ -109,7 +109,7 @@ const ImageUpload = ({
             alt="Preview"
             className={`w-full h-48 object-cover rounded-lg border-2 ${darkMode ? 'border-gray-600' : 'border-gray-300'}`}
             onError={(e) => {
-              e.target.src = 'http://127.0.0.1:8000/api/placeholder/400/300';
+              e.target.src = 'https://wanderluxe-ventures.onrender.com/api/placeholder/400/300';
             }}
           />
           <button

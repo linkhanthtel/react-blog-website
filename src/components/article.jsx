@@ -36,7 +36,7 @@ const Article = ({
             src={image}
             alt={getImageAlt(image, title)}
             className='w-full h-64 md:h-full object-cover'
-            fallbackSrc="http://127.0.0.1:8000/api/placeholder/400/300"
+            fallbackSrc="https://wanderluxe-ventures.onrender.com/api/placeholder/400/300"
           />
         </motion.div>
         <div className='md:w-3/5 p-6'>

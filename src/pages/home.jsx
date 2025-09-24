@@ -93,7 +93,7 @@ function Home() {
                 src={dynamicImages[currentImageIndex] || image4} 
                 alt="WanderLuxe Ventures" 
                 className="w-full h-full object-cover"
-                fallbackSrc="http://127.0.0.1:8000/api/placeholder/1200/600"
+                fallbackSrc="https://wanderluxe-ventures.onrender.com/api/placeholder/1200/600"
               />
             </animated.div>
           </motion.div>
@@ -365,7 +365,7 @@ function VerticalTimelineBlogs({ posts, darkMode }) {
                       src={post.image}
                       alt={getImageAlt(post.image, post.title)}
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                      fallbackSrc="http://127.0.0.1:8000/api/placeholder/64/64"
+                      fallbackSrc="https://wanderluxe-ventures.onrender.com/api/placeholder/64/64"
                     />
                   </div>
                   <div className="flex-1 min-w-0">
@@ -453,7 +453,7 @@ function MasonryGridBlogs({ posts, darkMode }) {
                   src={post.image}
                   alt={getImageAlt(post.image, post.title)}
                   className="w-full h-32 object-cover group-hover:scale-110 transition-transform duration-300"
-                  fallbackSrc="http://127.0.0.1:8000/api/placeholder/200/128"
+                  fallbackSrc="https://wanderluxe-ventures.onrender.com/api/placeholder/200/128"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                 <div className="absolute top-2 right-2">
@@ -573,7 +573,7 @@ function CategoryTabsBlogs({ posts, darkMode }) {
                     src={post.image}
                     alt={getImageAlt(post.image, post.title)}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                    fallbackSrc="http://127.0.0.1:8000/api/placeholder/48/48"
+                    fallbackSrc="https://wanderluxe-ventures.onrender.com/api/placeholder/48/48"
                   />
                 </div>
                 <div className="flex-1 min-w-0">
@@ -679,7 +679,7 @@ function ReadingProgressBlogs({ posts, darkMode }) {
                       src={post.image}
                       alt={getImageAlt(post.image, post.title)}
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                      fallbackSrc="http://127.0.0.1:8000/api/placeholder/64/64"
+                      fallbackSrc="https://wanderluxe-ventures.onrender.com/api/placeholder/64/64"
                     />
                   </div>
                   <div className="flex-1 min-w-0">
