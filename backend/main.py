@@ -33,6 +33,7 @@ import os
 allowed_origins = [
     "http://localhost:3000",
     "https://react-blog-website-omega.vercel.app",  # React dev server
+    "https://www.wanderluxe.live/",
 ]
 
 # Add any additional origins from environment variable
