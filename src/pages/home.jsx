@@ -9,11 +9,31 @@ import { usePosts } from '../context/postsContext';
 import { getImageAlt } from '../utils/imageUtils';
 import ImageWithFallback from '../components/ImageWithFallback';
 import LikeButton from '../components/LikeButton';
-import image4 from '../images/image4.jpg';
+import image7 from '../images/image7.jpg';
 
 // Dynamic content will be generated from backend data
 
-// Clean Button Component
+// Minimal Button Component
+function MinimalButton({ icon: Icon, text, variant }) {
+  const variants = {
+    primary: "bg-white text-slate-900 hover:bg-slate-100 shadow-lg",
+    secondary: "bg-slate-800/50 text-white border border-white/20 hover:bg-slate-700/50 backdrop-blur-sm",
+    outline: "bg-transparent text-white border border-white/40 hover:bg-white/10 backdrop-blur-sm"
+  };
+
+  return (
+    <motion.button
+      whileHover={{ scale: 1.02, y: -1 }}
+      whileTap={{ scale: 0.98 }}
+      className={`px-6 sm:px-8 py-3 rounded-full font-light text-xs sm:text-sm flex items-center justify-center transition-all duration-300 w-full sm:w-auto ${variants[variant]}`}
+    >
+      <Icon className="mr-2 text-xs sm:text-sm" />
+      <span>{text}</span>
+    </motion.button>
+  );
+}
+
+// Clean Button Component (keeping for compatibility)
 function CleanButton({ icon: Icon, text, variant }) {
   const variants = {
     primary: "bg-white text-gray-900 hover:bg-gray-100 shadow-lg",
@@ -30,6 +50,317 @@ function CleanButton({ icon: Icon, text, variant }) {
       <Icon className="mr-3 text-lg" />
       <span>{text}</span>
     </motion.button>
+  );
+}
+
+// Featured Blog Posts Component
+function FeaturedBlogPosts({ posts, darkMode }) {
+  const featuredPosts = posts.slice(0, 3);
+  
+  return (
+    <motion.section
+      initial={{ opacity: 0, y: 50 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.8 }}
+      className="mb-16"
+    >
+      <div className="text-center mb-12">
+        <h2 className={`text-4xl font-bold mb-4 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+          Featured Stories
+        </h2>
+        <p className={`text-lg ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+          Discover our most popular travel experiences
+        </p>
+      </div>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {featuredPosts.map((post, index) => (
+          <motion.article
+            key={post.id}
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: index * 0.2 }}
+            whileHover={{ y: -5 }}
+            className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-2xl shadow-lg overflow-hidden group cursor-pointer`}
+          >
+            <Link to={`/blogs/singlepost/${post.id}`}>
+              <div className="relative h-48 overflow-hidden">
+                <ImageWithFallback
+                  src={post.image}
+                  alt={post.title}
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                  fallbackSrc="https://wanderluxe-ventures.onrender.com/api/placeholder/400/300"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                <div className="absolute top-4 left-4">
+                  <span className="bg-white/90 text-gray-900 px-3 py-1 rounded-full text-sm font-medium">
+                    Featured
+                  </span>
+                </div>
+              </div>
+              <div className="p-6">
+                <h3 className={`text-xl font-bold mb-3 group-hover:text-blue-600 transition-colors duration-300 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                  {post.title}
+                </h3>
+                <p className={`text-sm mb-4 line-clamp-3 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                  {post.description || "Read more about this amazing destination..."}
+                </p>
+                <div className="flex items-center justify-between text-sm">
+                  <span className={`${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                    {new Date(post.created_at).toLocaleDateString()}
+                  </span>
+                  <div className="flex items-center space-x-4">
+                    <div className="flex items-center">
+                      <FaHeart className="text-red-500 mr-1" />
+                      <span className={darkMode ? 'text-gray-300' : 'text-gray-600'}>{post.likes}</span>
+                    </div>
+                    <div className="flex items-center">
+                      <FaComments className="text-blue-500 mr-1" />
+                      <span className={darkMode ? 'text-gray-300' : 'text-gray-600'}>{post.comments}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </Link>
+          </motion.article>
+        ))}
+      </div>
+    </motion.section>
+  );
+}
+
+// Blog Categories Component
+function BlogCategories({ darkMode }) {
+  const categories = [
+    { name: 'Adventure', icon: FaMountain, count: 12, color: 'bg-green-500' },
+    { name: 'Culture', icon: FaGlobe, count: 8, color: 'bg-blue-500' },
+    { name: 'Food', icon: FaLeaf, count: 15, color: 'bg-orange-500' },
+    { name: 'Beaches', icon: FaWater, count: 10, color: 'bg-cyan-500' },
+    { name: 'Cities', icon: FaPlane, count: 20, color: 'bg-purple-500' },
+    { name: 'Nature', icon: FaStar, count: 18, color: 'bg-pink-500' },
+  ];
+
+  return (
+    <motion.section
+      initial={{ opacity: 0, y: 50 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.8, delay: 0.2 }}
+      className="mb-16"
+    >
+      <div className="text-center mb-12">
+        <h2 className={`text-4xl font-bold mb-4 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+          Explore by Category
+        </h2>
+        <p className={`text-lg ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+          Find your perfect travel inspiration
+        </p>
+      </div>
+      
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
+        {categories.map((category, index) => (
+          <motion.div
+            key={category.name}
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5, delay: index * 0.1 }}
+            whileHover={{ scale: 1.05, y: -5 }}
+            className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-2xl p-6 text-center cursor-pointer shadow-lg hover:shadow-xl transition-all duration-300`}
+          >
+            <div className={`w-16 h-16 ${category.color} rounded-full flex items-center justify-center mx-auto mb-4`}>
+              <category.icon className="text-white text-2xl" />
+            </div>
+            <h3 className={`font-bold mb-2 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+              {category.name}
+            </h3>
+            <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+              {category.count} posts
+            </p>
+          </motion.div>
+        ))}
+      </div>
+    </motion.section>
+  );
+}
+
+// Recent Posts Grid Component
+function RecentPostsGrid({ posts, darkMode }) {
+  const recentPosts = posts.slice(0, 6);
+  
+  return (
+    <motion.section
+      initial={{ opacity: 0, y: 50 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.8, delay: 0.4 }}
+      className="mb-16"
+    >
+      <div className="text-center mb-12">
+        <h2 className={`text-4xl font-bold mb-4 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+          Latest Adventures
+        </h2>
+        <p className={`text-lg ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+          Stay updated with our newest travel stories
+        </p>
+      </div>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {recentPosts.map((post, index) => (
+          <motion.article
+            key={post.id}
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: index * 0.1 }}
+            whileHover={{ y: -3 }}
+            className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-xl shadow-md overflow-hidden group cursor-pointer`}
+          >
+            <Link to={`/blogs/singlepost/${post.id}`}>
+              <div className="relative h-40 overflow-hidden">
+                <ImageWithFallback
+                  src={post.image}
+                  alt={post.title}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  fallbackSrc="https://wanderluxe-ventures.onrender.com/api/placeholder/400/300"
+                />
+              </div>
+              <div className="p-4">
+                <h3 className={`font-bold mb-2 group-hover:text-blue-600 transition-colors duration-300 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                  {post.title}
+                </h3>
+                <p className={`text-sm mb-3 line-clamp-2 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                  {post.description || "Read more..."}
+                </p>
+                <div className="flex items-center justify-between text-xs">
+                  <span className={darkMode ? 'text-gray-400' : 'text-gray-500'}>
+                    {new Date(post.created_at).toLocaleDateString()}
+                  </span>
+                  <div className="flex items-center space-x-2">
+                    <FaHeart className="text-red-500" />
+                    <span className={darkMode ? 'text-gray-300' : 'text-gray-600'}>{post.likes}</span>
+                  </div>
+                </div>
+              </div>
+            </Link>
+          </motion.article>
+        ))}
+      </div>
+    </motion.section>
+  );
+}
+
+// Blog Statistics Component
+function BlogStatistics({ posts, darkMode }) {
+  const totalPosts = posts.length;
+  const totalLikes = posts.reduce((sum, post) => sum + post.likes, 0);
+  const totalComments = posts.reduce((sum, post) => sum + post.comments, 0);
+  const avgReadTime = Math.round(posts.reduce((sum, post) => sum + (post.title?.length || 0), 0) / posts.length / 200) || 5;
+
+  const stats = [
+    { label: 'Total Posts', value: totalPosts, icon: FaPlane },
+    { label: 'Total Likes', value: totalLikes, icon: FaHeart },
+    { label: 'Comments', value: totalComments, icon: FaComments },
+    { label: 'Avg Read Time', value: `${avgReadTime} min`, icon: FaClock },
+  ];
+
+  return (
+    <motion.section
+      initial={{ opacity: 0, y: 50 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.8, delay: 0.6 }}
+      className="mb-16"
+    >
+      <div className={`${darkMode ? 'bg-gray-800' : 'bg-gray-50'} rounded-2xl p-8`}>
+        <div className="text-center mb-8">
+          <h2 className={`text-3xl font-bold mb-2 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+            Our Impact
+          </h2>
+          <p className={`${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+            Numbers that tell our story
+          </p>
+        </div>
+        
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+          {stats.map((stat, index) => (
+            <motion.div
+              key={stat.label}
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5, delay: index * 0.1 }}
+              className="text-center"
+            >
+              <div className={`w-16 h-16 bg-blue-500 rounded-full flex items-center justify-center mx-auto mb-4`}>
+                <stat.icon className="text-white text-2xl" />
+              </div>
+              <div className={`text-3xl font-bold mb-2 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                {stat.value}
+              </div>
+              <div className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                {stat.label}
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </motion.section>
+  );
+}
+
+// Newsletter Signup Component
+function NewsletterSignup({ darkMode }) {
+  const [email, setEmail] = useState('');
+  const [isSubscribed, setIsSubscribed] = useState(false);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    // Simulate subscription
+    setIsSubscribed(true);
+    setTimeout(() => setIsSubscribed(false), 3000);
+  };
+
+  return (
+    <motion.section
+      initial={{ opacity: 0, y: 50 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.8, delay: 0.8 }}
+      className="mb-16"
+    >
+      <div className={`${darkMode ? 'bg-gradient-to-r from-gray-800 to-gray-700' : 'bg-gradient-to-r from-blue-600 to-purple-600'} rounded-2xl p-8 text-center text-white`}>
+        <h2 className="text-3xl font-bold mb-4">Stay Updated</h2>
+        <p className="text-lg mb-8 opacity-90">
+          Get the latest travel stories and tips delivered to your inbox
+        </p>
+        
+        {isSubscribed ? (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="text-center"
+          >
+            <div className="text-2xl mb-2">✅</div>
+            <p className="text-lg">Thank you for subscribing!</p>
+          </motion.div>
+        ) : (
+          <form onSubmit={handleSubmit} className="max-w-md mx-auto">
+            <div className="flex flex-col sm:flex-row gap-4">
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Enter your email"
+                className="flex-1 px-4 py-3 rounded-full text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white/50"
+                required
+              />
+              <motion.button
+                type="submit"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="px-8 py-3 bg-white text-blue-600 rounded-full font-semibold hover:bg-gray-100 transition-colors duration-300"
+              >
+                Subscribe
+              </motion.button>
+            </div>
+          </form>
+        )}
+      </div>
+    </motion.section>
   );
 }
 
@@ -68,13 +399,9 @@ function Home() {
   const [scrollY, setScrollY] = useState(0);
   const { darkMode } = useTheme();
   const { posts } = usePosts();
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [currentTextIndex, setCurrentTextIndex] = useState(0);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [weatherData, setWeatherData] = useState(null);
   const [isWeatherLoading, setIsWeatherLoading] = useState(true);
-  const [isTyping, setIsTyping] = useState(false);
-  const [typedText, setTypedText] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const heroRef = useRef(null);
 
@@ -93,44 +420,9 @@ function Home() {
     };
   }, []);
 
-  // Generate dynamic content from posts
-  const dynamicImages = posts.slice(0, 3).map(post => post.image).filter(Boolean);
-  const dynamicHeadings = posts.slice(0, 3).map(post => post.title);
-  const dynamicSubheadings = posts.slice(0, 3).map(post => post.description || "Discover amazing destinations and experiences");
-
-
-  // Typewriter effect
-  useEffect(() => {
-    const currentHeading = dynamicHeadings[currentTextIndex] || "Welcome to WanderLuxe Ventures";
-    let index = 0;
-    setIsTyping(true);
-    setTypedText('');
-
-    const typeInterval = setInterval(() => {
-      if (index < currentHeading.length) {
-        setTypedText(currentHeading.slice(0, index + 1));
-        index++;
-      } else {
-        setIsTyping(false);
-        clearInterval(typeInterval);
-      }
-    }, 100);
-
-    return () => clearInterval(typeInterval);
-  }, [currentTextIndex, dynamicHeadings]);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      if (dynamicImages.length > 0) {
-        setCurrentImageIndex((prevIndex) => (prevIndex + 1) % dynamicImages.length);
-      }
-      if (dynamicHeadings.length > 0) {
-        setCurrentTextIndex((prevIndex) => (prevIndex + 1) % dynamicHeadings.length);
-      }
-      setCurrentTime(new Date());
-    }, 8000);
-    return () => clearInterval(interval);
-  }, [dynamicImages.length, dynamicHeadings.length]);
+  // Static content for hero section
+  const heroTitle = "Discover the World";
+  const heroSubtitle = "Explore breathtaking destinations and create unforgettable memories with our curated travel experiences";
 
   useEffect(() => {
     const fetchWeatherData = async () => {
@@ -153,12 +445,6 @@ function Home() {
 
     fetchWeatherData();
   }, []);
-
-  const imageSpring = useSpring({
-    opacity: 1,
-    transform: `scale(${1 + scrollY * 0.001})`,
-    config: { duration: 0 }
-  });
 
   // Parallax transforms
   const y = useMotionValue(0);
@@ -213,123 +499,105 @@ function Home() {
         )}
       </AnimatePresence>
 
-      {/* Clean Travel Hero Section */}
-      <div ref={heroRef} className="relative h-screen overflow-hidden">
-        {/* Background Image with Clean Overlay */}
-        <AnimatePresence>
-          <motion.div
-            key={currentImageIndex}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 1.5, ease: "easeInOut" }}
-            className="absolute inset-0"
-          >
-            <ImageWithFallback 
-              src={dynamicImages[currentImageIndex] || image4} 
-              alt="Travel Destination" 
-              className="w-full h-full object-cover"
-              fallbackSrc="https://wanderluxe-ventures.onrender.com/api/placeholder/1200/600"
-            />
-          </motion.div>
-        </AnimatePresence>
-
-        {/* Clean Gradient Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/40 to-black/60"></div>
-        
-        {/* Subtle Pattern Overlay */}
-        <div className="absolute inset-0 opacity-5">
-          <div className="w-full h-full" style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Ccircle cx='30' cy='30' r='1'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-          }}></div>
+      {/* Hero Section with Background Image */}
+      <div ref={heroRef} className="relative min-h-screen flex items-center justify-center pt-16 md:pt-20">
+        {/* Background Image */}
+        <div className="absolute inset-0">
+          <ImageWithFallback 
+            src={image7} 
+            alt="Travel Destination" 
+            className="w-full h-full object-cover object-center"
+            fallbackSrc="https://wanderluxe-ventures.onrender.com/api/placeholder/1200/600"
+          />
         </div>
 
+        {/* Dark Overlay */}
+        <div className="absolute inset-0 bg-black/40"></div>
+
         {/* Main Content */}
-        <div className="absolute inset-0 flex flex-col items-center justify-center px-4 z-10">
-          {/* Clean Welcome Message */}
+        <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          {/* Welcome */}
           <motion.div
-            initial={{ opacity: 0, y: -20 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
-            className="text-center mb-8"
+            className="mb-6 sm:mb-8"
           >
             <motion.p 
-              className="text-white/80 text-lg font-light tracking-wide mb-4"
+              className="text-white/80 text-xs sm:text-sm font-medium tracking-widest uppercase mb-2 sm:mb-4"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.3 }}
             >
-              Welcome to WanderLuxe
+              WanderLuxe
             </motion.p>
           </motion.div>
 
           {/* Main Heading */}
-          <div className="text-center mb-8 px-4">
-            <motion.h1 
-              className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-light text-white mb-6 leading-tight"
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 1, delay: 0.2 }}
-            >
-              <span className="block font-serif italic">
-                {typedText}
-                {isTyping && <motion.span
-                  animate={{ opacity: [0, 1, 0] }}
-                  transition={{ duration: 0.8, repeat: Infinity }}
-                  className="text-white/60"
-                >|</motion.span>}
-              </span>
-            </motion.h1>
-          </div>
+          <motion.h1 
+            className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-thin text-white mb-6 sm:mb-8 leading-tight"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, delay: 0.2 }}
+          >
+            {heroTitle}
+          </motion.h1>
 
           {/* Subheading */}
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={currentTextIndex}
-              className="text-center mb-12 max-w-3xl mx-auto"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.6, delay: 0.4 }}
-            >
-              <p className="text-white/90 text-xl sm:text-2xl font-light leading-relaxed">
-                {dynamicSubheadings[currentTextIndex] || "Discover the world's most beautiful destinations and create unforgettable memories"}
-              </p>
-            </motion.div>
-          </AnimatePresence>
+          <motion.div
+            className="mb-12 sm:mb-16 max-w-3xl mx-auto"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+          >
+            <p className="text-white/90 text-base sm:text-lg md:text-xl font-light leading-relaxed px-4">
+              {heroSubtitle}
+            </p>
+          </motion.div>
 
-          {/* Clean Action Buttons */}
+          {/* Minimal Action Buttons */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.6 }}
-            className="flex flex-col sm:flex-row gap-4 mb-16"
+            className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center mb-16 sm:mb-20 px-4"
           >
-            <CleanButton
+            <MinimalButton
               icon={FaSearch}
-              text="Explore Destinations"
+              text="Explore"
               variant="primary"
             />
-            <CleanButton
+            <MinimalButton
               icon={FaMapMarkerAlt}
-              text="Plan Your Trip"
+              text="Plan Trip"
               variant="secondary"
             />
-            <CleanButton
+            <MinimalButton
               icon={FaCalendarAlt}
               text="Book Now"
               variant="outline"
             />
           </motion.div>
 
-          {/* Clean Weather Widget */}
+          {/* Minimal Stats */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.8 }}
-            className="mb-12"
+            className="grid grid-cols-3 gap-4 sm:gap-8 max-w-sm sm:max-w-md mx-auto mb-12 sm:mb-16 px-4"
           >
-            <CleanWeatherWidget weatherData={weatherData} isLoading={isWeatherLoading} />
+            <div className="text-center">
+              <div className="text-xl sm:text-2xl font-light text-white mb-1">50+</div>
+              <div className="text-xs sm:text-sm text-white/70">Destinations</div>
+            </div>
+            <div className="text-center">
+              <div className="text-xl sm:text-2xl font-light text-white mb-1">1000+</div>
+              <div className="text-xs sm:text-sm text-white/70">Travelers</div>
+            </div>
+            <div className="text-center">
+              <div className="text-xl sm:text-2xl font-light text-white mb-1">24/7</div>
+              <div className="text-xs sm:text-sm text-white/70">Support</div>
+            </div>
           </motion.div>
 
           {/* Scroll Indicator */}
@@ -345,10 +613,30 @@ function Home() {
               animate={{ y: [0, 8, 0] }}
               transition={{ duration: 2, repeat: Infinity }}
             >
-              <FaChevronDown className="text-2xl" />
+              <FaChevronDown className="text-xl" />
             </motion.a>
-            <span className="text-white/40 text-sm mt-2 font-light">Scroll to explore</span>
+            <span className="text-white/60 text-xs mt-3 font-light tracking-wide">Scroll to explore</span>
           </motion.div>
+        </div>
+      </div>
+
+      {/* Blog Content Section */}
+      <div className="relative bg-white dark:bg-gray-900">
+        <div className="container mx-auto px-4 py-16 relative z-10">
+          {/* Featured Blog Posts Section */}
+          <FeaturedBlogPosts posts={posts} darkMode={darkMode} />
+          
+          {/* Blog Categories Section */}
+          <BlogCategories darkMode={darkMode} />
+          
+          {/* Recent Posts Grid */}
+          <RecentPostsGrid posts={posts} darkMode={darkMode} />
+          
+          {/* Blog Statistics */}
+          <BlogStatistics posts={posts} darkMode={darkMode} />
+          
+          {/* Newsletter Signup */}
+          <NewsletterSignup darkMode={darkMode} />
         </div>
       </div>
 
