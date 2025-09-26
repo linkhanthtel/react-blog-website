@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { FaBars, FaTimes, FaMoon, FaSun, FaUser, FaSignOutAlt } from "react-icons/fa";
+import { motion, AnimatePresence } from 'framer-motion';
 import { useTheme } from '../context/themeContext';
 import { useAuth } from '../context/authContext';
 import AuthModal from './authModal';
@@ -16,6 +17,10 @@ function Navbar() {
     setIsOpen(!isOpen);
   };
 
+  const closeMenu = () => {
+    setIsOpen(false);
+  };
+
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 10);
@@ -28,6 +33,7 @@ function Navbar() {
   const handleLinkClick = (e) => {
     e.preventDefault();
     const href = e.currentTarget.getAttribute('href');
+    closeMenu(); // Close mobile menu when link is clicked
     window.location.href = href;
   };
 
@@ -37,12 +43,13 @@ function Navbar() {
         ? (darkMode ? 'bg-gray-900/95 backdrop-blur-sm shadow-lg' : 'bg-white/95 backdrop-blur-sm shadow-lg') 
         : (darkMode ? 'bg-transparent' : 'bg-transparent')
     }`}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8">
+        <div className="flex items-center justify-between h-14 sm:h-16">
           <div className="flex items-center">
             <Link to="/" onClick={handleLinkClick} className="flex-shrink-0">
-              <span className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-                WanderLuxe Ventures
+              <span className={`text-lg sm:text-xl lg:text-2xl font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                <span className="hidden sm:inline">WanderLuxe Ventures</span>
+                <span className="sm:hidden">WanderLuxe</span>
               </span>
             </Link>
           </div>
@@ -118,8 +125,21 @@ function Navbar() {
               </button>
             )}
           </div>
-          <div className="-mr-2 flex md:hidden">
-            <button
+          <div className="flex items-center space-x-2 md:hidden">
+            {/* Theme toggle for mobile */}
+            <button 
+              onClick={toggleDarkMode} 
+              className={`p-2 rounded-full transition duration-300 ${
+                darkMode 
+                  ? 'text-gray-200 hover:text-white hover:bg-gray-700' 
+                  : 'text-gray-700 hover:text-gray-900 hover:bg-gray-100'
+              }`}
+            >
+              {darkMode ? <FaSun className="h-4 w-4" /> : <FaMoon className="h-4 w-4" />}
+            </button>
+            
+            {/* Mobile menu button */}
+            <motion.button
               onClick={toggleMenu}
               type="button"
               className={`inline-flex items-center justify-center p-2 rounded-md transition duration-300 ${
@@ -129,98 +149,139 @@ function Navbar() {
               } focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white`}
               aria-controls="mobile-menu"
               aria-expanded="false"
+              whileTap={{ scale: 0.95 }}
             >
               <span className="sr-only">Open main menu</span>
-              {isOpen ? (
-                <FaTimes className="block h-6 w-6" />
-              ) : (
-                <FaBars className="block h-6 w-6" />
-              )}
-            </button>
+              <motion.div
+                animate={{ rotate: isOpen ? 90 : 0 }}
+                transition={{ duration: 0.2 }}
+              >
+                {isOpen ? (
+                  <FaTimes className="block h-5 w-5" />
+                ) : (
+                  <FaBars className="block h-5 w-5" />
+                )}
+              </motion.div>
+            </motion.button>
           </div>
         </div>
       </div>
 
-      {isOpen && (
-        <div className="md:hidden" id="mobile-menu">
-          <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-            {['Home', 'Blogs', 'Destinations', 'About', 'Contact'].map((item) => (
-              <Link
-                key={item}
-                to={item === 'Home' ? '/' : `/${item.toLowerCase()}`}
-                onClick={handleLinkClick}
-                className={`block px-3 py-2 rounded-md text-base font-medium transition duration-300 ${
-                  darkMode 
-                    ? 'text-gray-200 hover:bg-gray-700 hover:text-white' 
-                    : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
-                }`}
-              >
-                {item}
-              </Link>
-            ))}
-          </div>
-          <div className="px-4 py-3">
-            {isAuthenticated && (
-              <div className="mb-4">
-                <Link
-                  to="/manage-blogs"
-                  className={`block px-3 py-2 rounded-md text-base font-medium transition duration-300 ${
-                    darkMode 
-                      ? 'text-gray-200 hover:bg-gray-700 hover:text-white' 
-                      : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
-                  }`}
-                >
-                  Manage Blogs
-                </Link>
-              </div>
-            )}
-            <div className="flex justify-between items-center">
-              <div className="flex items-center space-x-2">
-                {isAuthenticated ? (
-                  <>
-                    <span className={`text-sm font-medium ${darkMode ? 'text-gray-200' : 'text-gray-700'}`}>
-                      Welcome, {user?.username}
-                    </span>
-                    <button
-                      onClick={logout}
-                      className={`p-2 rounded-full transition duration-300 ${
+      <AnimatePresence>
+        {isOpen && (
+          <>
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
+              className="fixed inset-0 bg-black/50 z-40 md:hidden"
+              onClick={closeMenu}
+            />
+            
+            {/* Mobile Menu */}
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.3, ease: 'easeInOut' }}
+              className="md:hidden overflow-hidden relative z-50"
+              id="mobile-menu"
+            >
+            <div className={`${darkMode ? 'bg-gray-900' : 'bg-white'} border-t ${darkMode ? 'border-gray-700' : 'border-gray-200'}`}>
+              {/* Navigation Links */}
+              <div className="px-4 py-4 space-y-2">
+                {['Home', 'Blogs', 'Destinations', 'About', 'Contact'].map((item, index) => (
+                  <motion.div
+                    key={item}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.3, delay: index * 0.1 }}
+                  >
+                    <Link
+                      to={item === 'Home' ? '/' : `/${item.toLowerCase()}`}
+                      onClick={handleLinkClick}
+                      className={`block px-4 py-3 rounded-lg text-base font-medium transition duration-300 ${
                         darkMode 
-                          ? 'text-gray-200 hover:text-white hover:bg-gray-700' 
-                          : 'text-gray-700 hover:text-gray-900 hover:bg-gray-100'
+                          ? 'text-gray-200 hover:bg-gray-700 hover:text-white' 
+                          : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
                       }`}
-                      title="Logout"
+                    >
+                      {item}
+                    </Link>
+                  </motion.div>
+                ))}
+              </div>
+
+              {/* User Section */}
+              <div className={`px-4 py-4 border-t ${darkMode ? 'border-gray-700' : 'border-gray-200'}`}>
+                {isAuthenticated ? (
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3, delay: 0.5 }}
+                    className="space-y-3"
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className={`text-sm font-medium ${darkMode ? 'text-gray-200' : 'text-gray-700'}`}>
+                        Welcome, {user?.username}
+                      </span>
+                    </div>
+                    <Link
+                      to="/manage-blogs"
+                      onClick={closeMenu}
+                      className={`block px-4 py-3 rounded-lg text-base font-medium transition duration-300 ${
+                        darkMode 
+                          ? 'text-gray-200 hover:bg-gray-700 hover:text-white' 
+                          : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
+                      }`}
+                    >
+                      Manage Blogs
+                    </Link>
+                    <button
+                      onClick={() => {
+                        logout();
+                        closeMenu();
+                      }}
+                      className={`w-full flex items-center justify-center space-x-2 px-4 py-3 rounded-lg text-base font-medium transition duration-300 ${
+                        darkMode 
+                          ? 'text-gray-200 hover:bg-gray-700 hover:text-white' 
+                          : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
+                      }`}
                     >
                       <FaSignOutAlt className="h-4 w-4" />
+                      <span>Logout</span>
                     </button>
-                  </>
+                  </motion.div>
                 ) : (
-                  <button
-                    onClick={() => setShowAuthModal(true)}
-                    className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition duration-300 ${
-                      darkMode 
-                        ? 'text-gray-200 hover:bg-gray-700 hover:text-white' 
-                        : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
-                    }`}
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3, delay: 0.5 }}
                   >
-                    <FaUser className="h-4 w-4" />
-                    <span>Login</span>
-                  </button>
+                    <button
+                      onClick={() => {
+                        setShowAuthModal(true);
+                        closeMenu();
+                      }}
+                      className={`w-full flex items-center justify-center space-x-2 px-4 py-3 rounded-lg text-base font-medium transition duration-300 ${
+                        darkMode 
+                          ? 'text-gray-200 hover:bg-gray-700 hover:text-white' 
+                          : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
+                      }`}
+                    >
+                      <FaUser className="h-4 w-4" />
+                      <span>Login</span>
+                    </button>
+                  </motion.div>
                 )}
               </div>
-              <button 
-                onClick={toggleDarkMode} 
-                className={`p-2 rounded-full transition duration-300 ${
-                  darkMode 
-                    ? 'text-gray-200 hover:text-white hover:bg-gray-700' 
-                    : 'text-gray-700 hover:text-gray-900 hover:bg-gray-100'
-                }`}
-              >
-                {darkMode ? <FaSun className="h-5 w-5" /> : <FaMoon className="h-5 w-5" />}
-              </button>
             </div>
-          </div>
-        </div>
-      )}
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
       
       {/* Auth Modal */}
       <AuthModal 
