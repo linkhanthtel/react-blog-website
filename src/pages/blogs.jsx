@@ -70,7 +70,7 @@ const Blogs = () => {
           Blogs
         </motion.h1>
         <div className="flex flex-col lg:flex-row gap-8">
-          <div className="lg:w-3/4">
+          <div className="lg:w-2/3">
             <motion.div 
               className="mb-6"
               initial={{ y: -10, opacity: 0 }}
@@ -192,75 +192,79 @@ const Blogs = () => {
             )}
           </div>
           <motion.div 
-            className="lg:w-1/4 space-y-6"
+            className="lg:w-1/3 space-y-8"
             initial={{ x: 20, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             transition={{ delay: 0.4, duration: 0.5 }}
           >
             {/* Popular Destinations Sidebar */}
-            <div className={`sticky top-24 space-y-6 ${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-2xl shadow-xl p-6`}>
+            <div className={`sticky top-24 ${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-3xl shadow-2xl border ${darkMode ? 'border-gray-700' : 'border-gray-200'} overflow-hidden`}>
               {/* Header */}
-              <div className="text-center">
-                <motion.div
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-                  className={`inline-flex items-center justify-center w-12 h-12 rounded-full mb-4 ${
-                    darkMode ? 'bg-green-600' : 'bg-green-500'
-                  }`}
-                >
-                  <FaChartLine className="text-white text-xl" />
-                </motion.div>
-                <h2 className={`text-2xl font-bold mb-2 ${darkMode ? 'text-gray-100' : 'text-gray-800'}`}>
-                  Popular Destinations
-                </h2>
-                <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                  Most loved travel destinations
-                </p>
+              <div className={`px-8 py-6 border-b ${darkMode ? 'border-gray-700' : 'border-gray-200'}`}>
+                <div className="flex items-center gap-3">
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
+                    darkMode ? 'bg-gradient-to-br from-green-500 to-green-600' : 'bg-gradient-to-br from-green-400 to-green-500'
+                  }`}>
+                    <FaChartLine className="text-white text-lg" />
+                  </div>
+                  <div>
+                    <h2 className={`text-xl font-bold ${darkMode ? 'text-gray-100' : 'text-gray-800'}`}>
+                      Popular Destinations
+                    </h2>
+                    <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                      Most loved travel destinations
+                    </p>
+                  </div>
+                </div>
               </div>
 
               {/* AI Trending Posts */}
               {aiTrendingPosts.length > 0 && (
-                <div className="mb-6">
-                  <div className="flex items-center gap-2 mb-4">
-                    <FaChartLine className={`text-lg ${darkMode ? 'text-purple-400' : 'text-purple-600'}`} />
-                    <h3 className={`text-lg font-bold ${darkMode ? 'text-gray-100' : 'text-gray-800'}`}>
+                <div className="px-8 py-6 border-b border-gray-200 dark:border-gray-700">
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
+                      darkMode ? 'bg-gradient-to-br from-purple-500 to-purple-600' : 'bg-gradient-to-br from-purple-400 to-purple-500'
+                    }`}>
+                      <FaChartLine className="text-white text-sm" />
+                    </div>
+                    <h3 className={`text-lg font-semibold ${darkMode ? 'text-gray-100' : 'text-gray-800'}`}>
                       AI Trending
                     </h3>
                   </div>
-                  <div className="space-y-3">
+                  <div className="space-y-4">
                     {aiTrendingPosts.slice(0, 3).map((post, index) => (
                       <motion.div
                         key={post.id}
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: 0.3 + index * 0.1, duration: 0.5 }}
-                        whileHover={{ scale: 1.02, x: 5 }}
-                        className={`group relative overflow-hidden rounded-xl ${
-                          darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-50 hover:bg-gray-100'
-                        } transition-all duration-300 cursor-pointer`}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.1 + index * 0.1, duration: 0.3 }}
+                        className="group cursor-pointer"
                       >
                         <Link to={`/blogs/singlepost/${post.id}`} className="block">
-                          <div className="flex gap-3 p-3">
-                            <div className="relative flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden">
+                          <div className="flex gap-4 p-4 rounded-2xl hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all duration-200">
+                            <div className="relative flex-shrink-0 w-20 h-20 rounded-xl overflow-hidden">
                               <ImageWithFallback
                                 src={post.image}
                                 alt={getImageAlt(post.image, post.title)}
-                                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                                fallbackSrc="https://wanderluxe-ventures.onrender.com/api/placeholder/64/64"
+                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                fallbackSrc="https://wanderluxe-ventures.onrender.com/api/placeholder/80/80"
                               />
                             </div>
                             <div className="flex-1 min-w-0">
-                              <h4 className={`font-bold text-sm mb-1 line-clamp-2 group-hover:text-purple-600 transition-colors duration-300 ${
+                              <h4 className={`font-semibold text-sm mb-2 line-clamp-2 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors duration-200 ${
                                 darkMode ? 'text-gray-100' : 'text-gray-800'
                               }`}>
                                 {post.title}
                               </h4>
-                              <div className="flex items-center justify-between text-xs">
-                                <span className={`${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                                  AI Score: {post.ai_score || 0}
-                                </span>
-                                <span className={`${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                  <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                    darkMode ? 'bg-purple-900/30 text-purple-300' : 'bg-purple-100 text-purple-700'
+                                  }`}>
+                                    AI: {post.ai_score || 0}
+                                  </span>
+                                </div>
+                                <span className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
                                   {post.likes} likes
                                 </span>
                               </div>
@@ -274,112 +278,99 @@ const Blogs = () => {
               )}
 
               {/* Popular Posts */}
-              <div className="space-y-4">
-                {posts.slice(0, 3).map((post, index) => (
-                  <motion.div
-                    key={post.id}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.3 + index * 0.1, duration: 0.5 }}
-                    whileHover={{ scale: 1.02, x: 5 }}
-                    className={`group relative overflow-hidden rounded-xl ${
-                      darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-50 hover:bg-gray-100'
-                    } transition-all duration-300 cursor-pointer`}
-                  >
-                    <Link to={`/blogs/singlepost/${post.id}`} className="block">
-                      <div className="flex gap-4 p-4">
-                        {/* Post Image */}
-                        <div className="relative flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden">
-                          <ImageWithFallback
-                            src={post.image}
-                            alt={getImageAlt(post.image, post.title)}
-                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                            fallbackSrc="https://wanderluxe-ventures.onrender.com/api/placeholder/80/80"
-                          />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                        </div>
+              <div className="px-8 py-6">
+                <div className="space-y-6">
+                  {posts.slice(0, 4).map((post, index) => (
+                    <motion.div
+                      key={post.id}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.1 + index * 0.1, duration: 0.3 }}
+                      className="group cursor-pointer"
+                    >
+                      <Link to={`/blogs/singlepost/${post.id}`} className="block">
+                        <div className="flex gap-4 p-4 rounded-2xl hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all duration-200">
+                          {/* Post Image */}
+                          <div className="relative flex-shrink-0 w-24 h-24 rounded-xl overflow-hidden">
+                            <ImageWithFallback
+                              src={post.image}
+                              alt={getImageAlt(post.image, post.title)}
+                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                              fallbackSrc="https://wanderluxe-ventures.onrender.com/api/placeholder/96/96"
+                            />
+                          </div>
 
-                        {/* Post Content */}
-                        <div className="flex-1 min-w-0">
-                          <h3 className={`font-bold text-sm mb-2 line-clamp-2 group-hover:text-green-600 transition-colors duration-300 ${
-                            darkMode ? 'text-gray-100' : 'text-gray-800'
-                          }`}>
-                            {post.title}
-                          </h3>
-                          
-                          {post.description && (
-                            <p className={`text-xs mb-2 line-clamp-2 ${
-                              darkMode ? 'text-gray-400' : 'text-gray-600'
+                          {/* Post Content */}
+                          <div className="flex-1 min-w-0">
+                            <h3 className={`font-semibold text-sm mb-2 line-clamp-2 group-hover:text-green-600 dark:group-hover:text-green-400 transition-colors duration-200 ${
+                              darkMode ? 'text-gray-100' : 'text-gray-800'
                             }`}>
-                              {post.description}
-                            </p>
-                          )}
+                              {post.title}
+                            </h3>
+                            
+                            {post.description && (
+                              <p className={`text-xs mb-3 line-clamp-2 ${
+                                darkMode ? 'text-gray-400' : 'text-gray-600'
+                              }`}>
+                                {post.description}
+                              </p>
+                            )}
 
-                          {/* Post Meta */}
-                          <div className="flex items-center justify-between text-xs">
-                            <div className="flex items-center space-x-2">
-                              <FaUser className={`${darkMode ? 'text-gray-500' : 'text-gray-400'}`} />
-                              <span className={`${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                                {post.author}
-                              </span>
-                            </div>
-                            <div className="flex items-center space-x-3">
-                              <LikeButton 
-                                postId={post.id} 
-                                initialLikes={post.likes} 
-                                size="sm" 
-                                showCount={true}
-                              />
-                              <div className="flex items-center">
-                                <FaComment className={`mr-1 ${darkMode ? 'text-blue-400' : 'text-blue-500'}`} />
-                                <span className={`${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                                  {post.comments}
+                            {/* Post Meta */}
+                            <div className="space-y-2">
+                              <div className="flex items-center justify-between text-xs">
+                                <div className="flex items-center gap-2">
+                                  <FaUser className={`${darkMode ? 'text-gray-500' : 'text-gray-400'}`} />
+                                  <span className={`${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                                    {post.author}
+                                  </span>
+                                </div>
+                                <span className={`${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>
+                                  {new Date(post.created_at).toLocaleDateString('en-US', { 
+                                    month: 'short', 
+                                    day: 'numeric' 
+                                  })}
                                 </span>
+                              </div>
+                              
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-3">
+                                  <LikeButton 
+                                    postId={post.id} 
+                                    initialLikes={post.likes} 
+                                    size="sm" 
+                                    showCount={true}
+                                  />
+                                  <div className="flex items-center gap-1">
+                                    <FaComment className={`text-xs ${darkMode ? 'text-blue-400' : 'text-blue-500'}`} />
+                                    <span className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                                      {post.comments}
+                                    </span>
+                                  </div>
+                                </div>
                               </div>
                             </div>
                           </div>
-
-                          {/* Date Badge */}
-                          <div className="mt-2">
-                            <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${
-                              darkMode ? 'bg-gray-600 text-gray-300' : 'bg-gray-200 text-gray-600'
-                            }`}>
-                              {new Date(post.created_at).toLocaleDateString('en-US', { 
-                                month: 'short', 
-                                day: 'numeric' 
-                              })}
-                            </span>
-                          </div>
                         </div>
-                      </div>
-
-                      {/* Hover Effect Line */}
-                      <div className={`absolute bottom-0 left-0 h-1 w-0 group-hover:w-full transition-all duration-300 ${
-                        darkMode ? 'bg-green-500' : 'bg-green-600'
-                      }`} />
-                    </Link>
-                  </motion.div>
-                ))}
+                      </Link>
+                    </motion.div>
+                  ))}
+                </div>
               </div>
 
-              {/* View All Button */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.7, duration: 0.5 }}
-                className="pt-4"
-              >
+              {/* Footer */}
+              <div className="px-8 py-6 border-t border-gray-200 dark:border-gray-700">
                 <Link
                   to="/blogs"
-                  className={`block w-full text-center py-3 px-4 rounded-xl font-semibold transition-all duration-300 ${
+                  className={`block w-full text-center py-3 px-4 rounded-xl font-medium transition-all duration-200 ${
                     darkMode 
-                      ? 'bg-gray-700 hover:bg-gray-600 text-gray-200 hover:text-white' 
-                      : 'bg-gray-100 hover:bg-gray-200 text-gray-700 hover:text-gray-900'
+                      ? 'bg-gray-700/50 hover:bg-gray-700 text-gray-300 hover:text-white border border-gray-600' 
+                      : 'bg-gray-50 hover:bg-gray-100 text-gray-700 hover:text-gray-900 border border-gray-200'
                   }`}
                 >
                   View All Destinations
                 </Link>
-              </motion.div>
+              </div>
             </div>
 
           </motion.div>
