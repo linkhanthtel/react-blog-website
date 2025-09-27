@@ -64,11 +64,11 @@ function FeaturedBlogPosts({ posts, darkMode }) {
       transition={{ duration: 0.8 }}
       className="mb-16"
     >
-      <div className="text-center mb-12">
-        <h2 className={`text-4xl font-bold mb-4 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+      <div className="text-center mb-16">
+        <h2 className={`text-4xl md:text-5xl font-bold mb-6 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
           Featured Stories
         </h2>
-        <p className={`text-lg ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+        <p className={`text-lg md:text-xl max-w-2xl mx-auto ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
           Discover our most popular travel experiences
         </p>
       </div>
@@ -81,7 +81,7 @@ function FeaturedBlogPosts({ posts, darkMode }) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: index * 0.2 }}
             whileHover={{ y: -5 }}
-            className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-2xl shadow-lg overflow-hidden group cursor-pointer`}
+            className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-2xl shadow-lg overflow-hidden group cursor-pointer border ${darkMode ? 'border-gray-700' : 'border-sky-200'}`}
           >
             <Link to={`/blogs/singlepost/${post.id}`}>
               <div className="relative h-48 overflow-hidden">
@@ -99,24 +99,24 @@ function FeaturedBlogPosts({ posts, darkMode }) {
                 </div>
               </div>
               <div className="p-6">
-                <h3 className={`text-xl font-bold mb-3 group-hover:text-blue-600 transition-colors duration-300 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                <h3 className={`text-xl font-semibold mb-4 group-hover:text-sky-600 transition-colors duration-300 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
                   {post.title}
                 </h3>
-                <p className={`text-sm mb-4 line-clamp-3 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                <p className={`text-sm mb-6 line-clamp-3 leading-relaxed ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
                   {post.description || "Read more about this amazing destination..."}
                 </p>
                 <div className="flex items-center justify-between text-sm">
-                  <span className={`${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                  <span className={`font-medium ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
                     {new Date(post.created_at).toLocaleDateString()}
                   </span>
                   <div className="flex items-center space-x-4">
                     <div className="flex items-center">
                       <FaHeart className="text-red-500 mr-1" />
-                      <span className={darkMode ? 'text-gray-300' : 'text-gray-600'}>{post.likes}</span>
+                      <span className={`font-medium ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>{post.likes}</span>
                     </div>
                     <div className="flex items-center">
                       <FaComments className="text-blue-500 mr-1" />
-                      <span className={darkMode ? 'text-gray-300' : 'text-gray-600'}>{post.comments}</span>
+                      <span className={`font-medium ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>{post.comments}</span>
                     </div>
                   </div>
                 </div>
@@ -147,11 +147,11 @@ function BlogCategories({ darkMode }) {
       transition={{ duration: 0.8, delay: 0.2 }}
       className="mb-16"
     >
-      <div className="text-center mb-12">
-        <h2 className={`text-4xl font-bold mb-4 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+      <div className="text-center mb-16">
+        <h2 className={`text-4xl md:text-5xl font-bold mb-6 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
           Explore by Category
         </h2>
-        <p className={`text-lg ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+        <p className={`text-lg md:text-xl max-w-2xl mx-auto ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
           Find your perfect travel inspiration
         </p>
       </div>
@@ -164,15 +164,15 @@ function BlogCategories({ darkMode }) {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5, delay: index * 0.1 }}
             whileHover={{ scale: 1.05, y: -5 }}
-            className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-2xl p-6 text-center cursor-pointer shadow-lg hover:shadow-xl transition-all duration-300`}
+            className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-2xl p-6 text-center cursor-pointer shadow-lg hover:shadow-xl transition-all duration-300 border ${darkMode ? 'border-gray-700' : 'border-sky-200'}`}
           >
             <div className={`w-16 h-16 ${category.color} rounded-full flex items-center justify-center mx-auto mb-4`}>
               <category.icon className="text-white text-2xl" />
             </div>
-            <h3 className={`font-bold mb-2 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+            <h3 className={`font-semibold mb-3 text-base ${darkMode ? 'text-white' : 'text-gray-900'}`}>
               {category.name}
             </h3>
-            <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+            <p className={`text-sm font-medium ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
               {category.count} posts
             </p>
           </motion.div>
@@ -193,11 +193,11 @@ function RecentPostsGrid({ posts, darkMode }) {
       transition={{ duration: 0.8, delay: 0.4 }}
       className="mb-16"
     >
-      <div className="text-center mb-12">
-        <h2 className={`text-4xl font-bold mb-4 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+      <div className="text-center mb-16">
+        <h2 className={`text-4xl md:text-5xl font-bold mb-6 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
           Latest Adventures
         </h2>
-        <p className={`text-lg ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+        <p className={`text-lg md:text-xl max-w-2xl mx-auto ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
           Stay updated with our newest travel stories
         </p>
       </div>
@@ -210,7 +210,7 @@ function RecentPostsGrid({ posts, darkMode }) {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: index * 0.1 }}
             whileHover={{ y: -3 }}
-            className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-xl shadow-md overflow-hidden group cursor-pointer`}
+            className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-xl shadow-md overflow-hidden group cursor-pointer border ${darkMode ? 'border-gray-700' : 'border-sky-200'}`}
           >
             <Link to={`/blogs/singlepost/${post.id}`}>
               <div className="relative h-40 overflow-hidden">
@@ -221,20 +221,20 @@ function RecentPostsGrid({ posts, darkMode }) {
                   fallbackSrc="https://wanderluxe-ventures.onrender.com/api/placeholder/400/300"
                 />
               </div>
-              <div className="p-4">
-                <h3 className={`font-bold mb-2 group-hover:text-blue-600 transition-colors duration-300 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+              <div className="p-5">
+                <h3 className={`font-semibold mb-3 group-hover:text-sky-600 transition-colors duration-300 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
                   {post.title}
                 </h3>
-                <p className={`text-sm mb-3 line-clamp-2 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                <p className={`text-sm mb-4 line-clamp-2 leading-relaxed ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
                   {post.description || "Read more..."}
                 </p>
                 <div className="flex items-center justify-between text-xs">
-                  <span className={darkMode ? 'text-gray-400' : 'text-gray-500'}>
+                  <span className={`font-medium ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
                     {new Date(post.created_at).toLocaleDateString()}
                   </span>
                   <div className="flex items-center space-x-2">
                     <FaHeart className="text-red-500" />
-                    <span className={darkMode ? 'text-gray-300' : 'text-gray-600'}>{post.likes}</span>
+                    <span className={`font-medium ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>{post.likes}</span>
                   </div>
                 </div>
               </div>
@@ -267,12 +267,12 @@ function BlogStatistics({ posts, darkMode }) {
       transition={{ duration: 0.8, delay: 0.6 }}
       className="mb-16"
     >
-      <div className={`${darkMode ? 'bg-gray-800' : 'bg-gray-50'} rounded-2xl p-8`}>
-        <div className="text-center mb-8">
-          <h2 className={`text-3xl font-bold mb-2 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+      <div className={`${darkMode ? 'bg-gray-800' : 'bg-sky-100'} rounded-2xl p-8 border ${darkMode ? 'border-gray-700' : 'border-sky-200'}`}>
+        <div className="text-center mb-12">
+          <h2 className={`text-3xl md:text-4xl font-bold mb-4 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
             Our Impact
           </h2>
-          <p className={`${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+          <p className={`text-lg ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
             Numbers that tell our story
           </p>
         </div>
@@ -286,13 +286,13 @@ function BlogStatistics({ posts, darkMode }) {
               transition={{ duration: 0.5, delay: index * 0.1 }}
               className="text-center"
             >
-              <div className={`w-16 h-16 bg-blue-500 rounded-full flex items-center justify-center mx-auto mb-4`}>
+              <div className={`w-16 h-16 ${darkMode ? 'bg-blue-500' : 'bg-sky-500'} rounded-full flex items-center justify-center mx-auto mb-4`}>
                 <stat.icon className="text-white text-2xl" />
               </div>
-              <div className={`text-3xl font-bold mb-2 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+              <div className={`text-3xl md:text-4xl font-bold mb-3 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
                 {stat.value}
               </div>
-              <div className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+              <div className={`text-sm font-medium ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                 {stat.label}
               </div>
             </motion.div>
@@ -322,9 +322,9 @@ function NewsletterSignup({ darkMode }) {
       transition={{ duration: 0.8, delay: 0.8 }}
       className="mb-16"
     >
-      <div className={`${darkMode ? 'bg-gradient-to-r from-gray-800 to-gray-700' : 'bg-gradient-to-r from-blue-600 to-purple-600'} rounded-2xl p-8 text-center text-white`}>
-        <h2 className="text-3xl font-bold mb-4">Stay Updated</h2>
-        <p className="text-lg mb-8 opacity-90">
+      <div className={`${darkMode ? 'bg-gradient-to-r from-gray-800 to-gray-700' : 'bg-gradient-to-r from-sky-500 to-sky-600'} rounded-2xl p-8 md:p-12 text-center text-white`}>
+        <h2 className="text-3xl md:text-4xl font-bold mb-6">Stay Updated</h2>
+        <p className="text-lg md:text-xl mb-10 opacity-90 max-w-2xl mx-auto">
           Get the latest travel stories and tips delivered to your inbox
         </p>
         
@@ -352,7 +352,7 @@ function NewsletterSignup({ darkMode }) {
                 type="submit"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="px-8 py-3 bg-white text-blue-600 rounded-full font-semibold hover:bg-gray-100 transition-colors duration-300"
+                className="px-8 py-3 bg-white text-sky-600 rounded-full font-semibold hover:bg-gray-100 transition-colors duration-300"
               >
                 Subscribe
               </motion.button>
@@ -462,7 +462,7 @@ function Home() {
   }, [y]);
 
   return (
-    <div className={`min-h-screen ${darkMode ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-900'} scroll-smooth`}>
+    <div className={`min-h-screen ${darkMode ? 'bg-gray-900 text-white' : 'bg-sky-50 text-gray-900'} scroll-smooth`}>
       {/* Loading Screen */}
       <AnimatePresence>
         {isLoading && (
@@ -621,8 +621,8 @@ function Home() {
       </div>
 
       {/* Blog Content Section */}
-      <div className="relative bg-white dark:bg-gray-900">
-        <div className="container mx-auto px-4 py-16 relative z-10">
+      <div className={`relative ${darkMode ? 'bg-gray-900' : 'bg-sky-100'}`}>
+        <div className="container mx-auto px-4 py-20 relative z-10">
           {/* Featured Blog Posts Section */}
           <FeaturedBlogPosts posts={posts} darkMode={darkMode} />
           
@@ -641,30 +641,30 @@ function Home() {
       </div>
 
       {/* Parallax Background Elements */}
-      <div className="relative">
+      <div className={`relative ${darkMode ? 'bg-gray-900' : 'bg-sky-50'}`}>
         <motion.div
-          className="absolute inset-0 bg-gradient-to-b from-transparent via-blue-50/10 to-purple-50/10 dark:from-transparent dark:via-blue-900/10 dark:to-purple-900/10"
+          className={`absolute inset-0 ${darkMode ? 'bg-gradient-to-b from-transparent via-blue-900/5 to-purple-900/5' : 'bg-gradient-to-b from-transparent via-sky-100/30 to-sky-200/20'}`}
           style={{ y: yTransform }}
         />
         
         {/* Floating geometric shapes */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          {[...Array(6)].map((_, i) => (
+          {[...Array(4)].map((_, i) => (
             <motion.div
               key={i}
-              className="absolute w-32 h-32 border border-blue-200/20 dark:border-blue-400/20 rounded-full"
+              className={`absolute w-24 h-24 border rounded-full ${darkMode ? 'border-blue-400/10' : 'border-sky-300/40'}`}
               style={{
-                left: `${20 + i * 15}%`,
-                top: `${10 + i * 20}%`,
+                left: `${15 + i * 25}%`,
+                top: `${20 + i * 15}%`,
                 x: xTransform,
                 y: yTransform,
               }}
               animate={{
                 rotate: [0, 360],
-                scale: [1, 1.1, 1],
+                scale: [1, 1.05, 1],
               }}
               transition={{
-                duration: 20 + i * 5,
+                duration: 30 + i * 10,
                 repeat: Infinity,
                 ease: "linear"
               }}
@@ -672,7 +672,7 @@ function Home() {
           ))}
         </div>
 
-        <div id="content" className="container mx-auto px-4 py-16 relative z-10">
+        <div id="content" className={`container mx-auto px-4 pt-20 relative z-10 ${darkMode ? 'bg-gray-900' : 'bg-sky-50'}`}>
           <div className="flex flex-col lg:flex-row gap-8">
             <motion.div 
               className="w-full lg:w-2/3"
