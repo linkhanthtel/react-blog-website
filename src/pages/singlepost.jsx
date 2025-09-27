@@ -11,6 +11,7 @@ import { getImageAlt } from '../utils/imageUtils';
 import ImageWithFallback from '../components/ImageWithFallback';
 import LikeButton from '../components/LikeButton';
 import CommentsSection from '../components/CommentsSection';
+import AIRecommendations from '../components/AIRecommendations';
 
 function SinglePost() {
   const { id } = useParams();
@@ -137,97 +138,12 @@ function SinglePost() {
                 </p>
               </div>
 
-              {/* Recommended Posts */}
-              <div className="space-y-4">
-                {posts
-                  .filter(p => p.id !== parseInt(id))
-                  .slice(0, 4)
-                  .map((post, index) => (
-                    <motion.div
-                      key={post.id}
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: 0.3 + index * 0.1, duration: 0.5 }}
-                      whileHover={{ scale: 1.02, x: 5 }}
-                      className={`group relative overflow-hidden rounded-xl ${
-                        darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-50 hover:bg-gray-100'
-                      } transition-all duration-300 cursor-pointer`}
-                    >
-                      <Link to={`/blogs/singlepost/${post.id}`} className="block">
-                        <div className="flex gap-4 p-4">
-                          {/* Post Image */}
-                          <div className="relative flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden">
-                            <ImageWithFallback
-                              src={post.image}
-                              alt={getImageAlt(post.image, post.title)}
-                              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                              fallbackSrc="https://wanderluxe-ventures.onrender.com/api/placeholder/80/80"
-                            />
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                          </div>
-
-                          {/* Post Content */}
-                          <div className="flex-1 min-w-0">
-                            <h3 className={`font-bold text-sm mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors duration-300 ${
-                              darkMode ? 'text-gray-100' : 'text-gray-800'
-                            }`}>
-                              {post.title}
-                            </h3>
-                            
-                            {post.description && (
-                              <p className={`text-xs mb-2 line-clamp-2 ${
-                                darkMode ? 'text-gray-400' : 'text-gray-600'
-                              }`}>
-                                {post.description}
-                              </p>
-                            )}
-
-                            {/* Post Meta */}
-                            <div className="flex items-center justify-between text-xs">
-                              <div className="flex items-center space-x-2">
-                                <FaUser className={`${darkMode ? 'text-gray-500' : 'text-gray-400'}`} />
-                                <span className={`${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                                  {post.author}
-                                </span>
-                              </div>
-                              <div className="flex items-center space-x-3">
-                                <div className="flex items-center">
-                                  <FaHeart className={`mr-1 ${darkMode ? 'text-red-400' : 'text-red-500'}`} />
-                                  <span className={`${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                                    {post.likes}
-                                  </span>
-                                </div>
-                                <div className="flex items-center">
-                                  <FaComment className={`mr-1 ${darkMode ? 'text-blue-400' : 'text-blue-500'}`} />
-                                  <span className={`${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                                    {post.comments}
-                                  </span>
-                                </div>
-                              </div>
-                            </div>
-
-                            {/* Date Badge */}
-                            <div className="mt-2">
-                              <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${
-                                darkMode ? 'bg-gray-600 text-gray-300' : 'bg-gray-200 text-gray-600'
-                              }`}>
-                                {new Date(post.created_at).toLocaleDateString('en-US', { 
-                                  month: 'short', 
-                                  day: 'numeric' 
-                                })}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Hover Effect Line */}
-                        <div className={`absolute bottom-0 left-0 h-1 w-0 group-hover:w-full transition-all duration-300 ${
-                          darkMode ? 'bg-blue-500' : 'bg-blue-600'
-                        }`} />
-                      </Link>
-                    </motion.div>
-                  ))}
-              </div>
+              {/* AI-Powered Recommendations */}
+              <AIRecommendations 
+                postId={parseInt(id)} 
+                currentPost={post}
+                limit={4}
+              />
 
               {/* View All Button */}
               <motion.div
