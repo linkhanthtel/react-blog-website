@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiSearch, FiRefreshCw } from 'react-icons/fi';
 import { FaUser, FaComment, FaChartLine } from 'react-icons/fa';
@@ -9,9 +9,12 @@ import { usePosts } from '../context/postsContext';
 import { getImageAlt } from '../utils/imageUtils';
 import ImageWithFallback from '../components/ImageWithFallback';
 import LikeButton from '../components/LikeButton';
+import apiService from '../services/api';
 
 const Blogs = () => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [aiTrendingPosts, setAiTrendingPosts] = useState([]);
+  const [aiLoading, setAiLoading] = useState(false);
   const { darkMode } = useTheme();
   const { posts, loading, error, fetchPosts } = usePosts();
 
@@ -31,6 +34,24 @@ const Blogs = () => {
   const handleRefresh = () => {
     fetchPosts();
   };
+
+  // Fetch AI trending posts
+  const fetchAITrendingPosts = async () => {
+    setAiLoading(true);
+    try {
+      const result = await apiService.getAITrendingPosts(5);
+      setAiTrendingPosts(result.trending_posts || []);
+    } catch (err) {
+      console.error('Error fetching AI trending posts:', err);
+    } finally {
+      setAiLoading(false);
+    }
+  };
+
+  // Load AI trending posts on component mount
+  useEffect(() => {
+    fetchAITrendingPosts();
+  }, []);
 
   return (
     <motion.div 
@@ -197,6 +218,60 @@ const Blogs = () => {
                   Most loved travel destinations
                 </p>
               </div>
+
+              {/* AI Trending Posts */}
+              {aiTrendingPosts.length > 0 && (
+                <div className="mb-6">
+                  <div className="flex items-center gap-2 mb-4">
+                    <FaChartLine className={`text-lg ${darkMode ? 'text-purple-400' : 'text-purple-600'}`} />
+                    <h3 className={`text-lg font-bold ${darkMode ? 'text-gray-100' : 'text-gray-800'}`}>
+                      AI Trending
+                    </h3>
+                  </div>
+                  <div className="space-y-3">
+                    {aiTrendingPosts.slice(0, 3).map((post, index) => (
+                      <motion.div
+                        key={post.id}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.3 + index * 0.1, duration: 0.5 }}
+                        whileHover={{ scale: 1.02, x: 5 }}
+                        className={`group relative overflow-hidden rounded-xl ${
+                          darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-50 hover:bg-gray-100'
+                        } transition-all duration-300 cursor-pointer`}
+                      >
+                        <Link to={`/blogs/singlepost/${post.id}`} className="block">
+                          <div className="flex gap-3 p-3">
+                            <div className="relative flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden">
+                              <ImageWithFallback
+                                src={post.image}
+                                alt={getImageAlt(post.image, post.title)}
+                                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                                fallbackSrc="https://wanderluxe-ventures.onrender.com/api/placeholder/64/64"
+                              />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <h4 className={`font-bold text-sm mb-1 line-clamp-2 group-hover:text-purple-600 transition-colors duration-300 ${
+                                darkMode ? 'text-gray-100' : 'text-gray-800'
+                              }`}>
+                                {post.title}
+                              </h4>
+                              <div className="flex items-center justify-between text-xs">
+                                <span className={`${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                                  AI Score: {post.ai_score || 0}
+                                </span>
+                                <span className={`${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                                  {post.likes} likes
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        </Link>
+                      </motion.div>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {/* Popular Posts */}
               <div className="space-y-4">
