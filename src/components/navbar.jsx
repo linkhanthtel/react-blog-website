@@ -1,15 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { FaBars, FaTimes, FaMoon, FaSun, FaUser, FaSignOutAlt } from "react-icons/fa";
+import { FaBars, FaTimes, FaMoon, FaSun, FaUser, FaSignOutAlt, FaBrain } from "react-icons/fa";
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTheme } from '../context/themeContext';
 import { useAuth } from '../context/authContext';
 import AuthModal from './authModal';
+import apiService from '../services/api';
 
 function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [aiStatus, setAiStatus] = useState(null);
   const { darkMode, toggleDarkMode } = useTheme();
   const { user, logout, isAuthenticated } = useAuth();
 
@@ -28,6 +30,21 @@ function Navbar() {
 
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Check AI status on component mount
+  useEffect(() => {
+    const checkAIStatus = async () => {
+      try {
+        const status = await apiService.getAIHealth();
+        setAiStatus(status);
+      } catch (err) {
+        console.log('AI services not available:', err.message);
+        setAiStatus({ error: 'AI services not available' });
+      }
+    };
+
+    checkAIStatus();
   }, []);
 
   const handleLinkClick = (e) => {
@@ -82,6 +99,20 @@ function Navbar() {
             >
               {darkMode ? <FaSun className="h-5 w-5" /> : <FaMoon className="h-5 w-5" />}
             </button>
+
+            {/* AI Status Indicator */}
+            {aiStatus && (
+              <div className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm ${
+                aiStatus.error 
+                  ? darkMode ? 'bg-red-900/30 text-red-400' : 'bg-red-100 text-red-600'
+                  : darkMode ? 'bg-green-900/30 text-green-400' : 'bg-green-100 text-green-600'
+              }`}>
+                <FaBrain className="h-4 w-4" />
+                <span className="hidden sm:inline">
+                  {aiStatus.error ? 'AI Offline' : 'AI Online'}
+                </span>
+              </div>
+            )}
             
             {/* Authentication Section */}
             {isAuthenticated ? (
