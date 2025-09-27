@@ -3,6 +3,7 @@ import { useAuth } from '../context/authContext';
 import { useTheme } from '../context/themeContext';
 import apiService from '../services/api';
 import ImageUpload from '../components/ImageUpload';
+import AIEnhancementPanel from '../components/AIEnhancementPanel';
 
 const BlogManagement = () => {
   const { user, isAuthenticated } = useAuth();
@@ -17,8 +18,10 @@ const BlogManagement = () => {
     content: '',
     description: '',
     image: '',
-    author: ''
+    author: '',
+    tags: ''
   });
+  const [showAI, setShowAI] = useState(false);
 
   // Redirect if not authenticated
   useEffect(() => {
@@ -54,16 +57,30 @@ const BlogManagement = () => {
     }));
   };
 
+  const handleAITitleChange = (title) => {
+    setFormData(prev => ({ ...prev, title }));
+  };
+
+  const handleAIDescriptionChange = (description) => {
+    setFormData(prev => ({ ...prev, description }));
+  };
+
+  const handleAITagsChange = (tags) => {
+    setFormData(prev => ({ ...prev, tags }));
+  };
+
   const resetForm = () => {
     setFormData({
       title: '',
       content: '',
       description: '',
       image: '',
-      author: user?.username || ''
+      author: user?.username || '',
+      tags: ''
     });
     setEditingPost(null);
     setShowCreateForm(false);
+    setShowAI(false);
   };
 
   const handleCreatePost = async (e) => {
@@ -90,7 +107,8 @@ const BlogManagement = () => {
       content: post.content,
       description: post.description || '',
       image: post.image || '',
-      author: post.author
+      author: post.author,
+      tags: post.tags || ''
     });
     setShowCreateForm(true);
   };
@@ -157,13 +175,21 @@ const BlogManagement = () => {
           </div>
         )}
 
-        <div className="mb-6">
+        <div className="mb-6 flex gap-3">
           <button
             onClick={() => setShowCreateForm(!showCreateForm)}
             className={`px-4 py-2 rounded transition-colors ${darkMode ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'bg-blue-600 hover:bg-blue-700 text-white'}`}
           >
             {showCreateForm ? 'Cancel' : 'Create New Post'}
           </button>
+          {showCreateForm && (
+            <button
+              onClick={() => setShowAI(!showAI)}
+              className={`px-4 py-2 rounded transition-colors ${darkMode ? 'bg-purple-600 hover:bg-purple-700 text-white' : 'bg-purple-600 hover:bg-purple-700 text-white'}`}
+            >
+              {showAI ? 'Hide AI Assistant' : 'Show AI Assistant'}
+            </button>
+          )}
         </div>
 
         {showCreateForm && (
@@ -214,6 +240,20 @@ const BlogManagement = () => {
               </div>
 
               <div className="mb-4">
+                <label className={`block text-sm font-medium mb-1 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                  Tags (comma-separated)
+                </label>
+                <input
+                  type="text"
+                  name="tags"
+                  value={formData.tags}
+                  onChange={handleInputChange}
+                  placeholder="travel, adventure, destination..."
+                  className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${darkMode ? 'bg-gray-700 border-gray-600 text-gray-100' : 'bg-white border-gray-300 text-gray-900'}`}
+                />
+              </div>
+
+              <div className="mb-4">
                 <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                   Post Image
                 </label>
@@ -255,6 +295,21 @@ const BlogManagement = () => {
                 </button>
               </div>
             </form>
+          </div>
+        )}
+
+        {/* AI Enhancement Panel */}
+        {showAI && showCreateForm && (
+          <div className="mb-8">
+            <AIEnhancementPanel
+              content={formData.content}
+              title={formData.title}
+              description={formData.description}
+              destination={formData.title.split(' ').slice(0, 2).join(' ')} // Extract destination from title
+              onTitleChange={handleAITitleChange}
+              onDescriptionChange={handleAIDescriptionChange}
+              onTagsChange={handleAITagsChange}
+            />
           </div>
         )}
 
