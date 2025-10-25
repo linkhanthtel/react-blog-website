@@ -4,6 +4,7 @@ import { useTheme } from '../context/themeContext';
 import apiService from '../services/api';
 import ImageUpload from '../components/ImageUpload';
 import AIEnhancementPanel from '../components/AIEnhancementPanel';
+import AITestPanel from '../components/AITestPanel';
 
 const BlogManagement = () => {
   const { user, isAuthenticated } = useAuth();
@@ -168,6 +169,9 @@ const BlogManagement = () => {
           <h1 className={`text-3xl font-bold mb-2 ${darkMode ? 'text-gray-100' : 'text-gray-800'}`}>Blogs</h1>
           <p className={`${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>Manage your blog posts - create, edit, and delete</p>
         </div>
+
+        {/* AI Test Panel */}
+        <AITestPanel />
 
         {error && (
           <div className={`px-4 py-3 rounded mb-4 ${darkMode ? 'bg-red-900 border-red-700 text-red-200' : 'bg-red-100 border-red-400 text-red-700'} border`}>

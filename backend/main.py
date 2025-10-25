@@ -5,6 +5,9 @@ from fastapi import UploadFile, File
 from fastapi.responses import FileResponse
 from database import engine, Base
 from routers import auth, users, posts
+from ai_service import ai_service
+from pydantic import BaseModel
+from typing import List, Dict, Optional
 import os
 import uuid
 from datetime import datetime
@@ -13,6 +16,53 @@ import io
 
 # Import models to ensure they are registered with SQLAlchemy
 from models import User, Post, Comment
+
+# AI Request/Response Models
+class AIContentRequest(BaseModel):
+    content: str
+    title: Optional[str] = ""
+    destination: Optional[str] = ""
+
+class AIDescriptionResponse(BaseModel):
+    description: str
+
+class AITitleResponse(BaseModel):
+    title: str
+
+class AITagsResponse(BaseModel):
+    tags: List[str]
+
+class AIContentImprovementResponse(BaseModel):
+    grammar_fixes: List[str]
+    readability_score: str
+    suggestions: List[str]
+    missing_elements: List[str]
+
+class AISimilarPostsRequest(BaseModel):
+    content: str
+    top_k: int = 5
+
+class AISimilarPostsResponse(BaseModel):
+    similar_posts: List[Dict]
+
+class AIContentModerationResponse(BaseModel):
+    is_safe: bool
+    confidence: float
+    issues: List[str]
+    toxic_score: float
+
+class AITravelInsightsResponse(BaseModel):
+    best_time: str
+    attractions: str
+    tips: str
+    budget: str
+    etiquette: str
+
+class AIWeatherInsightsResponse(BaseModel):
+    location: str
+    current_weather: str
+    recommendation: str
+    packing_tip: str
 
 # Create database tables
 Base.metadata.create_all(bind=engine)
@@ -55,6 +105,72 @@ app.mount("/uploads", StaticFiles(directory=UPLOAD_DIR), name="uploads")
 app.include_router(auth.router)
 app.include_router(users.router)
 app.include_router(posts.router)
+
+# AI Endpoints
+@app.post("/ai/generate-description", response_model=AIDescriptionResponse)
+async def generate_description(request: AIContentRequest):
+    """Generate AI-powered description for blog content"""
+    description = await ai_service.generate_description(request.content, request.title)
+    return AIDescriptionResponse(description=description)
+
+@app.post("/ai/suggest-title", response_model=AITitleResponse)
+async def suggest_title(request: AIContentRequest):
+    """Suggest AI-powered title for blog content"""
+    title = await ai_service.suggest_title(request.content, request.title)
+    return AITitleResponse(title=title)
+
+@app.post("/ai/generate-tags", response_model=AITagsResponse)
+async def generate_tags(request: AIContentRequest):
+    """Generate AI-powered tags for blog content"""
+    tags = await ai_service.generate_tags(request.content, request.title)
+    return AITagsResponse(tags=tags)
+
+@app.post("/ai/improve-content", response_model=AIContentImprovementResponse)
+async def improve_content(request: AIContentRequest):
+    """Get AI-powered content improvement suggestions"""
+    improvements = await ai_service.improve_content(request.content)
+    return AIContentImprovementResponse(**improvements)
+
+@app.post("/ai/similar-posts", response_model=AISimilarPostsResponse)
+async def find_similar_posts(request: AISimilarPostsRequest):
+    """Find similar posts using AI content similarity"""
+    # Get all posts from database
+    from database import get_db
+    from crud import get_posts
+    db = next(get_db())
+    all_posts_result = get_posts(db, skip=0, limit=100, search="")
+    all_posts = all_posts_result["posts"]
+    
+    similar_posts = ai_service.find_similar_posts(request.content, all_posts, request.top_k)
+    return AISimilarPostsResponse(similar_posts=similar_posts)
+
+@app.post("/ai/moderate-content", response_model=AIContentModerationResponse)
+async def moderate_content(request: AIContentRequest):
+    """Moderate content for inappropriate material"""
+    moderation_result = ai_service.moderate_content(request.content)
+    return AIContentModerationResponse(**moderation_result)
+
+@app.post("/ai/travel-insights", response_model=AITravelInsightsResponse)
+async def get_travel_insights(request: AIContentRequest):
+    """Get AI-generated travel insights for a destination"""
+    insights = await ai_service.generate_travel_insights(request.destination or "destination", request.content)
+    return AITravelInsightsResponse(**insights)
+
+@app.post("/ai/weather-insights", response_model=AIWeatherInsightsResponse)
+async def get_weather_insights(request: AIContentRequest):
+    """Get weather insights for a location"""
+    weather = await ai_service.get_weather_insights(request.destination or "location")
+    return AIWeatherInsightsResponse(**weather)
+
+@app.get("/ai/health")
+async def ai_health_check():
+    """Check AI service health"""
+    return {
+        "openai_available": ai_service.openai_client is not None,
+        "sentence_model_available": ai_service.sentence_model is not None,
+        "moderation_available": ai_service.moderation_pipeline is not None,
+        "status": "AI services initialized"
+    }
 
 @app.get("/")
 async def root():

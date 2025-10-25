@@ -188,6 +188,75 @@ class ApiService {
   async healthCheck() {
     return this.request('/health');
   }
+
+  // AI Endpoints
+  async generateDescription(content, title = '') {
+    return this.request('/ai/generate-description', {
+      method: 'POST',
+      body: JSON.stringify({ content, title }),
+    });
+  }
+
+  async suggestTitle(content, currentTitle = '') {
+    return this.request('/ai/suggest-title', {
+      method: 'POST',
+      body: JSON.stringify({ content, title: currentTitle }),
+    });
+  }
+
+  async generateTags(content, title = '') {
+    return this.request('/ai/generate-tags', {
+      method: 'POST',
+      body: JSON.stringify({ content, title }),
+    });
+  }
+
+  async improveContent(content) {
+    return this.request('/ai/improve-content', {
+      method: 'POST',
+      body: JSON.stringify({ content }),
+    });
+  }
+
+  async findSimilarPosts(content, topK = 5) {
+    return this.request('/ai/similar-posts', {
+      method: 'POST',
+      body: JSON.stringify({ content, top_k: topK }),
+    });
+  }
+
+  async moderateContent(content) {
+    return this.request('/ai/moderate-content', {
+      method: 'POST',
+      body: JSON.stringify({ content }),
+    });
+  }
+
+  async getTravelInsights(destination, content = '') {
+    return this.request('/ai/travel-insights', {
+      method: 'POST',
+      body: JSON.stringify({ destination, content }),
+    });
+  }
+
+  async getWeatherInsights(location) {
+    return this.request('/ai/weather-insights', {
+      method: 'POST',
+      body: JSON.stringify({ destination: location }),
+    });
+  }
+
+  async getPostRecommendations(postId, limit = 5) {
+    return this.request(`/posts/${postId}/recommendations?limit=${limit}`);
+  }
+
+  async getAITrendingPosts(limit = 10) {
+    return this.request(`/posts/trending/ai?limit=${limit}`);
+  }
+
+  async getAIHealth() {
+    return this.request('/ai/health');
+  }
 }
 
 // Create and export a singleton instance
