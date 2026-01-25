@@ -1,9 +1,8 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+/* eslint-disable no-unused-vars */
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence, useMotionValue, useTransform } from 'framer-motion';
-import { useSpring, animated, useTrail } from 'react-spring';
-import { FaHeart, FaComments, FaShare, FaChevronDown, FaPlane, FaHotel, FaUmbrellaBeach, FaSearch, FaMapMarkerAlt, FaCalendarAlt, FaSun, FaUser, FaClock, FaStar, FaRocket, FaGlobe, FaCompass, FaMountain, FaWater, FaLeaf, FaFire, FaSnowflake } from 'react-icons/fa';
+import { FaHeart, FaComments, FaShare, FaChevronDown, FaPlane, FaHotel, FaUmbrellaBeach, FaSearch, FaMapMarkerAlt, FaCalendarAlt, FaSun, FaUser, FaClock, FaStar, FaRocket, FaGlobe, FaCompass, FaMountain, FaWater, FaLeaf } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
-import Post from '../components/post';
 import { useTheme } from '../context/themeContext';
 import { usePosts } from '../context/postsContext';
 import { getImageAlt } from '../utils/imageUtils';
@@ -33,154 +32,191 @@ function MinimalButton({ icon: Icon, text, variant }) {
   );
 }
 
-// Clean Button Component (keeping for compatibility)
-function CleanButton({ icon: Icon, text, variant }) {
-  const variants = {
-    primary: "bg-white text-gray-900 hover:bg-gray-100 shadow-lg",
-    secondary: "bg-gray-900/50 text-white border border-white/20 hover:bg-white/10 backdrop-blur-sm",
-    outline: "bg-transparent text-white border border-white/40 hover:bg-white/10 backdrop-blur-sm"
-  };
 
-  return (
-    <motion.button
-      whileHover={{ scale: 1.02, y: -2 }}
-      whileTap={{ scale: 0.98 }}
-      className={`px-8 py-4 rounded-full font-medium flex items-center justify-center transition-all duration-300 ${variants[variant]}`}
-    >
-      <Icon className="mr-3 text-lg" />
-      <span>{text}</span>
-    </motion.button>
-  );
-}
-
-// Featured Blog Posts Component
+// Featured Blog Posts Component with 3D Effects
 function FeaturedBlogPosts({ posts, darkMode }) {
   const featuredPosts = posts.slice(0, 3);
+  const [hoveredIndex, setHoveredIndex] = useState(null);
   
   return (
-    <motion.section
-      initial={{ opacity: 0, y: 50 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.8 }}
-      className="mb-16"
-    >
-      <div className="text-center mb-16">
-        <h2 className={`text-4xl md:text-5xl font-bold mb-6 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+    <section className="mb-24">
+      <motion.div 
+        className="text-center mb-16"
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.6 }}
+      >
+        <motion.h2 
+          className={`text-4xl md:text-6xl font-bold mb-6 ${darkMode ? 'text-white' : 'text-gray-900'}`}
+          initial={{ scale: 0.5, opacity: 0 }}
+          whileInView={{ scale: 1, opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, type: "spring" }}
+        >
           Featured Stories
-        </h2>
-        <p className={`text-lg md:text-xl max-w-2xl mx-auto ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+        </motion.h2>
+        <motion.p 
+          className={`text-lg md:text-xl max-w-2xl mx-auto ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}
+          initial={{ y: 20, opacity: 0 }}
+          whileInView={{ y: 0, opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ delay: 0.2 }}
+        >
           Discover our most popular travel experiences
-        </p>
-      </div>
+        </motion.p>
+      </motion.div>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {featuredPosts.map((post, index) => (
-          <motion.article
+          <motion.div
             key={post.id}
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: index * 0.2 }}
-            whileHover={{ y: -5 }}
-            className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-2xl shadow-lg overflow-hidden group cursor-pointer border ${darkMode ? 'border-gray-700' : 'border-sky-200'}`}
+            initial={{ opacity: 0, y: 50, rotateX: -30 }}
+            whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
+            viewport={{ once: true, amount: 0.3 }}
+            transition={{ 
+              duration: 0.8, 
+              delay: index * 0.15,
+              type: "spring",
+              stiffness: 100
+            }}
+            onHoverStart={() => setHoveredIndex(index)}
+            onHoverEnd={() => setHoveredIndex(null)}
+            style={{ transformStyle: 'preserve-3d' }}
           >
             <Link to={`/blogs/singlepost/${post.id}`}>
-              <div className="relative h-48 overflow-hidden">
-                <ImageWithFallback
-                  src={post.image}
-                  alt={post.title}
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                  fallbackSrc="https://wanderluxe-ventures.onrender.com/api/placeholder/400/300"
+              <motion.article
+                className={`relative ${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-3xl shadow-2xl overflow-hidden group cursor-pointer border ${darkMode ? 'border-gray-700' : 'border-gray-200'}`}
+                whileHover={{ 
+                  y: -15, 
+                  rotateY: 5,
+                  scale: 1.03,
+                  transition: { duration: 0.3 }
+                }}
+                style={{ transformStyle: 'preserve-3d' }}
+              >
+                {/* 3D Depth Shadow */}
+                <motion.div
+                  className="absolute inset-0 rounded-3xl bg-gradient-to-br from-blue-500/20 to-purple-500/20 blur-2xl"
+                  animate={{
+                    opacity: hoveredIndex === index ? 0.6 : 0,
+                    scale: hoveredIndex === index ? 1.1 : 1,
+                  }}
+                  transition={{ duration: 0.3 }}
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                <div className="absolute top-4 left-4">
-                  <span className="bg-white/90 text-gray-900 px-3 py-1 rounded-full text-sm font-medium">
-                    Featured
-                  </span>
-                </div>
-              </div>
-              <div className="p-6">
-                <h3 className={`text-xl font-semibold mb-4 group-hover:text-sky-600 transition-colors duration-300 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-                  {post.title}
-                </h3>
-                <p className={`text-sm mb-6 line-clamp-3 leading-relaxed ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-                  {post.description || "Read more about this amazing destination..."}
-                </p>
-                <div className="flex items-center justify-between text-sm">
-                  <span className={`font-medium ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                    {new Date(post.created_at).toLocaleDateString()}
-                  </span>
-                  <div className="flex items-center space-x-4">
-                    <div className="flex items-center">
-                      <FaHeart className="text-red-500 mr-1" />
-                      <span className={`font-medium ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>{post.likes}</span>
+
+                <div className="relative h-56 overflow-hidden">
+                  <motion.div
+                    whileHover={{ scale: 1.2, rotate: 3 }}
+                    transition={{ duration: 0.6 }}
+                  >
+                    <ImageWithFallback
+                      src={post.image}
+                      alt={post.title}
+                      className="w-full h-full object-cover"
+                      fallbackSrc="https://wanderluxe-ventures.onrender.com/api/placeholder/400/300"
+                    />
+                  </motion.div>
+                  
+                  {/* Animated Gradient Overlay */}
+                  <motion.div 
+                    className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent"
+                    animate={{
+                      opacity: hoveredIndex === index ? 1 : 0.7,
+                    }}
+                  />
+                  
+                  {/* Floating Badge */}
+                  <motion.div 
+                    className="absolute top-6 left-6"
+                    initial={{ scale: 0, rotate: -180 }}
+                    whileInView={{ scale: 1, rotate: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: index * 0.2 + 0.3, type: "spring" }}
+                    whileHover={{ scale: 1.2, rotate: 10 }}
+                  >
+                    <span className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-4 py-2 rounded-full text-sm font-bold shadow-lg flex items-center space-x-1">
+                      <FaStar className="text-xs" />
+                      <span>Featured</span>
+                    </span>
+                  </motion.div>
+
+                  {/* Number Badge */}
+                  <motion.div
+                    className="absolute top-6 right-6"
+                    initial={{ scale: 0 }}
+                    whileInView={{ scale: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: index * 0.2 + 0.4, type: "spring" }}
+                    whileHover={{ scale: 1.3, rotate: 360 }}
+                  >
+                    <div className={`w-12 h-12 rounded-full bg-white/20 backdrop-blur-md border-2 border-white/40 flex items-center justify-center`}>
+                      <span className="text-white font-bold text-lg">{index + 1}</span>
                     </div>
-                    <div className="flex items-center">
-                      <FaComments className="text-blue-500 mr-1" />
-                      <span className={`font-medium ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>{post.comments}</span>
+                  </motion.div>
+                </div>
+
+                <motion.div 
+                  className="p-6"
+                  style={{ transform: 'translateZ(30px)' }}
+                >
+                  <motion.h3 
+                    className={`text-xl font-bold mb-4 line-clamp-2 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-blue-500 group-hover:to-purple-600 transition-all duration-300 ${darkMode ? 'text-white' : 'text-gray-900'}`}
+                    whileHover={{ x: 5 }}
+                  >
+                    {post.title}
+                  </motion.h3>
+                  <p className={`text-sm mb-6 line-clamp-3 leading-relaxed ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                    {post.description || "Read more about this amazing destination..."}
+                  </p>
+                  
+                  <div className="flex items-center justify-between text-sm">
+                    <span className={`font-medium ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                      {new Date(post.created_at).toLocaleDateString()}
+                    </span>
+                    <div className="flex items-center space-x-4">
+                      <motion.div 
+                        className="flex items-center space-x-1"
+                        whileHover={{ scale: 1.2 }}
+                      >
+                        <FaHeart className="text-red-500" />
+                        <span className={`font-medium ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>{post.likes}</span>
+                      </motion.div>
+                      <motion.div 
+                        className="flex items-center space-x-1"
+                        whileHover={{ scale: 1.2 }}
+                      >
+                        <FaComments className="text-blue-500" />
+                        <span className={`font-medium ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>{post.comments}</span>
+                      </motion.div>
                     </div>
                   </div>
-                </div>
-              </div>
+
+                  {/* Read More Arrow */}
+                  <motion.div
+                    className="mt-4 flex items-center space-x-2 text-blue-500 group-hover:text-purple-600"
+                    initial={{ x: -10, opacity: 0 }}
+                    whileInView={{ x: 0, opacity: 1 }}
+                    whileHover={{ x: 10 }}
+                  >
+                    <span className="text-sm font-semibold">Explore Story</span>
+                    <motion.span
+                      animate={{ x: [0, 5, 0] }}
+                      transition={{ duration: 1.5, repeat: Infinity }}
+                    >
+                      →
+                    </motion.span>
+                  </motion.div>
+                </motion.div>
+              </motion.article>
             </Link>
-          </motion.article>
-        ))}
-      </div>
-    </motion.section>
-  );
-}
-
-// Blog Categories Component
-function BlogCategories({ darkMode }) {
-  const categories = [
-    { name: 'Adventure', icon: FaMountain, count: 12, color: 'bg-green-500' },
-    { name: 'Culture', icon: FaGlobe, count: 8, color: 'bg-blue-500' },
-    { name: 'Food', icon: FaLeaf, count: 15, color: 'bg-orange-500' },
-    { name: 'Beaches', icon: FaWater, count: 10, color: 'bg-cyan-500' },
-    { name: 'Cities', icon: FaPlane, count: 20, color: 'bg-purple-500' },
-    { name: 'Nature', icon: FaStar, count: 18, color: 'bg-pink-500' },
-  ];
-
-  return (
-    <motion.section
-      initial={{ opacity: 0, y: 50 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.8, delay: 0.2 }}
-      className="mb-16"
-    >
-      <div className="text-center mb-16">
-        <h2 className={`text-4xl md:text-5xl font-bold mb-6 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-          Explore by Category
-        </h2>
-        <p className={`text-lg md:text-xl max-w-2xl mx-auto ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-          Find your perfect travel inspiration
-        </p>
-      </div>
-      
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
-        {categories.map((category, index) => (
-          <motion.div
-            key={category.name}
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5, delay: index * 0.1 }}
-            whileHover={{ scale: 1.05, y: -5 }}
-            className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-2xl p-6 text-center cursor-pointer shadow-lg hover:shadow-xl transition-all duration-300 border ${darkMode ? 'border-gray-700' : 'border-sky-200'}`}
-          >
-            <div className={`w-16 h-16 ${category.color} rounded-full flex items-center justify-center mx-auto mb-4`}>
-              <category.icon className="text-white text-2xl" />
-            </div>
-            <h3 className={`font-semibold mb-3 text-base ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-              {category.name}
-            </h3>
-            <p className={`text-sm font-medium ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-              {category.count} posts
-            </p>
           </motion.div>
         ))}
       </div>
-    </motion.section>
+    </section>
   );
 }
+
 
 // Recent Posts Grid Component
 function RecentPostsGrid({ posts, darkMode }) {
@@ -318,13 +354,36 @@ function NewsletterSignup({ darkMode }) {
   return (
     <motion.section
       initial={{ opacity: 0, y: 50 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.8, delay: 0.8 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.3 }}
+      transition={{ duration: 0.8 }}
       className="mb-16"
     >
-      <div className={`${darkMode ? 'bg-gradient-to-r from-gray-800 to-gray-700' : 'bg-gradient-to-r from-sky-500 to-sky-600'} rounded-2xl p-8 md:p-12 text-center text-white`}>
-        <h2 className="text-3xl md:text-4xl font-bold mb-6">Stay Updated</h2>
-        <p className="text-lg md:text-xl mb-10 opacity-90 max-w-2xl mx-auto">
+      <motion.div 
+        className={`${darkMode ? 'bg-gradient-to-r from-gray-800 to-gray-700' : 'bg-gradient-to-r from-sky-500 to-sky-600'} rounded-2xl p-8 md:p-12 text-center text-white relative overflow-hidden`}
+        whileHover={{ scale: 1.02 }}
+        transition={{ duration: 0.3 }}
+        style={{ transformStyle: 'preserve-3d' }}
+      >
+        {/* 3D Background Elements */}
+        <motion.div
+          className="absolute inset-0 opacity-20"
+          animate={{
+            backgroundPosition: ['0% 0%', '100% 100%'],
+          }}
+          transition={{
+            duration: 20,
+            repeat: Infinity,
+            repeatType: 'reverse',
+          }}
+          style={{
+            backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.3) 1px, transparent 1px)',
+            backgroundSize: '50px 50px',
+          }}
+        />
+        
+        <h2 className="text-3xl md:text-4xl font-bold mb-6 relative z-10">Stay Updated</h2>
+        <p className="text-lg md:text-xl mb-10 opacity-90 max-w-2xl mx-auto relative z-10">
           Get the latest travel stories and tips delivered to your inbox
         </p>
         
@@ -332,13 +391,13 @@ function NewsletterSignup({ darkMode }) {
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="text-center"
+            className="text-center relative z-10"
           >
             <div className="text-2xl mb-2">✅</div>
             <p className="text-lg">Thank you for subscribing!</p>
           </motion.div>
         ) : (
-          <form onSubmit={handleSubmit} className="max-w-md mx-auto">
+          <form onSubmit={handleSubmit} className="max-w-md mx-auto relative z-10">
             <div className="flex flex-col sm:flex-row gap-4">
               <input
                 type="email"
@@ -350,7 +409,7 @@ function NewsletterSignup({ darkMode }) {
               />
               <motion.button
                 type="submit"
-                whileHover={{ scale: 1.05 }}
+                whileHover={{ scale: 1.05, rotateZ: 2 }}
                 whileTap={{ scale: 0.95 }}
                 className="px-8 py-3 bg-white text-sky-600 rounded-full font-semibold hover:bg-gray-100 transition-colors duration-300"
               >
@@ -359,8 +418,437 @@ function NewsletterSignup({ darkMode }) {
             </div>
           </form>
         )}
-      </div>
+      </motion.div>
     </motion.section>
+  );
+}
+
+// 3D Scroll Reveal Wrapper
+function ScrollReveal3D({ children, delay = 0, darkMode }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 100, rotateX: -15 }}
+      whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
+      viewport={{ once: true, amount: 0.2 }}
+      transition={{ duration: 0.8, delay }}
+      style={{ transformStyle: 'preserve-3d', perspective: '1000px' }}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+// Floating 3D Categories
+function Floating3DCategories({ darkMode }) {
+  const categories = [
+    { name: 'Adventure', icon: FaMountain, color: 'from-green-500 to-emerald-600', count: 12 },
+    { name: 'Culture', icon: FaGlobe, color: 'from-blue-500 to-indigo-600', count: 8 },
+    { name: 'Food', icon: FaLeaf, color: 'from-orange-500 to-red-600', count: 15 },
+    { name: 'Beaches', icon: FaWater, color: 'from-cyan-500 to-blue-600', count: 10 },
+    { name: 'Cities', icon: FaPlane, color: 'from-purple-500 to-pink-600', count: 20 },
+    { name: 'Nature', icon: FaStar, color: 'from-pink-500 to-rose-600', count: 18 },
+  ];
+
+  return (
+    <section className="mb-24">
+      <motion.div 
+        className="text-center mb-16"
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+      >
+        <h2 className={`text-4xl md:text-5xl font-bold mb-6 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+          Explore Categories
+        </h2>
+        <p className={`text-lg md:text-xl max-w-2xl mx-auto ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+          Discover your next adventure
+        </p>
+      </motion.div>
+      
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
+        {categories.map((category, index) => (
+          <motion.div
+            key={category.name}
+            initial={{ opacity: 0, scale: 0.5, rotateY: -90 }}
+            whileInView={{ opacity: 1, scale: 1, rotateY: 0 }}
+            viewport={{ once: true }}
+            transition={{ 
+              duration: 0.6, 
+              delay: index * 0.1,
+              type: "spring",
+              stiffness: 100
+            }}
+            whileHover={{ 
+              scale: 1.1, 
+              rotateY: 10,
+              z: 50,
+              transition: { duration: 0.3 }
+            }}
+            style={{ transformStyle: 'preserve-3d' }}
+            className={`relative ${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-2xl p-6 text-center cursor-pointer shadow-xl hover:shadow-2xl transition-shadow duration-300 border ${darkMode ? 'border-gray-700' : 'border-gray-200'} group`}
+          >
+            {/* 3D Glow Effect */}
+            <div className={`absolute inset-0 rounded-2xl bg-gradient-to-br ${category.color} opacity-0 group-hover:opacity-20 blur-xl transition-opacity duration-300`} />
+            
+            <motion.div 
+              className={`relative w-16 h-16 bg-gradient-to-br ${category.color} rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg`}
+              whileHover={{ rotate: 360 }}
+              transition={{ duration: 0.6 }}
+            >
+              <category.icon className="text-white text-2xl" />
+            </motion.div>
+            <h3 className={`font-semibold mb-2 text-base relative ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+              {category.name}
+            </h3>
+            <p className={`text-sm font-medium relative ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+              {category.count} posts
+            </p>
+          </motion.div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+// Parallax Blog Showcase
+function ParallaxBlogShowcase({ posts, darkMode, scrollY }) {
+  const showcasePosts = posts.slice(0, 4);
+  
+  return (
+    <section className="mb-24 relative">
+      <motion.div 
+        className="text-center mb-16"
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        viewport={{ once: true }}
+      >
+        <h2 className={`text-4xl md:text-5xl font-bold mb-6 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+          Trending Stories
+        </h2>
+        <p className={`text-lg md:text-xl max-w-2xl mx-auto ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+          Most loved by our community
+        </p>
+      </motion.div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        {showcasePosts.map((post, index) => {
+          const isEven = index % 2 === 0;
+          
+          return (
+            <motion.div
+              key={post.id}
+              initial={{ opacity: 0, x: isEven ? -100 : 100, rotateY: isEven ? -20 : 20 }}
+              whileInView={{ opacity: 1, x: 0, rotateY: 0 }}
+              viewport={{ once: true, amount: 0.3 }}
+              transition={{ duration: 0.8, delay: index * 0.15 }}
+              style={{ transformStyle: 'preserve-3d' }}
+            >
+              <Link to={`/blogs/singlepost/${post.id}`}>
+                <motion.article
+                  className={`relative ${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-3xl overflow-hidden shadow-xl group cursor-pointer border ${darkMode ? 'border-gray-700' : 'border-gray-200'}`}
+                  whileHover={{ 
+                    y: -10,
+                    rotateX: 5,
+                    rotateY: isEven ? 5 : -5,
+                    scale: 1.02,
+                    transition: { duration: 0.3 }
+                  }}
+                  style={{ transformStyle: 'preserve-3d' }}
+                >
+                  {/* 3D Image Container */}
+                  <div className="relative h-64 overflow-hidden">
+                    <motion.div
+                      whileHover={{ scale: 1.15, rotate: 2 }}
+                      transition={{ duration: 0.6 }}
+                    >
+                      <ImageWithFallback
+                        src={post.image}
+                        alt={post.title}
+                        className="w-full h-64 object-cover"
+                        fallbackSrc="https://wanderluxe-ventures.onrender.com/api/placeholder/600/400"
+                      />
+                    </motion.div>
+                    
+                    {/* Gradient Overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                    
+                    {/* Floating Badge */}
+                    <motion.div 
+                      className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-full"
+                      whileHover={{ scale: 1.1, rotate: 5 }}
+                    >
+                      <span className="text-gray-900 text-sm font-bold">#{index + 1}</span>
+                    </motion.div>
+
+                    {/* Stats Overlay */}
+                    <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between">
+                      <div className="flex items-center space-x-4 text-white">
+                        <motion.div 
+                          className="flex items-center space-x-1"
+                          whileHover={{ scale: 1.2 }}
+                        >
+                          <FaHeart className="text-red-400" />
+                          <span className="text-sm font-medium">{post.likes}</span>
+                        </motion.div>
+                        <motion.div 
+                          className="flex items-center space-x-1"
+                          whileHover={{ scale: 1.2 }}
+                        >
+                          <FaComments className="text-blue-400" />
+                          <span className="text-sm font-medium">{post.comments}</span>
+                        </motion.div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Content with 3D Transform */}
+                  <motion.div 
+                    className="p-6"
+                    style={{ transform: 'translateZ(20px)' }}
+                  >
+                    <h3 className={`text-2xl font-bold mb-3 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-blue-500 group-hover:to-purple-600 transition-all duration-300 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                      {post.title}
+                    </h3>
+                    <p className={`text-sm mb-4 line-clamp-3 leading-relaxed ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                      {post.description || "Discover an amazing journey through this destination..."}
+                    </p>
+                    <div className="flex items-center justify-between">
+                      <span className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                        {new Date(post.created_at).toLocaleDateString()}
+                      </span>
+                      <motion.div
+                        className="text-blue-500 group-hover:text-purple-600 transition-colors"
+                        whileHover={{ x: 5 }}
+                      >
+                        <span className="text-sm font-semibold">Read more →</span>
+                      </motion.div>
+                    </div>
+                  </motion.div>
+                </motion.article>
+              </Link>
+            </motion.div>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
+// Interactive 3D Stats
+function Interactive3DStats({ posts, darkMode }) {
+  const totalPosts = posts.length;
+  const totalLikes = posts.reduce((sum, post) => sum + post.likes, 0);
+  const totalComments = posts.reduce((sum, post) => sum + post.comments, 0);
+  const avgReadTime = 5;
+
+  const stats = [
+    { label: 'Blog Posts', value: totalPosts, icon: FaRocket, color: 'from-blue-500 to-cyan-500' },
+    { label: 'Total Likes', value: totalLikes, icon: FaHeart, color: 'from-pink-500 to-rose-500' },
+    { label: 'Comments', value: totalComments, icon: FaComments, color: 'from-purple-500 to-indigo-500' },
+    { label: 'Avg Read Time', value: `${avgReadTime}m`, icon: FaClock, color: 'from-orange-500 to-yellow-500' },
+  ];
+
+  return (
+    <section className="mb-24">
+      <motion.div
+        className={`${darkMode ? 'bg-gradient-to-br from-gray-800 via-gray-900 to-gray-800' : 'bg-gradient-to-br from-white via-sky-50 to-white'} rounded-3xl p-12 shadow-2xl border ${darkMode ? 'border-gray-700' : 'border-gray-200'} relative overflow-hidden`}
+        initial={{ opacity: 0, scale: 0.9 }}
+        whileInView={{ opacity: 1, scale: 1 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.6 }}
+      >
+        {/* Animated Background Pattern */}
+        <motion.div
+          className="absolute inset-0 opacity-10"
+          animate={{
+            backgroundPosition: ['0% 0%', '100% 100%'],
+          }}
+          transition={{
+            duration: 20,
+            repeat: Infinity,
+            repeatType: 'reverse',
+          }}
+          style={{
+            backgroundImage: 'linear-gradient(45deg, transparent 30%, rgba(59, 130, 246, 0.3) 30%, rgba(59, 130, 246, 0.3) 70%, transparent 70%)',
+            backgroundSize: '100px 100px',
+          }}
+        />
+
+        <div className="text-center mb-12 relative z-10">
+          <h2 className={`text-3xl md:text-4xl font-bold mb-4 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+            Our Community Impact
+          </h2>
+          <p className={`text-lg ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+            Growing together, one story at a time
+          </p>
+        </div>
+        
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 relative z-10">
+          {stats.map((stat, index) => (
+            <motion.div
+              key={stat.label}
+              initial={{ opacity: 0, y: 50, rotateX: -90 }}
+              whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
+              viewport={{ once: true }}
+              transition={{ 
+                duration: 0.6, 
+                delay: index * 0.1,
+                type: "spring"
+              }}
+              whileHover={{ 
+                scale: 1.1,
+                rotateY: 10,
+                z: 50,
+                transition: { duration: 0.3 }
+              }}
+              style={{ transformStyle: 'preserve-3d' }}
+              className="text-center"
+            >
+              <motion.div 
+                className={`w-20 h-20 bg-gradient-to-br ${stat.color} rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-xl`}
+                whileHover={{ rotate: 360 }}
+                transition={{ duration: 0.6 }}
+              >
+                <stat.icon className="text-white text-3xl" />
+              </motion.div>
+              <motion.div 
+                className={`text-4xl md:text-5xl font-bold mb-2 ${darkMode ? 'text-white' : 'text-gray-900'}`}
+                initial={{ scale: 0 }}
+                whileInView={{ scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1 + 0.3, type: "spring", stiffness: 200 }}
+              >
+                {stat.value}
+              </motion.div>
+              <div className={`text-sm font-medium ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                {stat.label}
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </motion.div>
+    </section>
+  );
+}
+
+// Magnetic Card Grid
+function MagneticCardGrid({ posts, darkMode }) {
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [hoveredCard, setHoveredCard] = useState(null);
+  
+  const gridPosts = posts.slice(0, 6);
+
+  const handleMouseMove = (e, index) => {
+    const card = e.currentTarget;
+    const rect = card.getBoundingClientRect();
+    const x = e.clientX - rect.left - rect.width / 2;
+    const y = e.clientY - rect.top - rect.height / 2;
+    setMousePosition({ x, y });
+    setHoveredCard(index);
+  };
+
+  return (
+    <section className="mb-24">
+      <motion.div 
+        className="text-center mb-16"
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        viewport={{ once: true }}
+      >
+        <h2 className={`text-4xl md:text-5xl font-bold mb-6 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+          Latest Adventures
+        </h2>
+        <p className={`text-lg md:text-xl max-w-2xl mx-auto ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+          Interactive stories from around the world
+        </p>
+      </motion.div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {gridPosts.map((post, index) => (
+          <motion.div
+            key={post.id}
+            initial={{ opacity: 0, scale: 0.8, rotateY: -30 }}
+            whileInView={{ opacity: 1, scale: 1, rotateY: 0 }}
+            viewport={{ once: true, amount: 0.3 }}
+            transition={{ duration: 0.6, delay: index * 0.1 }}
+            onMouseMove={(e) => handleMouseMove(e, index)}
+            onMouseLeave={() => setHoveredCard(null)}
+            style={{
+              transformStyle: 'preserve-3d',
+              transform: hoveredCard === index 
+                ? `perspective(1000px) rotateY(${mousePosition.x / 20}deg) rotateX(${-mousePosition.y / 20}deg) translateZ(20px)` 
+                : 'none',
+              transition: 'transform 0.1s ease-out'
+            }}
+          >
+            <Link to={`/blogs/singlepost/${post.id}`}>
+              <motion.article
+                className={`relative ${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-2xl overflow-hidden shadow-xl group cursor-pointer border ${darkMode ? 'border-gray-700' : 'border-gray-200'}`}
+                whileHover={{ scale: 1.05 }}
+              >
+                {/* Spotlight Effect */}
+                {hoveredCard === index && (
+                  <motion.div
+                    className="absolute inset-0 pointer-events-none z-10"
+                    style={{
+                      background: `radial-gradient(circle 150px at ${mousePosition.x + 150}px ${mousePosition.y + 150}px, rgba(59, 130, 246, 0.2), transparent)`,
+                    }}
+                  />
+                )}
+
+                <div className="relative h-48 overflow-hidden">
+                  <motion.div
+                    whileHover={{ scale: 1.2 }}
+                    transition={{ duration: 0.4 }}
+                  >
+                    <ImageWithFallback
+                      src={post.image}
+                      alt={post.title}
+                      className="w-full h-full object-cover"
+                      fallbackSrc="https://wanderluxe-ventures.onrender.com/api/placeholder/400/300"
+                    />
+                  </motion.div>
+                  
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                  
+                  <motion.div 
+                    className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full"
+                    whileHover={{ scale: 1.1, rotate: 10 }}
+                  >
+                    <span className="text-gray-900 text-xs font-bold">Featured</span>
+                  </motion.div>
+                </div>
+
+                <div className="p-6" style={{ transform: 'translateZ(40px)' }}>
+                  <h3 className={`text-xl font-bold mb-3 line-clamp-2 group-hover:text-blue-500 transition-colors ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                    {post.title}
+                  </h3>
+                  <p className={`text-sm mb-4 line-clamp-3 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                    {post.description || "Explore this amazing destination..."}
+                  </p>
+                  
+                  <div className="flex items-center justify-between text-sm">
+                    <span className={`${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                      {new Date(post.created_at).toLocaleDateString()}
+                    </span>
+                    <div className="flex items-center space-x-3">
+                      <div className="flex items-center space-x-1">
+                        <FaHeart className="text-red-500" />
+                        <span className={`${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>{post.likes}</span>
+                      </div>
+                      <div className="flex items-center space-x-1">
+                        <FaComments className="text-blue-500" />
+                        <span className={`${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>{post.comments}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </motion.article>
+            </Link>
+          </motion.div>
+        ))}
+      </div>
+    </section>
   );
 }
 
@@ -399,9 +887,6 @@ function Home() {
   const [scrollY, setScrollY] = useState(0);
   const { darkMode } = useTheme();
   const { posts } = usePosts();
-  const [currentTime, setCurrentTime] = useState(new Date());
-  const [weatherData, setWeatherData] = useState(null);
-  const [isWeatherLoading, setIsWeatherLoading] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
   const heroRef = useRef(null);
 
@@ -424,32 +909,9 @@ function Home() {
   const heroTitle = "Discover the World";
   const heroSubtitle = "Explore breathtaking destinations and create unforgettable memories with our curated travel experiences";
 
-  useEffect(() => {
-    const fetchWeatherData = async () => {
-      setIsWeatherLoading(true);
-      try {
-        const response = await new Promise(resolve => 
-          setTimeout(() => resolve({ 
-            temperature: 25, 
-            condition: 'Sunny', 
-            location: 'Paradise City' 
-          }), 1000)
-        );
-        setWeatherData(response);
-      } catch (error) {
-        console.error('Error fetching weather data:', error);
-      } finally {
-        setIsWeatherLoading(false);
-      }
-    };
-
-    fetchWeatherData();
-  }, []);
-
   // Parallax transforms
   const y = useMotionValue(0);
   const yTransform = useTransform(y, [0, 1000], [0, -200]);
-  const xTransform = useTransform(y, [0, 1000], [0, 100]);
 
   // Scroll-triggered animations
   useEffect(() => {
@@ -620,96 +1082,102 @@ function Home() {
         </div>
       </div>
 
-      {/* Blog Content Section */}
-      <div className={`relative ${darkMode ? 'bg-gray-900' : 'bg-sky-100'}`}>
-        <div className="container mx-auto px-4 py-20 relative z-10">
-          {/* Featured Blog Posts Section */}
-          <FeaturedBlogPosts posts={posts} darkMode={darkMode} />
-          
-          {/* Blog Categories Section */}
-          <BlogCategories darkMode={darkMode} />
-          
-          {/* Recent Posts Grid */}
-          <RecentPostsGrid posts={posts} darkMode={darkMode} />
-          
-          {/* Blog Statistics */}
-          <BlogStatistics posts={posts} darkMode={darkMode} />
-          
-          {/* Newsletter Signup */}
-          <NewsletterSignup darkMode={darkMode} />
-        </div>
-      </div>
-
-      {/* Parallax Background Elements */}
-      <div className={`relative ${darkMode ? 'bg-gray-900' : 'bg-sky-50'}`}>
+      {/* 3D Interactive Content Section */}
+      <div className={`relative overflow-hidden ${darkMode ? 'bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900' : 'bg-gradient-to-b from-sky-50 via-white to-sky-50'}`}>
+        {/* Animated Background Layers */}
         <motion.div
-          className={`absolute inset-0 ${darkMode ? 'bg-gradient-to-b from-transparent via-blue-900/5 to-purple-900/5' : 'bg-gradient-to-b from-transparent via-sky-100/30 to-sky-200/20'}`}
+          className="absolute inset-0 opacity-30"
           style={{ y: yTransform }}
-        />
-        
-        {/* Floating geometric shapes */}
+        >
+          <div className={`absolute inset-0 ${darkMode ? 'bg-[radial-gradient(circle_at_50%_50%,rgba(59,130,246,0.1),transparent_50%)]' : 'bg-[radial-gradient(circle_at_50%_50%,rgba(14,165,233,0.15),transparent_50%)]'}`} />
+        </motion.div>
+
+        {/* Floating 3D Particles */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          {[...Array(4)].map((_, i) => (
+          {[...Array(12)].map((_, i) => (
             <motion.div
               key={i}
-              className={`absolute w-24 h-24 border rounded-full ${darkMode ? 'border-blue-400/10' : 'border-sky-300/40'}`}
+              className={`absolute w-2 h-2 rounded-full ${darkMode ? 'bg-blue-400/20' : 'bg-sky-400/30'}`}
               style={{
-                left: `${15 + i * 25}%`,
-                top: `${20 + i * 15}%`,
-                x: xTransform,
-                y: yTransform,
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
               }}
               animate={{
-                rotate: [0, 360],
-                scale: [1, 1.05, 1],
+                y: [-20, 20, -20],
+                x: [-10, 10, -10],
+                scale: [1, 1.5, 1],
+                opacity: [0.3, 0.7, 0.3],
               }}
               transition={{
-                duration: 30 + i * 10,
+                duration: 5 + Math.random() * 5,
                 repeat: Infinity,
-                ease: "linear"
+                ease: "easeInOut",
+                delay: Math.random() * 2,
               }}
             />
           ))}
         </div>
 
-        <div id="content" className={`container mx-auto px-4 pt-20 relative z-10 ${darkMode ? 'bg-gray-900' : 'bg-sky-50'}`}>
-          <div className="flex flex-col lg:flex-row gap-8">
-            <motion.div 
-              className="w-full lg:w-2/3"
-              initial={{ opacity: 0, x: -50 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.5 }}
-              style={{ y: yTransform }}
-            >
-              <EnhancedWeatherWidget weatherData={weatherData} isLoading={isWeatherLoading} darkMode={darkMode} />
-              <FeaturedDestinations darkMode={darkMode} posts={posts} />
-              <Post />
-              <TrendingPosts darkMode={darkMode} posts={posts} />
-            </motion.div>
-            <motion.div 
-              className="w-full lg:w-1/3 mt-8 lg:mt-0"
-              initial={{ opacity: 0, x: 50 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-              style={{ y: yTransform }}
-            >
-              {/* Creative Blog Displays Container */}
-              <div className="space-y-6 relative z-10">
-                {/* Vertical Timeline Blog Display */}
-                <VerticalTimelineBlogs posts={posts} darkMode={darkMode} />
-                
-                {/* Masonry Grid Blog Display */}
-                <MasonryGridBlogs posts={posts} darkMode={darkMode} />
-                
-                {/* Category Tabs Blog Display */}
-                <CategoryTabsBlogs posts={posts} darkMode={darkMode} />
-                
-                {/* Interactive Reading Progress */}
-                <ReadingProgressBlogs posts={posts} darkMode={darkMode} />
-              </div>
-            </motion.div>
-          </div>
+        <div className="container mx-auto px-4 py-20 relative z-10">
+          {/* 3D Scroll-Reveal Featured Section */}
+          <ScrollReveal3D darkMode={darkMode}>
+            <FeaturedBlogPosts posts={posts} darkMode={darkMode} />
+          </ScrollReveal3D>
+
+          {/* Interactive 3D Categories Grid */}
+          <ScrollReveal3D delay={0.2} darkMode={darkMode}>
+            <Floating3DCategories darkMode={darkMode} />
+          </ScrollReveal3D>
+
+          {/* Parallax Blog Showcase */}
+          <ParallaxBlogShowcase posts={posts} darkMode={darkMode} scrollY={scrollY} />
+
+          {/* 3D Stats Counter */}
+          <ScrollReveal3D delay={0.4} darkMode={darkMode}>
+            <Interactive3DStats posts={posts} darkMode={darkMode} />
+          </ScrollReveal3D>
+
+          {/* Magnetic Card Grid */}
+          <MagneticCardGrid posts={posts} darkMode={darkMode} />
+
+          {/* Testimonials Section */}
+          <ScrollReveal3D delay={0.3} darkMode={darkMode}>
+            <Testimonials3D darkMode={darkMode} />
+          </ScrollReveal3D>
+
+          {/* Travel Tips Section */}
+          <TravelTips3D darkMode={darkMode} scrollY={scrollY} />
+
+          {/* Destination Highlights */}
+          <DestinationHighlights darkMode={darkMode} posts={posts} />
+
+          {/* Interactive World Explorer */}
+          <ScrollReveal3D delay={0.4} darkMode={darkMode}>
+            <WorldExplorer darkMode={darkMode} />
+          </ScrollReveal3D>
+
+          {/* Travel Insights */}
+          <TravelInsights darkMode={darkMode} />
+
+          {/* Photo Gallery 3D */}
+          <PhotoGallery3D posts={posts} darkMode={darkMode} />
+
+          {/* Community Section */}
+          <ScrollReveal3D delay={0.5} darkMode={darkMode}>
+            <CommunitySection darkMode={darkMode} />
+          </ScrollReveal3D>
+
+          {/* FAQ Accordion */}
+          <FAQAccordion darkMode={darkMode} />
+
+          {/* Newsletter with 3D Effect */}
+          <ScrollReveal3D delay={0.6} darkMode={darkMode}>
+            <NewsletterSignup darkMode={darkMode} />
+          </ScrollReveal3D>
         </div>
+
+        {/* Scroll Progress Indicator */}
+        <ScrollProgressIndicator darkMode={darkMode} />
       </div>
     </div>
   );
@@ -1374,6 +1842,738 @@ function ReadingProgressBlogs({ posts, darkMode }) {
         })}
       </div>
     </div>
+  );
+}
+
+// Testimonials 3D Section
+function Testimonials3D({ darkMode }) {
+  const testimonials = [
+    {
+      name: "Sarah Johnson",
+      role: "Travel Blogger",
+      avatar: "🌸",
+      text: "This platform transformed how I discover destinations. The community is amazing and the content is always inspiring!",
+      rating: 5,
+      location: "New York, USA"
+    },
+    {
+      name: "Marco Rodriguez",
+      role: "Adventure Seeker",
+      avatar: "🏔️",
+      text: "I've found hidden gems I never knew existed. The detailed guides and stunning photography make planning adventures so easy.",
+      rating: 5,
+      location: "Barcelona, Spain"
+    },
+    {
+      name: "Yuki Tanaka",
+      role: "Photography Enthusiast",
+      avatar: "📸",
+      text: "The visual storytelling here is exceptional. Every post inspires me to grab my camera and explore new places.",
+      rating: 5,
+      location: "Tokyo, Japan"
+    }
+  ];
+
+  return (
+    <section className="mb-24">
+      <motion.div 
+        className="text-center mb-16"
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        viewport={{ once: true }}
+      >
+        <h2 className={`text-4xl md:text-5xl font-bold mb-6 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+          What Travelers Say
+        </h2>
+        <p className={`text-lg md:text-xl max-w-2xl mx-auto ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+          Join thousands of happy explorers worldwide
+        </p>
+      </motion.div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        {testimonials.map((testimonial, index) => (
+          <motion.div
+            key={index}
+            initial={{ opacity: 0, y: 50, rotateY: -30 }}
+            whileInView={{ opacity: 1, y: 0, rotateY: 0 }}
+            viewport={{ once: true, amount: 0.3 }}
+            transition={{ duration: 0.6, delay: index * 0.15 }}
+            whileHover={{ 
+              y: -10, 
+              rotateX: 5,
+              scale: 1.03,
+              transition: { duration: 0.3 }
+            }}
+            style={{ transformStyle: 'preserve-3d' }}
+          >
+            <div className={`relative ${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-3xl p-8 shadow-xl border ${darkMode ? 'border-gray-700' : 'border-gray-200'} h-full`}>
+              {/* Quote Icon */}
+              <motion.div
+                className="absolute -top-4 -left-4 w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center shadow-lg"
+                whileHover={{ rotate: 360, scale: 1.2 }}
+                transition={{ duration: 0.6 }}
+              >
+                <span className="text-white text-2xl">"</span>
+              </motion.div>
+
+              {/* Avatar */}
+              <div className="flex items-center mb-6">
+                <motion.div 
+                  className="w-16 h-16 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center text-3xl mr-4 shadow-lg"
+                  whileHover={{ scale: 1.1, rotate: 10 }}
+                >
+                  {testimonial.avatar}
+                </motion.div>
+                <div>
+                  <h4 className={`font-bold text-lg ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                    {testimonial.name}
+                  </h4>
+                  <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                    {testimonial.role}
+                  </p>
+                </div>
+              </div>
+
+              {/* Rating Stars */}
+              <div className="flex mb-4">
+                {[...Array(testimonial.rating)].map((_, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ scale: 0, rotate: -180 }}
+                    whileInView={{ scale: 1, rotate: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: index * 0.15 + i * 0.1 }}
+                    whileHover={{ scale: 1.3, rotate: 360 }}
+                  >
+                    <FaStar className="text-yellow-400 text-lg mr-1" />
+                  </motion.div>
+                ))}
+              </div>
+
+              {/* Testimonial Text */}
+              <p className={`text-sm leading-relaxed mb-4 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                {testimonial.text}
+              </p>
+
+              {/* Location */}
+              <div className="flex items-center text-xs text-gray-500">
+                <FaMapMarkerAlt className="mr-1" />
+                <span>{testimonial.location}</span>
+              </div>
+            </div>
+          </motion.div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+// Travel Tips 3D Section
+function TravelTips3D({ darkMode, scrollY }) {
+  const tips = [
+    { icon: FaPlane, title: "Book in Advance", description: "Save up to 40% by booking flights 6-8 weeks early", color: "from-blue-500 to-cyan-500" },
+    { icon: FaHotel, title: "Local Stays", description: "Experience authentic culture with local accommodations", color: "from-purple-500 to-pink-500" },
+    { icon: FaCalendarAlt, title: "Off-Season Travel", description: "Visit during shoulder season for better deals and fewer crowds", color: "from-green-500 to-emerald-500" },
+    { icon: FaMapMarkerAlt, title: "Research First", description: "Learn local customs and basic phrases before visiting", color: "from-orange-500 to-red-500" },
+    { icon: FaSun, title: "Pack Light", description: "Travel with carry-on only to save time and money", color: "from-yellow-500 to-orange-500" },
+    { icon: FaCompass, title: "Stay Flexible", description: "Allow room for spontaneous adventures and discoveries", color: "from-indigo-500 to-purple-500" },
+  ];
+
+  return (
+    <section className="mb-24">
+      <motion.div 
+        className="text-center mb-16"
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+      >
+        <h2 className={`text-4xl md:text-5xl font-bold mb-6 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+          Pro Travel Tips
+        </h2>
+        <p className={`text-lg md:text-xl max-w-2xl mx-auto ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+          Expert advice to make your journey unforgettable
+        </p>
+      </motion.div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {tips.map((tip, index) => (
+          <motion.div
+            key={index}
+            initial={{ opacity: 0, scale: 0.8, rotateX: -30 }}
+            whileInView={{ opacity: 1, scale: 1, rotateX: 0 }}
+            viewport={{ once: true, amount: 0.3 }}
+            transition={{ duration: 0.5, delay: index * 0.1 }}
+            whileHover={{ 
+              scale: 1.05,
+              rotateY: 10,
+              z: 30,
+              transition: { duration: 0.3 }
+            }}
+            style={{ transformStyle: 'preserve-3d' }}
+          >
+            <div className={`relative ${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-2xl p-6 shadow-lg border ${darkMode ? 'border-gray-700' : 'border-gray-200'} overflow-hidden group h-full`}>
+              {/* Animated Background */}
+              <motion.div
+                className={`absolute inset-0 bg-gradient-to-br ${tip.color} opacity-0 group-hover:opacity-10 transition-opacity duration-300`}
+                whileHover={{ scale: 1.2 }}
+              />
+
+              <div className="relative z-10">
+                <motion.div 
+                  className={`w-14 h-14 bg-gradient-to-br ${tip.color} rounded-xl flex items-center justify-center mb-4 shadow-lg`}
+                  whileHover={{ rotate: 360, scale: 1.1 }}
+                  transition={{ duration: 0.6 }}
+                >
+                  <tip.icon className="text-white text-2xl" />
+                </motion.div>
+
+                <h3 className={`text-xl font-bold mb-3 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                  {tip.title}
+                </h3>
+                <p className={`text-sm leading-relaxed ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                  {tip.description}
+                </p>
+              </div>
+            </div>
+          </motion.div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+// Destination Highlights
+function DestinationHighlights({ darkMode, posts }) {
+  const highlights = posts.slice(0, 4);
+
+  return (
+    <section className="mb-24">
+      <motion.div 
+        className="text-center mb-16"
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        viewport={{ once: true }}
+      >
+        <h2 className={`text-4xl md:text-5xl font-bold mb-6 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+          Featured Destinations
+        </h2>
+        <p className={`text-lg md:text-xl max-w-2xl mx-auto ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+          Explore the world's most breathtaking locations
+        </p>
+      </motion.div>
+
+      <div className="space-y-12">
+        {highlights.map((post, index) => {
+          const isEven = index % 2 === 0;
+
+          return (
+            <motion.div
+              key={post.id}
+              initial={{ opacity: 0, x: isEven ? -100 : 100 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true, amount: 0.3 }}
+              transition={{ duration: 0.8 }}
+            >
+              <Link to={`/blogs/singlepost/${post.id}`}>
+                <div className={`flex flex-col ${isEven ? 'lg:flex-row' : 'lg:flex-row-reverse'} gap-8 items-center`}>
+                  {/* Image Section */}
+                  <motion.div 
+                    className="lg:w-1/2"
+                    whileHover={{ scale: 1.03 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <div className="relative rounded-3xl overflow-hidden shadow-2xl group">
+                      <motion.div
+                        whileHover={{ scale: 1.1 }}
+                        transition={{ duration: 0.6 }}
+                      >
+                        <ImageWithFallback
+                          src={post.image}
+                          alt={post.title}
+                          className="w-full h-80 object-cover"
+                          fallbackSrc="https://wanderluxe-ventures.onrender.com/api/placeholder/600/400"
+                        />
+                      </motion.div>
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                    </div>
+                  </motion.div>
+
+                  {/* Content Section */}
+                  <motion.div 
+                    className="lg:w-1/2"
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: 0.3 }}
+                  >
+                    <motion.div
+                      className="inline-block mb-4"
+                      whileHover={{ scale: 1.1, rotate: 5 }}
+                    >
+                      <span className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-4 py-2 rounded-full text-sm font-bold">
+                        Destination #{index + 1}
+                      </span>
+                    </motion.div>
+
+                    <h3 className={`text-3xl md:text-4xl font-bold mb-4 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                      {post.title}
+                    </h3>
+                    <p className={`text-lg mb-6 leading-relaxed ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                      {post.description || "Discover the beauty and wonder of this incredible destination. From stunning landscapes to rich cultural experiences, every moment is an adventure waiting to happen."}
+                    </p>
+
+                    <div className="flex flex-wrap gap-4 mb-6">
+                      <div className="flex items-center space-x-2">
+                        <FaHeart className="text-red-500" />
+                        <span className={`font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                          {post.likes} Likes
+                        </span>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <FaComments className="text-blue-500" />
+                        <span className={`font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                          {post.comments} Comments
+                        </span>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <FaClock className="text-green-500" />
+                        <span className={`font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                          5 min read
+                        </span>
+                      </div>
+                    </div>
+
+                    <motion.button
+                      className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-8 py-3 rounded-full font-semibold shadow-lg"
+                      whileHover={{ scale: 1.05, boxShadow: "0 20px 40px rgba(59, 130, 246, 0.4)" }}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      Explore Destination →
+                    </motion.button>
+                  </motion.div>
+                </div>
+              </Link>
+            </motion.div>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
+// World Explorer Interactive
+function WorldExplorer({ darkMode }) {
+  const regions = [
+    { name: "Asia", count: 145, icon: "🏯", color: "from-red-500 to-orange-500" },
+    { name: "Europe", count: 98, icon: "🏰", color: "from-blue-500 to-cyan-500" },
+    { name: "Americas", count: 87, icon: "🗽", color: "from-green-500 to-emerald-500" },
+    { name: "Africa", count: 56, icon: "🦁", color: "from-yellow-500 to-orange-600" },
+    { name: "Oceania", count: 42, icon: "🏝️", color: "from-purple-500 to-pink-500" },
+  ];
+
+  return (
+    <section className="mb-24">
+      <div className={`${darkMode ? 'bg-gradient-to-br from-gray-800 to-gray-900' : 'bg-gradient-to-br from-sky-50 to-blue-50'} rounded-3xl p-12 shadow-2xl relative overflow-hidden`}>
+        {/* Animated Globe Background */}
+        <motion.div
+          className="absolute inset-0 opacity-5"
+          animate={{ rotate: 360 }}
+          transition={{ duration: 100, repeat: Infinity, ease: "linear" }}
+        >
+          <FaGlobe className="text-9xl absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" />
+        </motion.div>
+
+        <div className="relative z-10">
+          <motion.div 
+            className="text-center mb-12"
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+          >
+            <h2 className={`text-4xl md:text-5xl font-bold mb-6 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+              Explore the World
+            </h2>
+            <p className={`text-lg md:text-xl max-w-2xl mx-auto ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+              Discover destinations across all continents
+            </p>
+          </motion.div>
+
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
+            {regions.map((region, index) => (
+              <motion.div
+                key={region.name}
+                initial={{ opacity: 0, scale: 0, rotateY: -180 }}
+                whileInView={{ opacity: 1, scale: 1, rotateY: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: index * 0.1 }}
+                whileHover={{ 
+                  scale: 1.1,
+                  rotateY: 10,
+                  z: 50,
+                  transition: { duration: 0.3 }
+                }}
+                style={{ transformStyle: 'preserve-3d' }}
+                className="cursor-pointer"
+              >
+                <div className={`${darkMode ? 'bg-gray-700' : 'bg-white'} rounded-2xl p-6 text-center shadow-xl hover:shadow-2xl transition-shadow`}>
+                  <motion.div 
+                    className={`text-5xl mb-3`}
+                    whileHover={{ scale: 1.3, rotate: 360 }}
+                    transition={{ duration: 0.6 }}
+                  >
+                    {region.icon}
+                  </motion.div>
+                  <h3 className={`font-bold text-lg mb-2 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                    {region.name}
+                  </h3>
+                  <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                    {region.count} destinations
+                  </p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// Travel Insights
+function TravelInsights({ darkMode }) {
+  const insights = [
+    { label: "Countries Covered", value: "150+", icon: FaGlobe, color: "from-blue-500 to-cyan-500" },
+    { label: "Active Travelers", value: "50K+", icon: FaUser, color: "from-purple-500 to-pink-500" },
+    { label: "Photos Shared", value: "100K+", icon: FaCompass, color: "from-green-500 to-emerald-500" },
+    { label: "Travel Guides", value: "500+", icon: FaPlane, color: "from-orange-500 to-red-500" },
+  ];
+
+  return (
+    <section className="mb-24">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+        {insights.map((insight, index) => (
+          <motion.div
+            key={index}
+            initial={{ opacity: 0, y: 50, scale: 0.5 }}
+            whileInView={{ opacity: 1, y: 0, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: index * 0.1, type: "spring" }}
+            whileHover={{ 
+              scale: 1.1,
+              rotateX: 10,
+              z: 30,
+              transition: { duration: 0.3 }
+            }}
+            style={{ transformStyle: 'preserve-3d' }}
+          >
+            <div className={`${darkMode ? 'bg-gradient-to-br from-gray-800 to-gray-900' : 'bg-gradient-to-br from-white to-gray-50'} rounded-2xl p-6 text-center shadow-xl border ${darkMode ? 'border-gray-700' : 'border-gray-200'}`}>
+              <motion.div 
+                className={`w-16 h-16 bg-gradient-to-br ${insight.color} rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg`}
+                whileHover={{ rotate: 360 }}
+                transition={{ duration: 0.6 }}
+              >
+                <insight.icon className="text-white text-2xl" />
+              </motion.div>
+              <motion.div 
+                className={`text-3xl md:text-4xl font-bold mb-2 ${darkMode ? 'text-white' : 'text-gray-900'}`}
+                initial={{ scale: 0 }}
+                whileInView={{ scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1 + 0.3, type: "spring" }}
+              >
+                {insight.value}
+              </motion.div>
+              <p className={`text-sm font-medium ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                {insight.label}
+              </p>
+            </div>
+          </motion.div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+// Photo Gallery 3D
+function PhotoGallery3D({ posts, darkMode }) {
+  const galleryPosts = posts.slice(0, 8);
+
+  return (
+    <section className="mb-24">
+      <motion.div 
+        className="text-center mb-16"
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        viewport={{ once: true }}
+      >
+        <h2 className={`text-4xl md:text-5xl font-bold mb-6 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+          Travel Gallery
+        </h2>
+        <p className={`text-lg md:text-xl max-w-2xl mx-auto ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+          A visual journey around the world
+        </p>
+      </motion.div>
+
+      <div className="columns-1 md:columns-2 lg:columns-4 gap-4 space-y-4">
+        {galleryPosts.map((post, index) => (
+          <motion.div
+            key={post.id}
+            initial={{ opacity: 0, scale: 0.8 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: index * 0.05 }}
+            whileHover={{ 
+              scale: 1.05,
+              rotateZ: index % 2 === 0 ? 2 : -2,
+              z: 50,
+              transition: { duration: 0.3 }
+            }}
+            style={{ transformStyle: 'preserve-3d' }}
+            className="break-inside-avoid"
+          >
+            <Link to={`/blogs/singlepost/${post.id}`}>
+              <div className="relative rounded-2xl overflow-hidden shadow-lg group cursor-pointer">
+                <ImageWithFallback
+                  src={post.image}
+                  alt={post.title}
+                  className={`w-full ${index % 3 === 0 ? 'h-64' : index % 3 === 1 ? 'h-48' : 'h-56'} object-cover group-hover:scale-110 transition-transform duration-500`}
+                  fallbackSrc="https://wanderluxe-ventures.onrender.com/api/placeholder/300/400"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <div className="absolute bottom-4 left-4 right-4">
+                    <h4 className="text-white font-bold text-sm mb-2 line-clamp-2">{post.title}</h4>
+                    <div className="flex items-center space-x-3 text-white text-xs">
+                      <span className="flex items-center">
+                        <FaHeart className="mr-1 text-red-400" /> {post.likes}
+                      </span>
+                      <span className="flex items-center">
+                        <FaComments className="mr-1 text-blue-400" /> {post.comments}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </Link>
+          </motion.div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+// Community Section
+function CommunitySection({ darkMode }) {
+  const features = [
+    { icon: FaUser, title: "Join Community", description: "Connect with fellow travelers", color: "from-blue-500 to-cyan-500" },
+    { icon: FaShare, title: "Share Stories", description: "Post your travel experiences", color: "from-purple-500 to-pink-500" },
+    { icon: FaStar, title: "Get Featured", description: "Showcase your best content", color: "from-yellow-500 to-orange-500" },
+  ];
+
+  return (
+    <section className="mb-24">
+      <div className={`${darkMode ? 'bg-gradient-to-r from-blue-900 to-purple-900' : 'bg-gradient-to-r from-blue-500 to-purple-600'} rounded-3xl p-12 text-white relative overflow-hidden`}>
+        {/* Animated Background */}
+        <motion.div
+          className="absolute inset-0 opacity-20"
+          animate={{
+            backgroundPosition: ['0% 0%', '100% 100%'],
+          }}
+          transition={{
+            duration: 20,
+            repeat: Infinity,
+            repeatType: 'reverse',
+          }}
+          style={{
+            backgroundImage: 'radial-gradient(circle, white 2px, transparent 2px)',
+            backgroundSize: '50px 50px',
+          }}
+        />
+
+        <div className="relative z-10">
+          <motion.div 
+            className="text-center mb-12"
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+          >
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">
+              Join Our Community
+            </h2>
+            <p className="text-lg md:text-xl max-w-2xl mx-auto opacity-90">
+              Be part of a global network of passionate travelers
+            </p>
+          </motion.div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {features.map((feature, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 50, rotateX: -30 }}
+                whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: index * 0.15 }}
+                whileHover={{ 
+                  scale: 1.05,
+                  y: -10,
+                  transition: { duration: 0.3 }
+                }}
+                style={{ transformStyle: 'preserve-3d' }}
+              >
+                <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 text-center border border-white/20">
+                  <motion.div 
+                    className={`w-16 h-16 bg-gradient-to-br ${feature.color} rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg`}
+                    whileHover={{ rotate: 360 }}
+                    transition={{ duration: 0.6 }}
+                  >
+                    <feature.icon className="text-white text-2xl" />
+                  </motion.div>
+                  <h3 className="text-xl font-bold mb-2">{feature.title}</h3>
+                  <p className="text-sm opacity-80">{feature.description}</p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+
+          <motion.div 
+            className="text-center mt-12"
+            initial={{ opacity: 0, scale: 0.8 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+          >
+            <motion.button
+              className="bg-white text-purple-600 px-10 py-4 rounded-full font-bold text-lg shadow-xl"
+              whileHover={{ scale: 1.1, boxShadow: "0 20px 40px rgba(255, 255, 255, 0.3)" }}
+              whileTap={{ scale: 0.95 }}
+            >
+              Join Now - It's Free!
+            </motion.button>
+          </motion.div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// FAQ Accordion
+function FAQAccordion({ darkMode }) {
+  const [openIndex, setOpenIndex] = useState(null);
+
+  const faqs = [
+    {
+      question: "How do I start planning my trip?",
+      answer: "Browse our destination guides, read traveler reviews, and use our interactive planning tools to create your perfect itinerary. Our community is always here to help with tips and recommendations."
+    },
+    {
+      question: "Can I contribute my own travel stories?",
+      answer: "Absolutely! Join our community and share your adventures. Your stories can inspire thousands of fellow travelers. Simply create an account and start posting."
+    },
+    {
+      question: "Are the travel tips verified?",
+      answer: "Yes! All our content is curated by experienced travelers and verified by our editorial team. We ensure accuracy and relevance for every destination."
+    },
+    {
+      question: "How often is content updated?",
+      answer: "We update our content daily with fresh stories, new destinations, and the latest travel trends. Subscribe to our newsletter to stay informed."
+    },
+    {
+      question: "Is there a mobile app available?",
+      answer: "We're currently working on mobile apps for iOS and Android. In the meantime, our website is fully responsive and works great on all devices."
+    }
+  ];
+
+  return (
+    <section className="mb-24">
+      <motion.div 
+        className="text-center mb-16"
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        viewport={{ once: true }}
+      >
+        <h2 className={`text-4xl md:text-5xl font-bold mb-6 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+          Frequently Asked Questions
+        </h2>
+        <p className={`text-lg md:text-xl max-w-2xl mx-auto ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+          Everything you need to know
+        </p>
+      </motion.div>
+
+      <div className="max-w-3xl mx-auto space-y-4">
+        {faqs.map((faq, index) => (
+          <motion.div
+            key={index}
+            initial={{ opacity: 0, x: -50 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: index * 0.1 }}
+          >
+            <motion.div
+              className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-2xl shadow-lg border ${darkMode ? 'border-gray-700' : 'border-gray-200'} overflow-hidden`}
+              whileHover={{ scale: 1.02 }}
+            >
+              <motion.button
+                className="w-full p-6 text-left flex items-center justify-between"
+                onClick={() => setOpenIndex(openIndex === index ? null : index)}
+                whileTap={{ scale: 0.98 }}
+              >
+                <h3 className={`text-lg font-bold pr-4 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                  {faq.question}
+                </h3>
+                <motion.div
+                  animate={{ rotate: openIndex === index ? 180 : 0 }}
+                  transition={{ duration: 0.3 }}
+                  className={`flex-shrink-0 ${darkMode ? 'text-blue-400' : 'text-blue-600'}`}
+                >
+                  <FaChevronDown />
+                </motion.div>
+              </motion.button>
+              
+              <AnimatePresence>
+                {openIndex === index && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.3 }}
+                    className="overflow-hidden"
+                  >
+                    <div className={`p-6 pt-0 ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                      {faq.answer}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </motion.div>
+          </motion.div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+// Scroll Progress Indicator
+function ScrollProgressIndicator({ darkMode }) {
+  const [scrollProgress, setScrollProgress] = useState(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const totalHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+      const progress = (window.scrollY / totalHeight) * 100;
+      setScrollProgress(progress);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  return (
+    <motion.div 
+      className="fixed top-0 left-0 right-0 z-50 h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500"
+      style={{ 
+        scaleX: scrollProgress / 100,
+        transformOrigin: '0%',
+      }}
+      initial={{ scaleX: 0 }}
+    />
   );
 }
 
