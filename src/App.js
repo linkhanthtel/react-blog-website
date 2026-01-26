@@ -12,7 +12,6 @@ import { AuthProvider } from "./context/authContext";
 import { PostsProvider } from "./context/postsContext";
 import { CommentsProvider } from "./context/commentsContext";
 import About from "./pages/about";
-import Destination from "./pages/destination";
 import BlogManagement from "./pages/blogManagement";
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -29,7 +28,6 @@ function App() {
                 <Route path="/" element={<Home />} />
                 <Route path="/about" element={<About />} />
                 <Route path="/blogs" element={<Blogs />} />
-                <Route path="/destinations" element={<Destination />} />
                 <Route path="/blogs/singlepost/:id" element={<SinglePost />} />
                 <Route path="/join" element={<Join />} />
                 <Route path="/contact" element={<Contact />} />
