@@ -26,7 +26,7 @@ const Blogs = () => {
     { id: 'all', name: 'All Posts', icon: FaGlobe, color: 'from-blue-500 to-cyan-500' },
     { id: 'adventure', name: 'Adventure', icon: FaMountain, color: 'from-green-500 to-emerald-500' },
     { id: 'beach', name: 'Beach', icon: FaUmbrellaBeach, color: 'from-cyan-500 to-blue-500' },
-    { id: 'culture', name: 'Culture', icon: FaGlobe, color: 'from-purple-500 to-pink-500' },
+    { id: 'culture', name: 'Culture', icon: FaGlobe, color: 'from-sky-500 to-cyan-500' },
     { id: 'travel', name: 'Travel', icon: FaPlane, color: 'from-orange-500 to-red-500' },
   ];
 
@@ -99,7 +99,7 @@ const Blogs = () => {
       className={`min-h-screen ${darkMode ? 'bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900' : 'bg-gradient-to-b from-sky-50 via-white to-sky-50'}`}
     >
       {/* Hero Section with 3D Effects */}
-      <div className={`relative overflow-hidden ${darkMode ? 'bg-gradient-to-br from-blue-900 via-purple-900 to-pink-900' : 'bg-gradient-to-br from-blue-500 via-purple-600 to-pink-500'} pt-28 pb-20`}>
+      <div className={`relative overflow-hidden ${darkMode ? 'bg-gradient-to-br from-blue-900 via-purple-900 to-pink-900' : 'bg-gradient-to-br from-blue-500 via-sky-500 to-cyan-500'} pt-28 pb-20`}>
         {/* Animated Background Elements */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           {[...Array(8)].map((_, i) => (
@@ -254,7 +254,7 @@ const Blogs = () => {
               className={`px-6 py-4 rounded-2xl font-medium transition-all duration-300 ${
                 darkMode 
                   ? 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white' 
-                  : 'bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white'
+                  : 'bg-gradient-to-r from-blue-500 to-sky-500 hover:from-blue-600 hover:to-sky-600 text-white'
               } disabled:opacity-50 disabled:cursor-not-allowed shadow-lg`}
               whileHover={{ scale: 1.05, y: -2 }}
               whileTap={{ scale: 0.95 }}
@@ -482,7 +482,7 @@ const Blogs = () => {
                     className={`px-6 py-3 rounded-xl font-medium ${
                       darkMode 
                         ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white' 
-                        : 'bg-gradient-to-r from-blue-500 to-purple-600 text-white'
+                        : 'bg-gradient-to-r from-blue-500 to-sky-500 text-white'
                     }`}
                     whileHover={{ scale: 1.05, y: -2 }}
                     whileTap={{ scale: 0.95 }}
@@ -512,7 +512,7 @@ const Blogs = () => {
             >
               {/* Enhanced Header with 3D */}
               <div className={`px-6 py-6 bg-gradient-to-r ${
-                darkMode ? 'from-blue-900/50 to-purple-900/50' : 'from-blue-50 to-purple-50'
+                darkMode ? 'from-blue-900/50 to-purple-900/50' : 'from-blue-50 to-sky-50'
               } border-b-2 ${darkMode ? 'border-gray-700' : 'border-gray-200'}`}>
                 <div className="flex items-center gap-3">
                   <motion.div 
@@ -538,13 +538,13 @@ const Blogs = () => {
                 <div className="px-6 py-6 border-b-2 border-gray-200 dark:border-gray-700">
                   <div className="flex items-center gap-3 mb-6">
                     <motion.div 
-                      className={`w-10 h-10 rounded-xl flex items-center justify-center bg-gradient-to-br from-purple-500 to-pink-600 shadow-lg relative`}
+                      className={`w-10 h-10 rounded-xl flex items-center justify-center bg-gradient-to-br from-sky-500 to-cyan-500 shadow-lg relative`}
                       whileHover={{ rotate: 360, scale: 1.1 }}
                       transition={{ duration: 0.6 }}
                     >
                       {/* Pulsing ring */}
                       <motion.div
-                        className="absolute inset-0 rounded-xl bg-purple-500/30"
+                        className="absolute inset-0 rounded-xl bg-sky-500/30"
                         animate={{
                           scale: [1, 1.3, 1],
                           opacity: [0.5, 0, 0.5],
@@ -581,7 +581,7 @@ const Blogs = () => {
                           <div className={`flex gap-3 p-3 rounded-2xl transition-all duration-300 ${
                             darkMode 
                               ? 'hover:bg-purple-900/20 border border-gray-700 hover:border-purple-500/50' 
-                              : 'hover:bg-purple-50 border border-gray-200 hover:border-purple-300'
+                              : 'hover:bg-sky-50 border border-gray-200 hover:border-sky-300'
                           }`}>
                             <div className="relative flex-shrink-0 w-16 h-16 rounded-xl overflow-hidden">
                               <ImageWithFallback
@@ -590,19 +590,19 @@ const Blogs = () => {
                                 className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                                 fallbackSrc="https://wanderluxe-ventures.onrender.com/api/placeholder/80/80"
                               />
-                              <div className="absolute top-1 right-1 w-5 h-5 bg-purple-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
+                              <div className="absolute top-1 right-1 w-5 h-5 bg-sky-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
                                 {index + 1}
                               </div>
                             </div>
                             <div className="flex-1 min-w-0">
-                              <h4 className={`font-bold text-sm mb-2 line-clamp-2 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-purple-500 group-hover:to-pink-500 transition-all duration-300 ${
+                              <h4 className={`font-bold text-sm mb-2 line-clamp-2 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-sky-500 group-hover:to-cyan-500 transition-all duration-300 ${
                                 darkMode ? 'text-gray-100' : 'text-gray-800'
                               }`}>
                                 {post.title}
                               </h4>
                               <div className="flex items-center justify-between">
                                 <span className={`px-2 py-1 rounded-lg text-xs font-bold ${
-                                  darkMode ? 'bg-purple-900/50 text-purple-300' : 'bg-purple-100 text-purple-700'
+                                  darkMode ? 'bg-purple-900/50 text-purple-300' : 'bg-sky-100 text-sky-700'
                                 }`}>
                                   🧠 AI: {post.ai_score || 0}
                                 </span>
