@@ -97,7 +97,7 @@ function FeaturedBlogPosts({ posts, darkMode }) {
               >
                 {/* 3D Depth Shadow */}
                 <motion.div
-                  className="absolute inset-0 rounded-3xl bg-gradient-to-br from-blue-500/20 to-purple-500/20 blur-2xl"
+                  className="absolute inset-0 rounded-3xl bg-gradient-to-br from-blue-500/20 to-sky-500/20 blur-2xl"
                   animate={{
                     opacity: hoveredIndex === index ? 0.6 : 0,
                     scale: hoveredIndex === index ? 1.1 : 1,
@@ -161,7 +161,7 @@ function FeaturedBlogPosts({ posts, darkMode }) {
                   style={{ transform: 'translateZ(30px)' }}
                 >
                   <motion.h3 
-                    className={`text-xl font-bold mb-4 line-clamp-2 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-blue-500 group-hover:to-purple-600 transition-all duration-300 ${darkMode ? 'text-white' : 'text-gray-900'}`}
+                    className={`text-xl font-bold mb-4 line-clamp-2 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-blue-500 group-hover:to-sky-500 transition-all duration-300 ${darkMode ? 'text-white' : 'text-gray-900'}`}
                     whileHover={{ x: 5 }}
                   >
                     {post.title}
@@ -194,7 +194,7 @@ function FeaturedBlogPosts({ posts, darkMode }) {
 
                   {/* Read More Arrow */}
                   <motion.div
-                    className="mt-4 flex items-center space-x-2 text-blue-500 group-hover:text-purple-600"
+                    className="mt-4 flex items-center space-x-2 text-blue-500 group-hover:text-sky-500"
                     initial={{ x: -10, opacity: 0 }}
                     whileInView={{ x: 0, opacity: 1 }}
                     whileHover={{ x: 10 }}
@@ -445,7 +445,7 @@ function Floating3DCategories({ darkMode }) {
     { name: 'Culture', icon: FaGlobe, color: 'from-blue-500 to-indigo-600', count: 8 },
     { name: 'Food', icon: FaLeaf, color: 'from-orange-500 to-red-600', count: 15 },
     { name: 'Beaches', icon: FaWater, color: 'from-cyan-500 to-blue-600', count: 10 },
-    { name: 'Cities', icon: FaPlane, color: 'from-purple-500 to-pink-600', count: 20 },
+    { name: 'Cities', icon: FaPlane, color: 'from-sky-500 to-cyan-500', count: 20 },
     { name: 'Nature', icon: FaStar, color: 'from-pink-500 to-rose-600', count: 18 },
   ];
 
@@ -606,7 +606,7 @@ function ParallaxBlogShowcase({ posts, darkMode, scrollY }) {
                     className="p-6"
                     style={{ transform: 'translateZ(20px)' }}
                   >
-                    <h3 className={`text-2xl font-bold mb-3 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-blue-500 group-hover:to-purple-600 transition-all duration-300 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                    <h3 className={`text-2xl font-bold mb-3 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-blue-500 group-hover:to-sky-500 transition-all duration-300 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
                       {post.title}
                     </h3>
                     <p className={`text-sm mb-4 line-clamp-3 leading-relaxed ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>
@@ -617,7 +617,7 @@ function ParallaxBlogShowcase({ posts, darkMode, scrollY }) {
                         {new Date(post.created_at).toLocaleDateString()}
                       </span>
                       <motion.div
-                        className="text-blue-500 group-hover:text-purple-600 transition-colors"
+                        className="text-blue-500 group-hover:text-sky-500 transition-colors"
                         whileHover={{ x: 5 }}
                       >
                         <span className="text-sm font-semibold">Read more →</span>
@@ -644,7 +644,7 @@ function Interactive3DStats({ posts, darkMode }) {
   const stats = [
     { label: 'Blog Posts', value: totalPosts, icon: FaRocket, color: 'from-blue-500 to-cyan-500' },
     { label: 'Total Likes', value: totalLikes, icon: FaHeart, color: 'from-pink-500 to-rose-500' },
-    { label: 'Comments', value: totalComments, icon: FaComments, color: 'from-purple-500 to-indigo-500' },
+    { label: 'Comments', value: totalComments, icon: FaComments, color: 'from-sky-500 to-cyan-500' },
     { label: 'Avg Read Time', value: `${avgReadTime}m`, icon: FaClock, color: 'from-orange-500 to-yellow-500' },
   ];
 
@@ -932,7 +932,7 @@ function Home() {
             initial={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.5 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-blue-900 via-purple-900 to-pink-900"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-blue-900 via-sky-800 to-cyan-800"
           >
             <div className="text-center">
               <motion.div
@@ -1416,7 +1416,7 @@ function VerticalTimelineBlogs({ posts, darkMode }) {
           animate={{ scale: 1 }}
           transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
           className={`inline-flex items-center justify-center w-12 h-12 rounded-full mb-4 ${
-            darkMode ? 'bg-purple-600' : 'bg-purple-500'
+            darkMode ? 'bg-purple-600' : 'bg-sky-500'
           }`}
         >
           <FaCalendarAlt className="text-white text-xl" />
@@ -1443,7 +1443,7 @@ function VerticalTimelineBlogs({ posts, darkMode }) {
           >
             {/* Timeline Dot */}
             <div className={`absolute left-4 w-4 h-4 rounded-full border-4 ${
-              darkMode ? 'bg-gray-800 border-purple-500' : 'bg-white border-purple-500'
+              darkMode ? 'bg-gray-800 border-purple-500' : 'bg-white border-sky-500'
             } z-10`}></div>
             
             {/* Content Card */}
@@ -1461,7 +1461,7 @@ function VerticalTimelineBlogs({ posts, darkMode }) {
                     />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h3 className={`font-bold text-sm mb-2 line-clamp-2 group-hover:text-purple-600 transition-colors duration-300 ${
+                    <h3 className={`font-bold text-sm mb-2 line-clamp-2 group-hover:text-sky-600 transition-colors duration-300 ${
                       darkMode ? 'text-gray-100' : 'text-gray-800'
                     }`}>
                       {post.title}
@@ -1909,7 +1909,7 @@ function Testimonials3D({ darkMode }) {
             <div className={`relative ${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-3xl p-8 shadow-xl border ${darkMode ? 'border-gray-700' : 'border-gray-200'} h-full`}>
               {/* Quote Icon */}
               <motion.div
-                className="absolute -top-4 -left-4 w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center shadow-lg"
+                className="absolute -top-4 -left-4 w-12 h-12 bg-gradient-to-br from-blue-500 to-sky-500 rounded-full flex items-center justify-center shadow-lg"
                 whileHover={{ rotate: 360, scale: 1.2 }}
                 transition={{ duration: 0.6 }}
               >
@@ -1972,11 +1972,11 @@ function Testimonials3D({ darkMode }) {
 function TravelTips3D({ darkMode, scrollY }) {
   const tips = [
     { icon: FaPlane, title: "Book in Advance", description: "Save up to 40% by booking flights 6-8 weeks early", color: "from-blue-500 to-cyan-500" },
-    { icon: FaHotel, title: "Local Stays", description: "Experience authentic culture with local accommodations", color: "from-purple-500 to-pink-500" },
+    { icon: FaHotel, title: "Local Stays", description: "Experience authentic culture with local accommodations", color: "from-sky-500 to-cyan-500" },
     { icon: FaCalendarAlt, title: "Off-Season Travel", description: "Visit during shoulder season for better deals and fewer crowds", color: "from-green-500 to-emerald-500" },
     { icon: FaMapMarkerAlt, title: "Research First", description: "Learn local customs and basic phrases before visiting", color: "from-orange-500 to-red-500" },
     { icon: FaSun, title: "Pack Light", description: "Travel with carry-on only to save time and money", color: "from-yellow-500 to-orange-500" },
-    { icon: FaCompass, title: "Stay Flexible", description: "Allow room for spontaneous adventures and discoveries", color: "from-indigo-500 to-purple-500" },
+    { icon: FaCompass, title: "Stay Flexible", description: "Allow room for spontaneous adventures and discoveries", color: "from-cyan-500 to-sky-500" },
   ];
 
   return (
@@ -2110,7 +2110,7 @@ function DestinationHighlights({ darkMode, posts }) {
                       className="inline-block mb-4"
                       whileHover={{ scale: 1.1, rotate: 5 }}
                     >
-                      <span className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-4 py-2 rounded-full text-sm font-bold">
+                      <span className="bg-gradient-to-r from-blue-500 to-sky-500 text-white px-4 py-2 rounded-full text-sm font-bold">
                         Destination #{index + 1}
                       </span>
                     </motion.div>
@@ -2144,7 +2144,7 @@ function DestinationHighlights({ darkMode, posts }) {
                     </div>
 
                     <motion.button
-                      className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-8 py-3 rounded-full font-semibold shadow-lg"
+                      className="bg-gradient-to-r from-blue-500 to-sky-500 text-white px-8 py-3 rounded-full font-semibold shadow-lg"
                       whileHover={{ scale: 1.05, boxShadow: "0 20px 40px rgba(59, 130, 246, 0.4)" }}
                       whileTap={{ scale: 0.95 }}
                     >
@@ -2168,7 +2168,7 @@ function WorldExplorer({ darkMode }) {
     { name: "Europe", count: 98, icon: "🏰", color: "from-blue-500 to-cyan-500" },
     { name: "Americas", count: 87, icon: "🗽", color: "from-green-500 to-emerald-500" },
     { name: "Africa", count: 56, icon: "🦁", color: "from-yellow-500 to-orange-600" },
-    { name: "Oceania", count: 42, icon: "🏝️", color: "from-purple-500 to-pink-500" },
+    { name: "Oceania", count: 42, icon: "🏝️", color: "from-sky-500 to-cyan-500" },
   ];
 
   return (
@@ -2243,7 +2243,7 @@ function WorldExplorer({ darkMode }) {
 function TravelInsights({ darkMode }) {
   const insights = [
     { label: "Countries Covered", value: "150+", icon: FaGlobe, color: "from-blue-500 to-cyan-500" },
-    { label: "Active Travelers", value: "50K+", icon: FaUser, color: "from-purple-500 to-pink-500" },
+    { label: "Active Travelers", value: "50K+", icon: FaUser, color: "from-sky-500 to-cyan-500" },
     { label: "Photos Shared", value: "100K+", icon: FaCompass, color: "from-green-500 to-emerald-500" },
     { label: "Travel Guides", value: "500+", icon: FaPlane, color: "from-orange-500 to-red-500" },
   ];
@@ -2365,13 +2365,13 @@ function PhotoGallery3D({ posts, darkMode }) {
 function CommunitySection({ darkMode }) {
   const features = [
     { icon: FaUser, title: "Join Community", description: "Connect with fellow travelers", color: "from-blue-500 to-cyan-500" },
-    { icon: FaShare, title: "Share Stories", description: "Post your travel experiences", color: "from-purple-500 to-pink-500" },
+    { icon: FaShare, title: "Share Stories", description: "Post your travel experiences", color: "from-sky-500 to-cyan-500" },
     { icon: FaStar, title: "Get Featured", description: "Showcase your best content", color: "from-yellow-500 to-orange-500" },
   ];
 
   return (
     <section className="mb-24">
-      <div className={`${darkMode ? 'bg-gradient-to-r from-blue-900 to-purple-900' : 'bg-gradient-to-r from-blue-500 to-purple-600'} rounded-3xl p-12 text-white relative overflow-hidden`}>
+      <div className={`${darkMode ? 'bg-gradient-to-r from-blue-900 to-purple-900' : 'bg-gradient-to-r from-blue-500 to-sky-500'} rounded-3xl p-12 text-white relative overflow-hidden`}>
         {/* Animated Background */}
         <motion.div
           className="absolute inset-0 opacity-20"
@@ -2441,7 +2441,7 @@ function CommunitySection({ darkMode }) {
             viewport={{ once: true }}
           >
             <motion.button
-              className="bg-white text-purple-600 px-10 py-4 rounded-full font-bold text-lg shadow-xl"
+              className="bg-white text-sky-600 px-10 py-4 rounded-full font-bold text-lg shadow-xl"
               whileHover={{ scale: 1.1, boxShadow: "0 20px 40px rgba(255, 255, 255, 0.3)" }}
               whileTap={{ scale: 0.95 }}
             >
@@ -2567,7 +2567,7 @@ function ScrollProgressIndicator({ darkMode }) {
 
   return (
     <motion.div 
-      className="fixed top-0 left-0 right-0 z-50 h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500"
+      className="fixed top-0 left-0 right-0 z-50 h-1 bg-gradient-to-r from-blue-500 via-sky-500 to-cyan-500"
       style={{ 
         scaleX: scrollProgress / 100,
         transformOrigin: '0%',
