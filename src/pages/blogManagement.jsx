@@ -189,7 +189,7 @@ const BlogManagement = () => {
           {showCreateForm && (
             <button
               onClick={() => setShowAI(!showAI)}
-              className={`px-4 py-2 rounded transition-colors ${darkMode ? 'bg-purple-600 hover:bg-purple-700 text-white' : 'bg-purple-600 hover:bg-purple-700 text-white'}`}
+              className={`px-4 py-2 rounded transition-colors ${darkMode ? 'bg-purple-600 hover:bg-purple-700 text-white' : 'bg-sky-500 hover:bg-sky-600 text-white'}`}
             >
               {showAI ? 'Hide AI Assistant' : 'Show AI Assistant'}
             </button>
