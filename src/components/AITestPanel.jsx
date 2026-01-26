@@ -54,7 +54,7 @@ const AITestPanel = () => {
   return (
     <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-xl shadow-lg p-6 mb-8`}>
       <div className="flex items-center gap-2 mb-6">
-        <FaBrain className={`text-2xl ${darkMode ? 'text-purple-400' : 'text-purple-600'}`} />
+        <FaBrain className={`text-2xl ${darkMode ? 'text-purple-400' : 'text-sky-600'}`} />
         <h3 className={`text-xl font-bold ${darkMode ? 'text-gray-100' : 'text-gray-800'}`}>
           AI Features Test Panel
         </h3>
@@ -67,7 +67,7 @@ const AITestPanel = () => {
           className={`w-full py-3 px-4 rounded-lg font-medium transition-all duration-200 ${
             darkMode 
               ? 'bg-purple-600 hover:bg-purple-700 text-white' 
-              : 'bg-purple-500 hover:bg-purple-600 text-white'
+              : 'bg-sky-500 hover:bg-sky-600 text-white'
           } disabled:opacity-50 disabled:cursor-not-allowed`}
         >
           {testing ? (
@@ -152,7 +152,7 @@ const AITestPanel = () => {
                     <span
                       key={index}
                       className={`px-2 py-1 rounded-full text-xs ${
-                        darkMode ? 'bg-purple-600 text-white' : 'bg-purple-100 text-purple-700'
+                        darkMode ? 'bg-purple-600 text-white' : 'bg-sky-100 text-sky-700'
                       }`}
                     >
                       #{tag}

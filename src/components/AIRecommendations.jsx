@@ -115,7 +115,7 @@ const AIRecommendations = ({ postId, currentPost, limit = 5 }) => {
     <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-xl shadow-lg p-6`}>
       {/* Header */}
       <div className="flex items-center gap-2 mb-6">
-        <FaBrain className={`text-2xl ${darkMode ? 'text-purple-400' : 'text-purple-600'}`} />
+        <FaBrain className={`text-2xl ${darkMode ? 'text-purple-400' : 'text-sky-600'}`} />
         <h3 className={`text-xl font-bold ${darkMode ? 'text-gray-100' : 'text-gray-800'}`}>
           AI-Powered Recommendations
         </h3>
@@ -185,7 +185,7 @@ const AIRecommendations = ({ postId, currentPost, limit = 5 }) => {
 
                   {/* Post Content */}
                   <div className="flex-1 min-w-0">
-                    <h3 className={`font-bold text-sm mb-2 line-clamp-2 group-hover:text-purple-600 transition-colors duration-300 ${
+                    <h3 className={`font-bold text-sm mb-2 line-clamp-2 group-hover:text-sky-600 transition-colors duration-300 ${
                       darkMode ? 'text-gray-100' : 'text-gray-800'
                     }`}>
                       {post.title}
@@ -227,8 +227,8 @@ const AIRecommendations = ({ postId, currentPost, limit = 5 }) => {
 
                     {/* AI Similarity Indicator */}
                     <div className="mt-2 flex items-center gap-1">
-                      <FaBrain className={`text-xs ${darkMode ? 'text-purple-400' : 'text-purple-600'}`} />
-                      <span className={`text-xs ${darkMode ? 'text-purple-400' : 'text-purple-600'}`}>
+                      <FaBrain className={`text-xs ${darkMode ? 'text-purple-400' : 'text-sky-600'}`} />
+                      <span className={`text-xs ${darkMode ? 'text-purple-400' : 'text-sky-600'}`}>
                         AI Recommended
                       </span>
                     </div>
@@ -244,7 +244,7 @@ const AIRecommendations = ({ postId, currentPost, limit = 5 }) => {
 
                 {/* Hover Effect Line */}
                 <div className={`absolute bottom-0 left-0 h-1 w-0 group-hover:w-full transition-all duration-300 ${
-                  darkMode ? 'bg-purple-500' : 'bg-purple-600'
+                  darkMode ? 'bg-purple-500' : 'bg-sky-500'
                 }`} />
               </Link>
             </motion.div>

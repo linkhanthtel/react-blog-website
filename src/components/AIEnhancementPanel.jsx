@@ -97,7 +97,7 @@ const AIEnhancementPanel = ({
   return (
     <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-xl shadow-lg p-6`}>
       <div className="flex items-center gap-2 mb-6">
-        <FaMagic className={`text-2xl ${darkMode ? 'text-purple-400' : 'text-purple-600'}`} />
+        <FaMagic className={`text-2xl ${darkMode ? 'text-purple-400' : 'text-sky-600'}`} />
         <h3 className={`text-xl font-bold ${darkMode ? 'text-gray-100' : 'text-gray-800'}`}>
           AI Content Enhancement
         </h3>
@@ -187,7 +187,7 @@ const AIEnhancementPanel = ({
             <button
               onClick={() => applyResult('description', results.description)}
               className={`px-3 py-1 rounded text-sm ${
-                darkMode ? 'bg-purple-600 hover:bg-purple-700' : 'bg-purple-500 hover:bg-purple-600'
+                darkMode ? 'bg-purple-600 hover:bg-purple-700' : 'bg-sky-500 hover:bg-sky-600'
               } text-white`}
             >
               Use This Description
