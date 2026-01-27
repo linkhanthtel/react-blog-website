@@ -75,7 +75,7 @@ function Navbar() {
           scaleX: scrollProgress / 100,
           background: darkMode 
             ? 'linear-gradient(90deg, rgba(59, 130, 246, 0.8) 0%, rgba(147, 51, 234, 0.8) 50%, rgba(236, 72, 153, 0.8) 100%)'
-            : 'linear-gradient(90deg, rgba(59, 130, 246, 1) 0%, rgba(147, 51, 234, 1) 50%, rgba(236, 72, 153, 1) 100%)'
+            : 'linear-gradient(90deg, rgba(59, 130, 246, 1) 0%, rgba(56, 189, 248, 1) 50%, rgba(14, 165, 233, 1) 100%)'
         }}
         initial={{ scaleX: 0 }}
       />
@@ -116,7 +116,7 @@ function Navbar() {
                   className={`absolute bottom-0 left-0 h-0.5 ${
                     darkMode 
                       ? 'bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400' 
-                      : 'bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600'
+                      : 'bg-gradient-to-r from-blue-600 via-sky-500 to-cyan-500'
                   }`}
                   initial={{ width: 0 }}
                   whileHover={{ width: '100%' }}
@@ -127,7 +127,7 @@ function Navbar() {
           {/* Futuristic Desktop Navigation */}
           <div className="hidden md:block">
             <div className="ml-10 flex items-center space-x-1">
-              {['Home', 'Blogs', 'Destinations', 'About', 'Contact'].map((item, index) => {
+              {['Home', 'Blogs', 'About', 'Contact'].map((item, index) => {
                 const path = item === 'Home' ? '/' : `/${item.toLowerCase()}`;
                 const active = isActive(path);
                 
@@ -179,7 +179,7 @@ function Navbar() {
                           className={`absolute bottom-0 left-0 right-0 h-px ${
                             darkMode 
                               ? 'bg-gradient-to-r from-transparent via-purple-400 to-transparent' 
-                              : 'bg-gradient-to-r from-transparent via-purple-600 to-transparent'
+                              : 'bg-gradient-to-r from-transparent via-sky-500 to-transparent'
                           }`}
                           initial={{ scaleX: 0, opacity: 0 }}
                           whileHover={{ scaleX: 1, opacity: 1 }}
@@ -232,7 +232,7 @@ function Navbar() {
                 className={`absolute bottom-0 left-0 right-0 h-px ${
                   darkMode 
                     ? 'bg-gradient-to-r from-transparent via-blue-400 to-transparent' 
-                    : 'bg-gradient-to-r from-transparent via-purple-600 to-transparent'
+                    : 'bg-gradient-to-r from-transparent via-sky-500 to-transparent'
                 }`}
                 initial={{ scaleX: 0 }}
                 whileHover={{ scaleX: 1 }}
@@ -448,7 +448,7 @@ function Navbar() {
               <div className={`${darkMode ? 'bg-gray-900/95 backdrop-blur-xl' : 'bg-white/95 backdrop-blur-xl'} border ${darkMode ? 'border-gray-800/50' : 'border-gray-200/50'}`}>
                 {/* Navigation Links */}
                 <div className="px-6 py-8 space-y-1">
-                  {['Home', 'Blogs', 'Destinations', 'About', 'Contact'].map((item, index) => {
+                  {['Home', 'Blogs', 'About', 'Contact'].map((item, index) => {
                     const path = item === 'Home' ? '/' : `/${item.toLowerCase()}`;
                     const active = isActive(path);
                     
@@ -490,7 +490,7 @@ function Navbar() {
                               className={`absolute left-0 top-1/2 -translate-y-1/2 h-4 w-0.5 ${
                                 darkMode 
                                   ? 'bg-gradient-to-b from-blue-400 to-purple-400' 
-                                  : 'bg-gradient-to-b from-blue-600 to-purple-600'
+                                  : 'bg-gradient-to-b from-blue-600 to-sky-500'
                               }`}
                               initial={{ scaleY: 0 }}
                               animate={{ scaleY: 1 }}
@@ -603,4 +603,4 @@ function Navbar() {
   );
 }
 
-export default Navbar;
+export default React.memo(Navbar);
