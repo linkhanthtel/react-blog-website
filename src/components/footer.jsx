@@ -21,7 +21,7 @@ function Footer() {
 
     const socialIcons = [
         { Icon: FaFacebook, label: 'Facebook', color: 'hover:text-blue-400', bgColor: 'from-blue-500 to-blue-600' },
-        { Icon: AiFillInstagram, label: 'Instagram', color: 'hover:text-pink-400', bgColor: 'from-pink-500 to-purple-600' },
+        { Icon: AiFillInstagram, label: 'Instagram', color: 'hover:text-pink-400', bgColor: 'from-pink-500 to-sky-500' },
         { Icon: FaYoutube, label: 'YouTube', color: 'hover:text-red-400', bgColor: 'from-red-500 to-red-600' },
         { Icon: FaTwitter, label: 'Twitter', color: 'hover:text-sky-400', bgColor: 'from-sky-400 to-blue-500' },
         { Icon: FaLinkedin, label: 'LinkedIn', color: 'hover:text-blue-400', bgColor: 'from-blue-600 to-blue-700' },
@@ -32,7 +32,7 @@ function Footer() {
             className={`relative overflow-hidden ${
                 darkMode 
                     ? 'bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900' 
-                    : 'bg-gradient-to-br from-blue-600 via-purple-600 to-blue-700'
+                    : 'bg-gradient-to-br from-blue-600 via-sky-500 to-cyan-500'
             } text-white`}
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
@@ -234,7 +234,7 @@ function Footer() {
                                 <FaGlobe className="text-yellow-400" />
                                 <span>Explore</span>
                             </h3>
-                            {['Home', 'Blogs', 'Destinations', 'About'].map((item, index) => (
+                            {['Home', 'Blogs', 'About'].map((item, index) => (
                                 <motion.div
                                     key={item}
                                     whileHover={{ x: 5 }}
@@ -368,4 +368,4 @@ function Footer() {
     );
 }
 
-export default Footer;
+export default React.memo(Footer);
