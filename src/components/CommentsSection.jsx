@@ -224,4 +224,4 @@ const CommentsSection = ({ postId, postAuthor }) => {
   );
 };
 
-export default CommentsSection;
+export default React.memo(CommentsSection);

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { getImageUrl, isPixabayUrl } from '../utils/imageUtils';
 
 const ImageWithFallback = ({ 
@@ -6,10 +6,45 @@ const ImageWithFallback = ({
   alt, 
   className = '', 
   fallbackSrc = '/api/placeholder/400/300',
-  showPixabayMessage = true 
+  showPixabayMessage = true,
+  loading = 'lazy',
+  priority = false
 }) => {
   const [imageError, setImageError] = useState(false);
   const [showMessage, setShowMessage] = useState(false);
+  const [isInView, setIsInView] = useState(priority);
+  const imgRef = useRef(null);
+
+  // Intersection Observer for lazy loading
+  useEffect(() => {
+    if (priority || !imgRef.current) {
+      setIsInView(true);
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setIsInView(true);
+            observer.disconnect();
+          }
+        });
+      },
+      {
+        rootMargin: '50px', // Start loading 50px before image enters viewport
+        threshold: 0.01
+      }
+    );
+
+    observer.observe(imgRef.current);
+
+    return () => {
+      if (imgRef.current) {
+        observer.disconnect();
+      }
+    };
+  }, [priority]);
 
   const handleError = () => {
     setImageError(true);
@@ -23,14 +58,18 @@ const ImageWithFallback = ({
   const isPixabay = isPixabayUrl(src);
 
   return (
-    <div className="relative">
-      <img 
-        src={finalSrc}
-        alt={alt}
-        className={className}
-        onError={handleError}
-        onLoad={handleLoad}
-      />
+    <div className="relative" ref={imgRef}>
+      {isInView && (
+        <img 
+          src={finalSrc}
+          alt={alt}
+          className={className}
+          loading={loading}
+          decoding="async"
+          onError={handleError}
+          onLoad={handleLoad}
+        />
+      )}
       
       {/* Pixabay URL warning message */}
       {isPixabay && showPixabayMessage && (
@@ -59,4 +98,4 @@ const ImageWithFallback = ({
   );
 };
 
-export default ImageWithFallback;
+export default React.memo(ImageWithFallback);

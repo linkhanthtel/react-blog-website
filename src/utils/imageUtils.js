@@ -1,41 +1,60 @@
 // Utility functions for handling different image URL formats
 
+// Memoized image URL getter for better performance
+const imageUrlCache = new Map();
+
 export const getImageUrl = (imageUrl, width = 400, height = 300) => {
   if (!imageUrl) {
     return `https://wanderluxe-ventures.onrender.com/api/placeholder/${width}/${height}`;
   }
 
+  // Check cache first
+  const cacheKey = `${imageUrl}_${width}_${height}`;
+  if (imageUrlCache.has(cacheKey)) {
+    return imageUrlCache.get(cacheKey);
+  }
+
+  let finalUrl;
+
   // If it's a relative URL from our uploads, prepend the API base URL
   if (imageUrl.startsWith('/uploads/')) {
-    return `https://wanderluxe-ventures.onrender.com${imageUrl}`;
+    finalUrl = `https://wanderluxe-ventures.onrender.com${imageUrl}`;
   }
-
   // If it's already a direct image URL (ends with common image extensions)
-  if (imageUrl.match(/\.(jpg|jpeg|png|gif|webp|svg)(\?.*)?$/i)) {
-    return imageUrl;
+  else if (imageUrl.match(/\.(jpg|jpeg|png|gif|webp|svg)(\?.*)?$/i)) {
+    finalUrl = imageUrl;
   }
-
   // If it's a Pixabay page URL, we can't directly use it as an image
-  if (imageUrl.includes('pixabay.com')) {
-    return `https://wanderluxe-ventures.onrender.com/api/placeholder/${width}/${height}`;
+  else if (imageUrl.includes('pixabay.com')) {
+    finalUrl = `https://wanderluxe-ventures.onrender.com/api/placeholder/${width}/${height}`;
   }
-
   // If it's an Unsplash URL, try to convert it to a usable format
-  if (imageUrl.includes('unsplash.com')) {
+  else if (imageUrl.includes('unsplash.com')) {
     // Convert Unsplash URL to direct image URL
     const unsplashId = imageUrl.match(/photos\/([^/]+)/);
     if (unsplashId) {
-      return `https://images.unsplash.com/photo-${unsplashId[1]}?w=${width}&h=${height}&fit=crop`;
+      finalUrl = `https://images.unsplash.com/photo-${unsplashId[1]}?w=${width}&h=${height}&fit=crop`;
+    } else {
+      finalUrl = imageUrl;
     }
   }
-
   // If it's a placeholder service URL, use it as is
-  if (imageUrl.includes('placeholder') || imageUrl.includes('picsum')) {
-    return imageUrl;
+  else if (imageUrl.includes('placeholder') || imageUrl.includes('picsum')) {
+    finalUrl = imageUrl;
+  }
+  // For any other URL, try to use it directly
+  else {
+    finalUrl = imageUrl;
   }
 
-  // For any other URL, try to use it directly
-  return imageUrl;
+  // Cache the result (limit cache size to prevent memory issues)
+  if (imageUrlCache.size > 100) {
+    const firstKey = imageUrlCache.keys().next().value;
+    imageUrlCache.delete(firstKey);
+  }
+  imageUrlCache.set(cacheKey, finalUrl);
+
+  return finalUrl;
 };
 
 export const isPixabayUrl = (url) => {

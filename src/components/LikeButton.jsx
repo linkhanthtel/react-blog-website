@@ -78,4 +78,4 @@ const LikeButton = ({ postId, initialLikes = 0, size = 'sm', showCount = true })
   );
 };
 
-export default LikeButton;
+export default React.memo(LikeButton);

@@ -111,4 +111,4 @@ function ArticleCard({
   );
 }
 
-export default ArticleCard;
+export default React.memo(ArticleCard);
