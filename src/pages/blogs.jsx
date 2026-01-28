@@ -291,11 +291,11 @@ const Blogs = () => {
                 <span>{category.name}</span>
                 {selectedCategory === category.id && (
                   <motion.span
-                    className="ml-1"
-                    initial={{ rotate: -180, opacity: 0 }}
-                    animate={{ rotate: 0, opacity: 1 }}
+                    className="ml-1 text-xs uppercase tracking-wide"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
                   >
-                    ✓
+                    ACTIVE
                   </motion.span>
                 )}
               </motion.button>
@@ -333,7 +333,7 @@ const Blogs = () => {
         <div className="flex flex-col lg:flex-row gap-8">
           <div className="lg:w-2/3">
             {/* Enhanced Error State */}
-            {error && (
+                {error && (
               <motion.div 
                 initial={{ opacity: 0, scale: 0.9, y: -10 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -345,7 +345,7 @@ const Blogs = () => {
                   <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
                     darkMode ? 'bg-red-800' : 'bg-red-200'
                   }`}>
-                    <span className="text-2xl">⚠️</span>
+                        <span className="text-sm font-semibold tracking-wide">ERROR</span>
                   </div>
                   <div>
                     <p className="font-semibold">Error loading posts</p>
@@ -730,10 +730,10 @@ const Blogs = () => {
                                   </div>
                                 </div>
                                 <motion.div
-                                  className="text-xs font-bold text-green-500"
+                                  className="text-xs font-bold text-green-500 underline-offset-4 group-hover:underline"
                                   whileHover={{ x: 5 }}
                                 >
-                                  →
+                                  View details
                                 </motion.div>
                               </div>
                             </div>
