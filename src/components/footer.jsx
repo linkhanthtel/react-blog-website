@@ -176,19 +176,16 @@ function Footer() {
 
                                 {isSubscribed ? (
                                     <motion.div
-                                        initial={{ opacity: 0, scale: 0.8 }}
-                                        animate={{ opacity: 1, scale: 1 }}
+                                        initial={{ opacity: 0, scale: 0.9, y: 10 }}
+                                        animate={{ opacity: 1, scale: 1, y: 0 }}
                                         className="text-center py-6"
                                     >
-                                        <motion.div
-                                            initial={{ scale: 0 }}
-                                            animate={{ scale: 1 }}
-                                            transition={{ type: 'spring', stiffness: 200 }}
-                                            className="text-5xl mb-3"
-                                        >
-                                            ✅
-                                        </motion.div>
-                                        <p className="text-white font-medium">Thank you for subscribing!</p>
+                                        <p className="text-white font-medium text-lg tracking-wide">
+                                            Thank you for subscribing!
+                                        </p>
+                                        <p className="text-white/70 text-sm mt-1">
+                                            You&apos;ll start receiving our latest updates soon.
+                                        </p>
                                     </motion.div>
                                 ) : (
                                     <form onSubmit={handleNewsletterSubmit} className="space-y-3">
