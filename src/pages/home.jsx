@@ -194,18 +194,14 @@ function FeaturedBlogPosts({ posts, darkMode }) {
 
                   {/* Read More Arrow */}
                   <motion.div
-                    className="mt-4 flex items-center space-x-2 text-blue-500 group-hover:text-sky-500"
+                  className="mt-4 flex items-center space-x-2 text-blue-500 group-hover:text-sky-500"
                     initial={{ x: -10, opacity: 0 }}
                     whileInView={{ x: 0, opacity: 1 }}
                     whileHover={{ x: 10 }}
                   >
-                    <span className="text-sm font-semibold">Explore Story</span>
-                    <motion.span
-                      animate={{ x: [0, 5, 0] }}
-                      transition={{ duration: 1.5, repeat: Infinity }}
-                    >
-                      →
-                    </motion.span>
+                    <span className="text-sm font-semibold underline-offset-4 group-hover:underline">
+                      Explore Story
+                    </span>
                   </motion.div>
                 </motion.div>
               </motion.article>
@@ -389,12 +385,14 @@ function NewsletterSignup({ darkMode }) {
         
         {isSubscribed ? (
           <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
+            initial={{ opacity: 0, scale: 0.9, y: 10 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
             className="text-center relative z-10"
           >
-            <div className="text-2xl mb-2">✅</div>
-            <p className="text-lg">Thank you for subscribing!</p>
+            <p className="text-lg font-medium">Thank you for subscribing!</p>
+            <p className="text-sm text-white/80 mt-1">
+              You&apos;ll start receiving our latest stories soon.
+            </p>
           </motion.div>
         ) : (
           <form onSubmit={handleSubmit} className="max-w-md mx-auto relative z-10">
@@ -620,7 +618,9 @@ function ParallaxBlogShowcase({ posts, darkMode, scrollY }) {
                         className="text-blue-500 group-hover:text-sky-500 transition-colors"
                         whileHover={{ x: 5 }}
                       >
-                        <span className="text-sm font-semibold">Read more →</span>
+                        <span className="text-sm font-semibold underline-offset-4 group-hover:underline">
+                          Read more
+                        </span>
                       </motion.div>
                     </div>
                   </motion.div>
@@ -1069,14 +1069,13 @@ function Home() {
             transition={{ delay: 1.2, duration: 0.8 }}
             className="flex flex-col items-center"
           >
-            <motion.a 
-              href="#content" 
+            <motion.div 
               className="text-white/60 hover:text-white transition-colors duration-300"
               animate={{ y: [0, 8, 0] }}
               transition={{ duration: 2, repeat: Infinity }}
             >
               <FaChevronDown className="text-xl" />
-            </motion.a>
+            </motion.div>
             <span className="text-white/60 text-xs mt-3 font-light tracking-wide">Scroll to explore</span>
           </motion.div>
         </div>
@@ -1859,7 +1858,7 @@ function Testimonials3D({ darkMode }) {
     {
       name: "Marco Rodriguez",
       role: "Adventure Seeker",
-      avatar: "🏔️",
+      avatar: "",
       text: "I've found hidden gems I never knew existed. The detailed guides and stunning photography make planning adventures so easy.",
       rating: 5,
       location: "Barcelona, Spain"
@@ -2148,7 +2147,7 @@ function DestinationHighlights({ darkMode, posts }) {
                       whileHover={{ scale: 1.05, boxShadow: "0 20px 40px rgba(59, 130, 246, 0.4)" }}
                       whileTap={{ scale: 0.95 }}
                     >
-                      Explore Destination →
+                      Explore Destination
                     </motion.button>
                   </motion.div>
                 </div>
@@ -2168,7 +2167,7 @@ function WorldExplorer({ darkMode }) {
     { name: "Europe", count: 98, icon: "🏰", color: "from-blue-500 to-cyan-500" },
     { name: "Americas", count: 87, icon: "🗽", color: "from-green-500 to-emerald-500" },
     { name: "Africa", count: 56, icon: "🦁", color: "from-yellow-500 to-orange-600" },
-    { name: "Oceania", count: 42, icon: "🏝️", color: "from-sky-500 to-cyan-500" },
+    { name: "Oceania", count: 42, icon: "", color: "from-sky-500 to-cyan-500" },
   ];
 
   return (
