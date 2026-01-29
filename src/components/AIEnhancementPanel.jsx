@@ -292,7 +292,7 @@ const AIEnhancementPanel = ({
                   : darkMode ? 'text-red-300' : 'text-red-700'
               }`}>
                 <span className="font-medium">
-                  Status: {results.moderation.is_safe ? '✅ Safe' : '⚠️ Needs Review'}
+                  Status: {results.moderation.is_safe ? 'Safe' : 'Needs Review'}
                 </span>
                 <span className="text-sm">
                   (Confidence: {Math.round(results.moderation.confidence * 100)}%)
