@@ -30,7 +30,7 @@ const ImageUrlGuide = ({ isOpen, onClose }) => {
           </div>
 
           <div>
-            <h4 className="font-semibold text-green-600 dark:text-green-400 mb-2">✅ Use direct image URLs:</h4>
+            <h4 className="font-semibold text-green-600 dark:text-green-400 mb-2">Use direct image URLs:</h4>
             <p className="text-sm bg-green-50 dark:bg-green-900 p-3 rounded">
               <code>https://cdn.pixabay.com/photo/2017/11/15/13/27/yangon-2951834_1280.jpg</code>
             </p>
