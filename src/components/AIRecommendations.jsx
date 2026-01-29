@@ -266,7 +266,7 @@ const AIRecommendations = ({ postId, currentPost, limit = 5 }) => {
         darkMode ? 'border-gray-700' : 'border-gray-200'
       }`}>
         <p className={`text-xs ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>
-          💡 Recommendations powered by AI content similarity analysis
+          Recommendations powered by AI content similarity analysis
         </p>
       </div>
     </div>
