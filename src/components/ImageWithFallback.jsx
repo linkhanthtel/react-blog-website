@@ -75,7 +75,7 @@ const ImageWithFallback = ({
       {isPixabay && showPixabayMessage && (
         <div className="absolute bottom-2 left-2 right-2 bg-yellow-100 border border-yellow-400 text-yellow-700 px-2 py-1 rounded text-xs">
           <div className="flex items-center justify-between">
-            <span>⚠️ Pixabay page URL detected</span>
+            <span>Pixabay page URL detected</span>
             <button 
               onClick={() => setShowMessage(!showMessage)}
               className="font-bold"
@@ -87,7 +87,7 @@ const ImageWithFallback = ({
             <div className="mt-1 text-xs">
               <p>To display images from Pixabay, please use direct image URLs instead of page URLs.</p>
               <p className="mt-1">
-                <strong>Tip:</strong> Right-click on the image on Pixabay and select "Copy image address" 
+                <strong>Tip:</strong> Right-click on the image on Pixabay and select &quot;Copy image address&quot; 
                 to get the direct URL.
               </p>
             </div>
