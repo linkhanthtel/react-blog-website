@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { FaSun, FaMoon, FaUserCircle, FaSignOutAlt, FaBars, FaTimes, FaPen } from 'react-icons/fa';
 import { useTheme } from '../context/themeContext';
 import { useAuth } from '../context/authContext';
 import AuthModal from './authModal';
@@ -175,197 +176,168 @@ function Navbar() {
               })}
             </div>
           </div>
-          {/* Futuristic Right Side Actions */}
-          <div className="hidden md:flex items-center space-x-6">
-            {/* Elegant Theme Toggle */}
-            <motion.button 
-              onClick={toggleDarkMode} 
-              className={`relative px-4 py-2 text-xs font-light tracking-wider transition-all duration-500 ${
-                darkMode 
-                  ? 'text-gray-300 hover:text-white' 
-                  : 'text-gray-600 hover:text-gray-900'
+          {/* Right side: theme toggle + auth */}
+          <div className="hidden md:flex items-center gap-3">
+            {/* Theme toggle – icon button */}
+            <motion.button
+              onClick={toggleDarkMode}
+              aria-label={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}
+              className={`p-2.5 rounded-xl transition-colors duration-300 ${
+                darkMode
+                  ? 'text-amber-300 hover:text-amber-200 hover:bg-white/10'
+                  : 'text-sky-600 hover:text-sky-700 hover:bg-gray-100'
               }`}
-              whileHover={{ letterSpacing: '0.1em' }}
-              transition={{ duration: 0.3 }}
+              whileHover={{ scale: 1.08 }}
+              whileTap={{ scale: 0.95 }}
             >
               <AnimatePresence mode="wait">
                 {darkMode ? (
                   <motion.span
                     key="light"
-                    initial={{ opacity: 0, y: -5 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 5 }}
-                    transition={{ duration: 0.3 }}
+                    initial={{ opacity: 0, rotate: -90 }}
+                    animate={{ opacity: 1, rotate: 0 }}
+                    exit={{ opacity: 0, rotate: 90 }}
+                    transition={{ duration: 0.25 }}
+                    className="inline-flex"
                   >
-                    LIGHT
+                    <FaSun className="w-5 h-5" />
                   </motion.span>
                 ) : (
                   <motion.span
                     key="dark"
-                    initial={{ opacity: 0, y: -5 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 5 }}
-                    transition={{ duration: 0.3 }}
+                    initial={{ opacity: 0, rotate: 90 }}
+                    animate={{ opacity: 1, rotate: 0 }}
+                    exit={{ opacity: 0, rotate: -90 }}
+                    transition={{ duration: 0.25 }}
+                    className="inline-flex"
                   >
-                    DARK
+                    <FaMoon className="w-5 h-5" />
                   </motion.span>
                 )}
               </AnimatePresence>
-              <motion.div
-                className={`absolute bottom-0 left-0 right-0 h-px ${
-                  darkMode 
-                    ? 'bg-gradient-to-r from-transparent via-blue-400 to-transparent' 
-                    : 'bg-gradient-to-r from-transparent via-sky-500 to-transparent'
-                }`}
-                initial={{ scaleX: 0 }}
-                whileHover={{ scaleX: 1 }}
-                transition={{ duration: 0.4 }}
-              />
             </motion.button>
 
-            {/* Elegant Authentication */}
+            {/* Auth: logged in */}
             {isAuthenticated ? (
-              <div className="flex items-center space-x-4">
+              <div className="flex items-center gap-2">
                 <motion.div
-                  initial={{ opacity: 0, x: 10 }}
+                  initial={{ opacity: 0, x: 8 }}
                   animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.5, ease: 'easeOut' }}
+                  transition={{ duration: 0.4 }}
                 >
                   <Link
                     to="/manage-blogs"
-                    className={`px-4 py-2 text-xs font-light tracking-wider transition-all duration-500 ${
-                      darkMode 
-                        ? 'text-gray-300 hover:text-white' 
-                        : 'text-gray-600 hover:text-gray-900'
+                    aria-label="Manage blogs"
+                    className={`flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium transition-colors ${
+                      darkMode
+                        ? 'text-gray-300 hover:text-white hover:bg-white/10'
+                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
                     }`}
                   >
-                    <motion.span 
-                      whileHover={{ letterSpacing: '0.1em' }}
-                      transition={{ duration: 0.3 }}
-                    >
-                      <span className="hidden xl:inline">MANAGE</span>
-                      <span className="xl:hidden">MGT</span>
-                    </motion.span>
+                    <FaPen className="w-4 h-4 shrink-0" />
+                    <span className="hidden xl:inline">Manage</span>
                   </Link>
                 </motion.div>
-                
                 <motion.div
-                  className={`px-3 py-1.5 text-xs font-light tracking-wider border ${
-                    darkMode 
-                      ? 'text-gray-300 border-gray-700/50' 
-                      : 'text-gray-600 border-gray-300/50'
+                  className={`flex items-center gap-2 px-3 py-2 rounded-xl border ${
+                    darkMode
+                      ? 'text-gray-300 border-gray-700/50 bg-gray-800/50'
+                      : 'text-gray-600 border-gray-200 bg-gray-50'
                   }`}
-                  initial={{ opacity: 0, scale: 0.9 }}
+                  initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.5, ease: 'easeOut' }}
+                  transition={{ duration: 0.4 }}
                 >
-                  <span className="hidden lg:inline">{user?.username?.toUpperCase()}</span>
-                  <span className="lg:hidden">{user?.username?.charAt(0).toUpperCase()}</span>
+                  <FaUserCircle className={`w-5 h-5 shrink-0 ${darkMode ? 'text-sky-400' : 'text-sky-600'}`} />
+                  <span className="text-sm font-medium max-w-[100px] truncate" title={user?.username}>
+                    {user?.username}
+                  </span>
                 </motion.div>
-                
                 <motion.button
                   onClick={logout}
-                  className={`px-4 py-2 text-xs font-light tracking-wider transition-all duration-500 ${
-                    darkMode 
-                      ? 'text-red-400/70 hover:text-red-300' 
-                      : 'text-red-600/70 hover:text-red-700'
+                  aria-label="Log out"
+                  className={`p-2.5 rounded-xl transition-colors ${
+                    darkMode
+                      ? 'text-red-400/80 hover:text-red-300 hover:bg-red-500/10'
+                      : 'text-red-600 hover:text-red-700 hover:bg-red-50'
                   }`}
-                  whileHover={{ letterSpacing: '0.1em' }}
-                  transition={{ duration: 0.3 }}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
                 >
-                  EXIT
+                  <FaSignOutAlt className="w-5 h-5" />
                 </motion.button>
               </div>
             ) : (
               <motion.button
                 onClick={() => setShowAuthModal(true)}
-                className={`px-6 py-2.5 text-xs font-light tracking-wider transition-all duration-500 ${
-                  darkMode 
-                    ? 'text-white border border-white/20 hover:border-white/40' 
-                    : 'text-gray-900 border border-gray-300 hover:border-gray-400'
+                aria-label="Log in"
+                className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-colors ${
+                  darkMode
+                    ? 'text-white border border-white/30 hover:bg-white/10'
+                    : 'text-gray-900 border border-gray-300 hover:bg-gray-100'
                 }`}
-                whileHover={{ letterSpacing: '0.15em', scale: 1.02 }}
+                whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
-                initial={{ opacity: 0, x: 10 }}
+                initial={{ opacity: 0, x: 8 }}
                 animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.5, ease: 'easeOut' }}
+                transition={{ duration: 0.4 }}
               >
-                LOGIN
+                <FaUserCircle className="w-5 h-5 shrink-0" />
+                <span>Log in</span>
               </motion.button>
             )}
           </div>
-          {/* Futuristic Mobile Actions */}
-          <div className="flex items-center space-x-4 md:hidden">
-            {/* Elegant Theme Toggle */}
-            <motion.button 
-              onClick={toggleDarkMode} 
-              className={`px-3 py-1.5 text-xs font-light tracking-wider transition-all duration-500 ${
-                darkMode 
-                  ? 'text-gray-300 hover:text-white' 
-                  : 'text-gray-600 hover:text-gray-900'
+          {/* Mobile: theme + login/user + menu */}
+          <div className="flex items-center gap-2 md:hidden">
+            <motion.button
+              onClick={toggleDarkMode}
+              aria-label={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}
+              className={`p-2.5 rounded-xl ${
+                darkMode ? 'text-amber-300 hover:bg-white/10' : 'text-sky-600 hover:bg-gray-100'
               }`}
-              whileHover={{ letterSpacing: '0.1em' }}
-              transition={{ duration: 0.3 }}
+              whileTap={{ scale: 0.95 }}
             >
               <AnimatePresence mode="wait">
                 {darkMode ? (
-                  <motion.span
-                    key="light-mobile"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    LGT
+                  <motion.span key="sun" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="inline-flex">
+                    <FaSun className="w-5 h-5" />
                   </motion.span>
                 ) : (
-                  <motion.span
-                    key="dark-mobile"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    DRK
+                  <motion.span key="moon" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="inline-flex">
+                    <FaMoon className="w-5 h-5" />
                   </motion.span>
                 )}
               </AnimatePresence>
             </motion.button>
-            
-            {/* Minimalist Menu Toggle */}
+            {!isAuthenticated && (
+              <motion.button
+                onClick={() => setShowAuthModal(true)}
+                aria-label="Log in"
+                className={`p-2.5 rounded-xl ${darkMode ? 'text-white/90 hover:bg-white/10' : 'text-gray-700 hover:bg-gray-100'}`}
+                whileTap={{ scale: 0.95 }}
+              >
+                <FaUserCircle className="w-5 h-5" />
+              </motion.button>
+            )}
             <motion.button
               onClick={toggleMenu}
               type="button"
-              className={`px-4 py-2 text-xs font-light tracking-wider transition-all duration-500 ${
-                darkMode 
-                  ? 'text-gray-300 hover:text-white border border-gray-700/50 hover:border-gray-600' 
-                  : 'text-gray-600 hover:text-gray-900 border border-gray-300/50 hover:border-gray-400'
-              } focus:outline-none`}
+              aria-label={isOpen ? 'Close menu' : 'Open menu'}
               aria-controls="mobile-menu"
               aria-expanded={isOpen}
-              whileHover={{ letterSpacing: '0.15em' }}
+              className={`p-2.5 rounded-xl ${
+                darkMode ? 'text-gray-300 hover:bg-white/10' : 'text-gray-600 hover:bg-gray-100'
+              } focus:outline-none`}
               whileTap={{ scale: 0.95 }}
             >
               <AnimatePresence mode="wait">
                 {isOpen ? (
-                  <motion.span
-                    key="close"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    CLOSE
+                  <motion.span key="close" initial={{ opacity: 0, rotate: -90 }} animate={{ opacity: 1, rotate: 0 }} exit={{ opacity: 0 }} className="inline-flex">
+                    <FaTimes className="w-5 h-5" />
                   </motion.span>
                 ) : (
-                  <motion.span
-                    key="menu"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    MENU
+                  <motion.span key="menu" initial={{ opacity: 0, rotate: 90 }} animate={{ opacity: 1, rotate: 0 }} exit={{ opacity: 0 }} className="inline-flex">
+                    <FaBars className="w-5 h-5" />
                   </motion.span>
                 )}
               </AnimatePresence>
@@ -455,88 +427,54 @@ function Navbar() {
                   })}
                 </div>
 
-                {/* User Section */}
+                {/* User Section (mobile menu) */}
                 <div className={`px-6 py-6 border-t ${darkMode ? 'border-gray-800/50' : 'border-gray-200/50'}`}>
                   {isAuthenticated ? (
                     <motion.div
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.4, delay: 0.3, ease: 'easeOut' }}
-                      className="space-y-3"
+                      transition={{ duration: 0.4, delay: 0.2 }}
+                      className="space-y-2"
                     >
-                      {/* User Info */}
-                      <motion.div 
-                        className={`px-4 py-3 border ${darkMode ? 'border-gray-800/50' : 'border-gray-200/50'}`}
-                        whileHover={{ scale: 1.01 }}
-                        transition={{ duration: 0.3 }}
-                      >
-                        <p className={`text-xs font-light tracking-wider mb-1 ${darkMode ? 'text-gray-500' : 'text-gray-500'}`}>
-                          USER
+                      <div className={`flex items-center gap-3 px-4 py-3 rounded-xl ${darkMode ? 'bg-gray-800/50' : 'bg-gray-50'}`}>
+                        <FaUserCircle className={`w-8 h-8 shrink-0 ${darkMode ? 'text-sky-400' : 'text-sky-600'}`} />
+                        <p className={`text-sm font-medium truncate ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                          {user?.username}
                         </p>
-                        <p className={`text-sm font-light tracking-wide ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-                          {user?.username?.toUpperCase()}
-                        </p>
-                      </motion.div>
-                      
-                      {/* Manage Blogs */}
-                      <motion.div whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }}>
-                        <Link
-                          to="/manage-blogs"
-                          onClick={closeMenu}
-                          className={`block px-4 py-3 text-sm font-light tracking-wider transition-all duration-500 border ${
-                            darkMode 
-                              ? 'text-gray-300 hover:text-white border-gray-800/50 hover:border-gray-700' 
-                              : 'text-gray-600 hover:text-gray-900 border-gray-200/50 hover:border-gray-300'
-                          }`}
-                        >
-                          <motion.span
-                            whileHover={{ letterSpacing: '0.15em', x: 5 }}
-                            transition={{ duration: 0.3 }}
-                          >
-                            MANAGE
-                          </motion.span>
-                        </Link>
-                      </motion.div>
-                      
-                      {/* Logout */}
-                      <motion.button
-                        onClick={() => {
-                          logout();
-                          closeMenu();
-                        }}
-                        className={`w-full px-4 py-3 text-sm font-light tracking-wider transition-all duration-500 border ${
-                          darkMode 
-                            ? 'text-red-400/70 hover:text-red-300 border-red-900/30 hover:border-red-800/50' 
-                            : 'text-red-600/70 hover:text-red-700 border-red-200/50 hover:border-red-300'
+                      </div>
+                      <Link
+                        to="/manage-blogs"
+                        onClick={closeMenu}
+                        className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors ${
+                          darkMode ? 'text-gray-300 hover:bg-white/10' : 'text-gray-600 hover:bg-gray-100'
                         }`}
-                        whileHover={{ letterSpacing: '0.15em' }}
-                        whileTap={{ scale: 0.99 }}
                       >
-                        EXIT
-                      </motion.button>
+                        <FaPen className="w-4 h-4 shrink-0" />
+                        Manage blogs
+                      </Link>
+                      <button
+                        onClick={() => { logout(); closeMenu(); }}
+                        className={`flex items-center gap-3 w-full px-4 py-3 rounded-xl text-sm font-medium transition-colors ${
+                          darkMode ? 'text-red-400 hover:bg-red-500/10' : 'text-red-600 hover:bg-red-50'
+                        }`}
+                      >
+                        <FaSignOutAlt className="w-4 h-4 shrink-0" />
+                        Log out
+                      </button>
                     </motion.div>
                   ) : (
-                    <motion.div
+                    <motion.button
+                      onClick={() => { setShowAuthModal(true); closeMenu(); }}
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.4, delay: 0.3, ease: 'easeOut' }}
+                      transition={{ duration: 0.4, delay: 0.2 }}
+                      className={`flex items-center justify-center gap-2 w-full px-4 py-3 rounded-xl text-sm font-medium ${
+                        darkMode ? 'text-white border border-white/30 hover:bg-white/10' : 'text-gray-900 border border-gray-300 hover:bg-gray-100'
+                      }`}
                     >
-                      <motion.button
-                        onClick={() => {
-                          setShowAuthModal(true);
-                          closeMenu();
-                        }}
-                        className={`w-full px-4 py-3 text-sm font-light tracking-wider transition-all duration-500 border ${
-                          darkMode 
-                            ? 'text-white border-white/20 hover:border-white/40' 
-                            : 'text-gray-900 border-gray-300 hover:border-gray-400'
-                        }`}
-                        whileHover={{ letterSpacing: '0.2em', scale: 1.01 }}
-                        whileTap={{ scale: 0.99 }}
-                      >
-                        LOGIN
-                      </motion.button>
-                    </motion.div>
+                      <FaUserCircle className="w-5 h-5" />
+                      Log in
+                    </motion.button>
                   )}
                 </div>
               </div>
