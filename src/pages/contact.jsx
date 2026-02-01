@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, useMotionValue, useTransform } from 'framer-motion';
-import { FiUser, FiPhone, FiMessageSquare, FiSend, FiMail, FiMapPin, FiClock } from 'react-icons/fi';
+import { FiUser, FiPhone, FiMessageSquare, FiSend, FiMail } from 'react-icons/fi';
 import { FaRocket, FaChevronDown, FaPhone as FaPhoneSolid, FaEnvelope as FaEnvelopeSolid, FaMapMarkerAlt as FaMapMarkerAltSolid, FaGlobe as FaGlobeSolid, FaClock as FaClockSolid } from 'react-icons/fa';
 import { useTheme } from '../context/themeContext';
 import ImageWithFallback from '../components/ImageWithFallback';
@@ -70,7 +70,6 @@ const ContactCard = ({ icon: Icon, title, content, color, index, darkMode }) => 
 
 const Contact = () => {
   const { darkMode } = useTheme();
-  const [scrollY, setScrollY] = useState(0);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -84,7 +83,6 @@ const Contact = () => {
 
   useEffect(() => {
     const handleScroll = () => {
-      setScrollY(window.scrollY);
       y.set(window.scrollY);
     };
     window.addEventListener('scroll', handleScroll);

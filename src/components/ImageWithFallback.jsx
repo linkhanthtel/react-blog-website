@@ -37,10 +37,11 @@ const ImageWithFallback = ({
       }
     );
 
-    observer.observe(imgRef.current);
+    const node = imgRef.current;
+    observer.observe(node);
 
     return () => {
-      if (imgRef.current) {
+      if (node) {
         observer.disconnect();
       }
     };

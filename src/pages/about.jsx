@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { motion, useMotionValue, useTransform } from 'framer-motion';
 import { FaGlobe, FaPen, FaCamera, FaRocket, FaHeart, FaAward, FaUsers, FaStar, FaChevronDown } from 'react-icons/fa';
 import { useTheme } from '../context/themeContext';
-import ImageWithFallback from '../components/ImageWithFallback';
 
 // 3D Scroll Reveal Wrapper
 const ScrollReveal3D = ({ children, delay = 0, className = '' }) => {
@@ -83,13 +82,11 @@ const Floating3DCard = ({ icon: Icon, title, description, color, index, darkMode
 
 const About = () => {
   const { darkMode } = useTheme();
-  const [scrollY, setScrollY] = useState(0);
   const y = useMotionValue(0);
   const yTransform = useTransform(y, [0, 1000], [0, -150]);
 
   useEffect(() => {
     const handleScroll = () => {
-      setScrollY(window.scrollY);
       y.set(window.scrollY);
     };
     window.addEventListener('scroll', handleScroll);

@@ -1,6 +1,5 @@
 import React, { useState } from 'react'
 import { FiUser, FiTag, FiFileText, FiSend } from 'react-icons/fi'
-import image5 from '../images/image5.jpg'
 import image1 from "../images/image1.jpg"
 
 const Join = () => {
