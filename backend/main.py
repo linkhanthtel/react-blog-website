@@ -1,3 +1,12 @@
+import os
+from pathlib import Path
+
+# Load .env from backend directory (when running from project root or backend)
+env_path = Path(__file__).resolve().parent / ".env"
+if env_path.exists():
+    from dotenv import load_dotenv
+    load_dotenv(env_path)
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -8,7 +17,6 @@ from routers import auth, users, posts
 from ai_service import ai_service
 from pydantic import BaseModel
 from typing import List, Dict, Optional
-import os
 import uuid
 from datetime import datetime
 from PIL import Image, ImageDraw, ImageFont
@@ -79,7 +87,6 @@ app = FastAPI(
 )
 
 # CORS middleware for React frontend
-import os
 allowed_origins = [
     "http://localhost:3000",
     "https://react-blog-website-omega.vercel.app",  # React dev server
