@@ -14,8 +14,6 @@ import apiService from '../services/api';
 
 const Blogs = () => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [aiTrendingPosts, setAiTrendingPosts] = useState([]);
-  const [aiLoading, setAiLoading] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [sortBy, setSortBy] = useState('latest');
   const [viewMode, setViewMode] = useState('grid');
@@ -72,24 +70,6 @@ const Blogs = () => {
   const handleRefresh = () => {
     fetchPosts();
   };
-
-  // Fetch AI trending posts
-  const fetchAITrendingPosts = async () => {
-    setAiLoading(true);
-    try {
-      const result = await apiService.getAITrendingPosts(5);
-      setAiTrendingPosts(result.trending_posts || []);
-    } catch (err) {
-      console.error('Error fetching AI trending posts:', err);
-    } finally {
-      setAiLoading(false);
-    }
-  };
-
-  // Load AI trending posts on component mount
-  useEffect(() => {
-    fetchAITrendingPosts();
-  }, []);
 
   return (
     <motion.div 
@@ -532,93 +512,6 @@ const Blogs = () => {
                   </div>
                 </div>
               </div>
-
-              {/* Enhanced AI Trending Posts with 3D */}
-              {aiTrendingPosts.length > 0 && (
-                <div className="px-6 py-6 border-b-2 border-gray-200 dark:border-gray-700">
-                  <div className="flex items-center gap-3 mb-6">
-                    <motion.div 
-                      className={`w-10 h-10 rounded-xl flex items-center justify-center bg-gradient-to-br from-sky-500 to-cyan-500 shadow-lg relative`}
-                      whileHover={{ rotate: 360, scale: 1.1 }}
-                      transition={{ duration: 0.6 }}
-                    >
-                      {/* Pulsing ring */}
-                      <motion.div
-                        className="absolute inset-0 rounded-xl bg-sky-500/30"
-                        animate={{
-                          scale: [1, 1.3, 1],
-                          opacity: [0.5, 0, 0.5],
-                        }}
-                        transition={{
-                          duration: 2,
-                          repeat: Infinity,
-                          ease: 'easeInOut',
-                        }}
-                      />
-                      <FaRocket className="text-white text-lg relative z-10" />
-                    </motion.div>
-                    <div>
-                      <h3 className={`text-lg font-bold ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-                        AI Trending
-                      </h3>
-                      <p className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                        Powered by AI analytics
-                      </p>
-                    </div>
-                  </div>
-                  <div className="space-y-3">
-                    {aiTrendingPosts.slice(0, 3).map((post, index) => (
-                      <motion.div
-                        key={post.id}
-                        initial={{ opacity: 0, x: -20, rotateY: -30 }}
-                        animate={{ opacity: 1, x: 0, rotateY: 0 }}
-                        transition={{ delay: 0.1 + index * 0.1, duration: 0.5 }}
-                        whileHover={{ scale: 1.02, x: 5 }}
-                        className="group cursor-pointer"
-                        style={{ transformStyle: 'preserve-3d' }}
-                      >
-                        <Link to={`/blogs/singlepost/${post.id}`} className="block">
-                          <div className={`flex gap-3 p-3 rounded-2xl transition-all duration-300 ${
-                            darkMode 
-                              ? 'hover:bg-purple-900/20 border border-gray-700 hover:border-purple-500/50' 
-                              : 'hover:bg-sky-50 border border-gray-200 hover:border-sky-300'
-                          }`}>
-                            <div className="relative flex-shrink-0 w-16 h-16 rounded-xl overflow-hidden">
-                              <ImageWithFallback
-                                src={post.image}
-                                alt={getImageAlt(post.image, post.title)}
-                                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                                fallbackSrc="https://wanderluxe-ventures.onrender.com/api/placeholder/80/80"
-                              />
-                              <div className="absolute top-1 right-1 w-5 h-5 bg-sky-500 rounded-full flex items-center justify-center text-white text-xs font-bold">
-                                {index + 1}
-                              </div>
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <h4 className={`font-bold text-sm mb-2 line-clamp-2 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-sky-500 group-hover:to-cyan-500 transition-all duration-300 ${
-                                darkMode ? 'text-gray-100' : 'text-gray-800'
-                              }`}>
-                                {post.title}
-                              </h4>
-                              <div className="flex items-center justify-between">
-                                <span className={`px-2 py-1 rounded-lg text-xs font-bold ${
-                                  darkMode ? 'bg-purple-900/50 text-purple-300' : 'bg-sky-100 text-sky-700'
-                                }`}>
-                                  🧠 AI: {post.ai_score || 0}
-                                </span>
-                                <span className={`text-xs flex items-center space-x-1 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                                  <FaHeart className="text-red-400" />
-                                  <span>{post.likes}</span>
-                                </span>
-                              </div>
-                            </div>
-                          </div>
-                        </Link>
-                      </motion.div>
-                    ))}
-                  </div>
-                </div>
-              )}
 
               {/* Enhanced Popular Posts with 3D Effects */}
               <div className="px-6 py-6">

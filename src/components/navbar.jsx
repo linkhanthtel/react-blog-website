@@ -4,13 +4,11 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useTheme } from '../context/themeContext';
 import { useAuth } from '../context/authContext';
 import AuthModal from './authModal';
-import apiService from '../services/api';
 
 function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
-  const [aiStatus, setAiStatus] = useState(null);
   const [scrollProgress, setScrollProgress] = useState(0);
   const { darkMode, toggleDarkMode } = useTheme();
   const { user, logout, isAuthenticated } = useAuth();
@@ -36,21 +34,6 @@ function Navbar() {
 
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  // Check AI status on component mount
-  useEffect(() => {
-    const checkAIStatus = async () => {
-      try {
-        const status = await apiService.getAIHealth();
-        setAiStatus(status);
-      } catch (err) {
-        console.log('AI services not available:', err.message);
-        setAiStatus({ error: 'AI services not available' });
-      }
-    };
-
-    checkAIStatus();
   }, []);
 
   const handleLinkClick = (e) => {
@@ -240,37 +223,6 @@ function Navbar() {
               />
             </motion.button>
 
-            {/* Minimalist AI Status */}
-            {aiStatus && (
-              <motion.div 
-                className={`relative flex items-center gap-2 px-3 py-1.5 text-xs font-light tracking-wider ${
-                  aiStatus.error 
-                    ? darkMode ? 'text-red-400/70' : 'text-red-600/70'
-                    : darkMode ? 'text-green-400/70' : 'text-green-600/70'
-                }`}
-                initial={{ opacity: 0, x: 10 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.5, ease: 'easeOut' }}
-              >
-                <motion.div
-                  className={`absolute left-0 top-1/2 -translate-y-1/2 w-1.5 h-1.5 rounded-full ${
-                    aiStatus.error ? 'bg-red-400' : 'bg-green-400'
-                  }`}
-                  animate={{
-                    opacity: [1, 0.3, 1],
-                  }}
-                  transition={{
-                    duration: 2,
-                    repeat: Infinity,
-                    ease: 'easeInOut',
-                  }}
-                />
-                <span className="pl-3 hidden lg:inline">
-                  {aiStatus.error ? 'AI OFFLINE' : 'AI ONLINE'}
-                </span>
-              </motion.div>
-            )}
-            
             {/* Elegant Authentication */}
             {isAuthenticated ? (
               <div className="flex items-center space-x-4">

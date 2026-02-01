@@ -11,7 +11,6 @@ import { getImageAlt } from '../utils/imageUtils';
 import ImageWithFallback from '../components/ImageWithFallback';
 import LikeButton from '../components/LikeButton';
 import CommentsSection from '../components/CommentsSection';
-import AIRecommendations from '../components/AIRecommendations';
 
 function SinglePost() {
   const { id } = useParams();
@@ -137,13 +136,6 @@ function SinglePost() {
                   Discover more amazing content
                 </p>
               </div>
-
-              {/* AI-Powered Recommendations */}
-              <AIRecommendations 
-                postId={parseInt(id)} 
-                currentPost={post}
-                limit={4}
-              />
 
               {/* View All Button */}
               <motion.div

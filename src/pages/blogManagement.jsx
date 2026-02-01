@@ -3,8 +3,6 @@ import { useAuth } from '../context/authContext';
 import { useTheme } from '../context/themeContext';
 import apiService from '../services/api';
 import ImageUpload from '../components/ImageUpload';
-import AIEnhancementPanel from '../components/AIEnhancementPanel';
-import AITestPanel from '../components/AITestPanel';
 
 const BlogManagement = () => {
   const { user, isAuthenticated } = useAuth();
@@ -22,8 +20,6 @@ const BlogManagement = () => {
     author: '',
     tags: ''
   });
-  const [showAI, setShowAI] = useState(false);
-
   // Redirect if not authenticated
   useEffect(() => {
     if (!isAuthenticated) {
@@ -58,18 +54,6 @@ const BlogManagement = () => {
     }));
   };
 
-  const handleAITitleChange = (title) => {
-    setFormData(prev => ({ ...prev, title }));
-  };
-
-  const handleAIDescriptionChange = (description) => {
-    setFormData(prev => ({ ...prev, description }));
-  };
-
-  const handleAITagsChange = (tags) => {
-    setFormData(prev => ({ ...prev, tags }));
-  };
-
   const resetForm = () => {
     setFormData({
       title: '',
@@ -81,7 +65,6 @@ const BlogManagement = () => {
     });
     setEditingPost(null);
     setShowCreateForm(false);
-    setShowAI(false);
   };
 
   const handleCreatePost = async (e) => {
@@ -170,9 +153,6 @@ const BlogManagement = () => {
           <p className={`${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>Manage your blog posts - create, edit, and delete</p>
         </div>
 
-        {/* AI Test Panel */}
-        <AITestPanel />
-
         {error && (
           <div className={`px-4 py-3 rounded mb-4 ${darkMode ? 'bg-red-900 border-red-700 text-red-200' : 'bg-red-100 border-red-400 text-red-700'} border`}>
             {error}
@@ -186,14 +166,6 @@ const BlogManagement = () => {
           >
             {showCreateForm ? 'Cancel' : 'Create New Post'}
           </button>
-          {showCreateForm && (
-            <button
-              onClick={() => setShowAI(!showAI)}
-              className={`px-4 py-2 rounded transition-colors ${darkMode ? 'bg-purple-600 hover:bg-purple-700 text-white' : 'bg-sky-500 hover:bg-sky-600 text-white'}`}
-            >
-              {showAI ? 'Hide AI Assistant' : 'Show AI Assistant'}
-            </button>
-          )}
         </div>
 
         {showCreateForm && (
@@ -299,21 +271,6 @@ const BlogManagement = () => {
                 </button>
               </div>
             </form>
-          </div>
-        )}
-
-        {/* AI Enhancement Panel */}
-        {showAI && showCreateForm && (
-          <div className="mb-8">
-            <AIEnhancementPanel
-              content={formData.content}
-              title={formData.title}
-              description={formData.description}
-              destination={formData.title.split(' ').slice(0, 2).join(' ')} // Extract destination from title
-              onTitleChange={handleAITitleChange}
-              onDescriptionChange={handleAIDescriptionChange}
-              onTagsChange={handleAITagsChange}
-            />
           </div>
         )}
 
