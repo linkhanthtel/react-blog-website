@@ -1,580 +1,672 @@
-import React, { useState, useEffect } from 'react';
-import { motion, useMotionValue, useTransform } from 'framer-motion';
-import { FiUser, FiPhone, FiMessageSquare, FiSend, FiMail } from 'react-icons/fi';
-import { FaRocket, FaChevronDown, FaPhone as FaPhoneSolid, FaEnvelope as FaEnvelopeSolid, FaMapMarkerAlt as FaMapMarkerAltSolid, FaGlobe as FaGlobeSolid, FaClock as FaClockSolid } from 'react-icons/fa';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { FiUser, FiMail, FiPhone, FiMapPin, FiMessageSquare, FiSend, FiArrowRight, FiArrowLeft, FiCheck } from 'react-icons/fi';
 import { useTheme } from '../context/themeContext';
-import ImageWithFallback from '../components/ImageWithFallback';
-import image4 from '../images/image4.jpg';
 
-// 3D Scroll Reveal Wrapper
-const ScrollReveal3D = ({ children, delay = 0, className = '' }) => {
+const MouseGlow = ({ darkMode }) => {
+  const ref = useRef(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const onMove = (e) => {
+      el.style.background = `radial-gradient(600px circle at ${e.clientX}px ${e.clientY}px, ${
+        darkMode ? 'rgba(56,189,248,0.05)' : 'rgba(14,165,233,0.06)'
+      }, transparent 50%)`;
+    };
+    window.addEventListener('mousemove', onMove);
+    return () => window.removeEventListener('mousemove', onMove);
+  }, [darkMode]);
+  return <div ref={ref} className="pointer-events-none fixed inset-0 z-0" />;
+};
+
+const FloatingShape = ({ darkMode, size, x, y, delay, duration }) => (
+  <motion.div
+    className={`absolute rounded-full ${darkMode ? 'border border-white/[0.04]' : 'border border-gray-900/[0.04]'}`}
+    style={{ width: size, height: size, left: x, top: y }}
+    animate={{
+      y: [0, -30, 0],
+      rotate: [0, 180, 360],
+      scale: [1, 1.15, 1],
+    }}
+    transition={{ duration, delay, repeat: Infinity, ease: 'easeInOut' }}
+  />
+);
+
+const StaggerWords = ({ text, className }) => {
+  const words = text.split(' ');
   return (
-    <motion.div
-      className={className}
-      initial={{ opacity: 0, y: 100, rotateX: -15 }}
-      whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
-      viewport={{ once: true, amount: 0.2 }}
-      transition={{ duration: 0.8, delay, type: 'spring', stiffness: 100 }}
-      style={{ transformStyle: 'preserve-3d', perspective: '1000px' }}
-    >
-      {children}
-    </motion.div>
+    <span className={className}>
+      {words.map((word, i) => (
+        <motion.span
+          key={i}
+          className="inline-block mr-[0.3em]"
+          initial={{ opacity: 0, y: 40, rotateX: -40 }}
+          animate={{ opacity: 1, y: 0, rotateX: 0 }}
+          transition={{ duration: 0.6, delay: 0.3 + i * 0.1, ease: [0.22, 1, 0.36, 1] }}
+          style={{ transformStyle: 'preserve-3d' }}
+        >
+          {word}
+        </motion.span>
+      ))}
+    </span>
   );
 };
 
-// Floating Contact Card
-const ContactCard = ({ icon: Icon, title, content, color, index, darkMode }) => {
-  return (
+const PulsingDot = ({ darkMode }) => (
+  <div className="relative">
+    <div className={`w-2.5 h-2.5 rounded-full ${darkMode ? 'bg-emerald-400' : 'bg-emerald-500'}`} />
     <motion.div
-      initial={{ opacity: 0, scale: 0.8, rotateY: -30 }}
-      whileInView={{ opacity: 1, scale: 1, rotateY: 0 }}
-      viewport={{ once: true, amount: 0.3 }}
-      transition={{ duration: 0.6, delay: index * 0.15, type: 'spring', stiffness: 100 }}
-      whileHover={{ 
-        y: -15, 
-        rotateY: 5,
-        scale: 1.05,
-        transition: { duration: 0.3 }
-      }}
-      style={{ transformStyle: 'preserve-3d' }}
-      className={`p-8 rounded-3xl shadow-2xl border ${
-        darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
-      } h-full group cursor-pointer`}
-    >
-      {/* 3D Glow Effect */}
-      <motion.div
-        className={`absolute inset-0 rounded-3xl bg-gradient-to-br ${color} opacity-0 group-hover:opacity-20 blur-xl transition-opacity duration-300`}
-      />
-      
-      <motion.div
-        className={`relative w-16 h-16 bg-gradient-to-br ${color} rounded-2xl flex items-center justify-center mb-6 shadow-lg`}
-        whileHover={{ rotate: 360, scale: 1.1 }}
-        transition={{ duration: 0.6 }}
-      >
-        <Icon className="text-white text-2xl" />
-      </motion.div>
+      className={`absolute inset-0 rounded-full ${darkMode ? 'bg-emerald-400' : 'bg-emerald-500'}`}
+      animate={{ scale: [1, 2.5], opacity: [0.6, 0] }}
+      transition={{ duration: 1.5, repeat: Infinity }}
+    />
+  </div>
+);
 
-      <h3 className={`text-xl font-bold mb-3 ${
-        darkMode ? 'text-white' : 'text-gray-900'
-      }`}>
-        {title}
-      </h3>
-      <p className={`text-lg ${
-        darkMode ? 'text-gray-300' : 'text-gray-600'
-      }`}>
-        {content}
-      </p>
-    </motion.div>
-  );
+const FORM_STEPS = [
+  { id: 'details', title: 'Your details', subtitle: 'Tell us who you are' },
+  { id: 'message', title: 'Your message', subtitle: 'What would you like to say?' },
+  { id: 'review', title: 'Review & send', subtitle: 'Everything look good?' },
+];
+
+const slideVariants = {
+  enter: (dir) => ({ x: dir > 0 ? 220 : -220, opacity: 0, scale: 0.96 }),
+  center: { x: 0, opacity: 1, scale: 1 },
+  exit: (dir) => ({ x: dir > 0 ? -220 : 220, opacity: 0, scale: 0.96 }),
 };
+
+const shapes = [
+  { size: 220, x: '8%', y: '15%', delay: 0, duration: 22 },
+  { size: 160, x: '82%', y: '8%', delay: 2, duration: 16 },
+  { size: 120, x: '72%', y: '55%', delay: 4, duration: 18 },
+  { size: 200, x: '3%', y: '68%', delay: 1, duration: 24 },
+  { size: 100, x: '45%', y: '78%', delay: 3, duration: 14 },
+];
+
+const contactMethods = [
+  { label: 'Email', value: 'hello@wanderluxe.com', icon: FiMail },
+  { label: 'Phone', value: '+1 (555) 123-4567', icon: FiPhone },
+  { label: 'Location', value: 'San Francisco, CA', icon: FiMapPin },
+];
 
 const Contact = () => {
   const { darkMode } = useTheme();
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    message: ''
-  });
+  const [step, setStep] = useState(0);
+  const [direction, setDirection] = useState(1);
+  const [formData, setFormData] = useState({ name: '', email: '', message: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
-  const y = useMotionValue(0);
-  const yTransform = useTransform(y, [0, 1000], [0, -150]);
+  const [focusedField, setFocusedField] = useState(null);
+  const nameRef = useRef(null);
+  const messageRef = useRef(null);
 
   useEffect(() => {
-    const handleScroll = () => {
-      y.set(window.scrollY);
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, [y]);
+    if (step === 0 && nameRef.current) nameRef.current.focus();
+    if (step === 1 && messageRef.current) messageRef.current.focus();
+  }, [step]);
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const canProceed = useCallback(() => {
+    if (step === 0) return formData.name.trim() && formData.email.trim();
+    if (step === 1) return formData.message.trim();
+    return true;
+  }, [step, formData]);
+
+  const goNext = () => {
+    if (canProceed() && step < FORM_STEPS.length - 1) {
+      setDirection(1);
+      setStep((s) => s + 1);
+    }
+  };
+
+  const goPrev = () => {
+    if (step > 0) {
+      setDirection(-1);
+      setStep((s) => s - 1);
+    }
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey && step < 2 && canProceed()) {
+      e.preventDefault();
+      goNext();
+    }
+  };
+
+  const handleSubmit = async () => {
     setIsSubmitting(true);
-    
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    console.log('Form submitted:', formData);
+    await new Promise((r) => setTimeout(r, 2000));
     setSubmitted(true);
     setIsSubmitting(false);
-    
-    // Reset form after 3 seconds
     setTimeout(() => {
-      setFormData({ name: '', email: '', phone: '', message: '' });
+      setFormData({ name: '', email: '', message: '' });
       setSubmitted(false);
-    }, 3000);
+      setStep(0);
+    }, 4000);
   };
 
-  const contactInfo = [
-    {
-      icon: FaPhoneSolid,
-      title: 'Phone',
-      content: '+1 (555) 123-4567',
-      color: 'from-blue-500 to-cyan-500'
-    },
-    {
-      icon: FaEnvelopeSolid,
-      title: 'Email',
-      content: 'hello@wanderluxe.com',
-      color: 'from-sky-500 to-blue-500'
-    },
-    {
-      icon: FaMapMarkerAltSolid,
-      title: 'Address',
-      content: 'San Francisco, CA',
-      color: 'from-cyan-500 to-sky-500'
-    },
-    {
-      icon: FaClockSolid,
-      title: 'Hours',
-      content: 'Mon-Fri: 9AM-6PM',
-      color: 'from-blue-500 to-sky-500'
-    },
-  ];
+  const inputClass = (field) =>
+    `w-full pl-12 pr-4 py-4 rounded-xl border-2 transition-all duration-300 outline-none ${
+      darkMode
+        ? 'bg-gray-900/50 text-white border-gray-700 focus:border-sky-400 focus:ring-4 focus:ring-sky-400/10 placeholder-gray-600'
+        : 'bg-gray-50 text-gray-900 border-gray-200 focus:border-sky-400 focus:ring-4 focus:ring-sky-500/10 placeholder-gray-400'
+    }`;
+
+  const iconClass = (field) =>
+    `absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 transition-colors duration-200 ${
+      focusedField === field
+        ? darkMode ? 'text-sky-400' : 'text-sky-500'
+        : darkMode ? 'text-gray-600' : 'text-gray-400'
+    }`;
 
   return (
-    <div className={`min-h-screen ${darkMode ? 'bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900' : 'bg-gradient-to-b from-sky-50 via-white to-sky-50'} scroll-smooth`}>
-      {/* Hero Section with Parallax */}
-      <motion.section
-        className={`relative overflow-hidden pt-32 pb-20 ${
-          darkMode 
-            ? 'bg-gradient-to-br from-blue-900 via-gray-900 to-gray-900' 
-            : 'bg-gradient-to-br from-blue-500 via-sky-400 to-cyan-400'
-        }`}
-        style={{ y: yTransform }}
-      >
-        {/* Animated Background Elements */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          {[...Array(8)].map((_, i) => (
-            <motion.div
-              key={i}
-              className={`absolute w-32 h-32 rounded-full ${
-                darkMode ? 'bg-blue-500/10' : 'bg-white/10'
-              } blur-3xl`}
-              style={{
-                left: `${10 + i * 12}%`,
-                top: `${20 + (i % 3) * 30}%`,
-              }}
-              animate={{
-                y: [0, 30, 0],
-                x: [0, 20, 0],
-                scale: [1, 1.2, 1],
-              }}
-              transition={{
-                duration: 8 + i * 2,
-                repeat: Infinity,
-                ease: 'easeInOut',
-              }}
+    <div className={`min-h-screen relative overflow-hidden ${darkMode ? 'bg-gray-950' : 'bg-gray-50'}`}>
+      <MouseGlow darkMode={darkMode} />
+
+      {/* Subtle background grid */}
+      <svg className="absolute inset-0 w-full h-full pointer-events-none" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <pattern id="contact-grid" width="80" height="80" patternUnits="userSpaceOnUse">
+            <path
+              d="M 80 0 L 0 0 0 80"
+              fill="none"
+              stroke={darkMode ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.03)'}
+              strokeWidth="1"
             />
-          ))}
-        </div>
+          </pattern>
+        </defs>
+        <rect width="100%" height="100%" fill="url(#contact-grid)" />
+      </svg>
 
-        <div className="container mx-auto px-4 relative z-10">
-          <ScrollReveal3D>
-            <motion.div className="text-center max-w-4xl mx-auto">
-              <motion.div
-                className="inline-flex items-center space-x-2 px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full text-white text-sm mb-6"
-                whileHover={{ scale: 1.05 }}
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ type: 'spring', stiffness: 200 }}
-              >
-                <FaRocket className="text-yellow-300" />
-                <span>Get in Touch</span>
-              </motion.div>
+      {/* Floating shapes */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        {shapes.map((s, i) => (
+          <FloatingShape key={i} darkMode={darkMode} {...s} />
+        ))}
+      </div>
 
-              <motion.h1
-                className="text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6"
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.2, duration: 0.8 }}
-              >
-                Contact{' '}
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-200 to-pink-200">
-                  Us
-                </span>
-              </motion.h1>
-
-              <motion.p
-                className="text-xl text-white/90 mb-8 max-w-2xl mx-auto leading-relaxed"
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.4, duration: 0.8 }}
-              >
-                We'd love to hear from you. Send us a message and we'll respond as soon as possible.
-              </motion.p>
-
-              {/* Scroll Indicator */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.8, duration: 0.8 }}
-                className="flex flex-col items-center mt-12"
-              >
-                <motion.div
-                  animate={{ y: [0, 8, 0] }}
-                  transition={{ duration: 2, repeat: Infinity }}
-                >
-                  <FaChevronDown className="text-white/60 text-xl" />
-                </motion.div>
-                <span className="text-white/60 text-xs mt-3 font-light tracking-wide">Scroll to explore</span>
-              </motion.div>
-            </motion.div>
-          </ScrollReveal3D>
-        </div>
-      </motion.section>
-
-      {/* Main Content */}
-      <div className="container mx-auto px-4 py-20">
-        {/* Contact Info Cards */}
-        <ScrollReveal3D delay={0.2}>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-24">
-            {contactInfo.map((info, index) => (
-              <ContactCard
-                key={index}
-                icon={info.icon}
-                title={info.title}
-                content={info.content}
-                color={info.color}
-                index={index}
-                darkMode={darkMode}
-              />
-            ))}
-          </div>
-        </ScrollReveal3D>
-
-        {/* Contact Form Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-24">
-          {/* Form */}
-          <ScrollReveal3D delay={0.3}>
+      <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* ---- Hero ---- */}
+        <section className="pt-32 sm:pt-40 pb-16 sm:pb-20">
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1 }} className="max-w-3xl">
             <motion.div
-              className={`p-8 md:p-12 rounded-3xl shadow-2xl border ${
-                darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
-              } relative overflow-hidden`}
-              initial={{ opacity: 0, x: -50, rotateY: -30 }}
-              whileInView={{ opacity: 1, x: 0, rotateY: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8, type: 'spring' }}
-              style={{ transformStyle: 'preserve-3d' }}
-            >
-              {/* 3D Background Pattern */}
-              <div className="absolute inset-0 opacity-5">
-                <div className="absolute inset-0" style={{
-                  backgroundImage: 'linear-gradient(45deg, transparent 25%, rgba(59, 130, 246, 0.1) 25%, rgba(59, 130, 246, 0.1) 50%, transparent 50%, transparent 75%, rgba(59, 130, 246, 0.1) 75%)',
-                  backgroundSize: '40px 40px'
-                }} />
-              </div>
+              className={`w-16 h-0.5 mb-8 ${darkMode ? 'bg-sky-400' : 'bg-sky-500'}`}
+              initial={{ scaleX: 0 }}
+              animate={{ scaleX: 1 }}
+              transition={{ duration: 0.8, delay: 0.15 }}
+              style={{ transformOrigin: 'left' }}
+            />
 
-              <div className="relative z-10">
-                <motion.div
-                  className="flex items-center mb-8"
-                  initial={{ opacity: 0, x: -20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
-                >
-                  <motion.div
-                    className="w-12 h-12 bg-gradient-to-br from-blue-500 to-sky-500 rounded-xl flex items-center justify-center mr-4"
-                    whileHover={{ rotate: 360 }}
-                    transition={{ duration: 0.6 }}
-                  >
-                    <FiSend className="text-white text-xl" />
-                  </motion.div>
-                  <h2 className={`text-3xl md:text-4xl font-bold ${
-                    darkMode ? 'text-white' : 'text-gray-900'
-                  }`}>
-                    Send Message
-                  </h2>
-                </motion.div>
-
-                {submitted ? (
-                  <motion.div
-                    initial={{ scale: 0, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    className="text-center py-12"
-                  >
-                    <motion.div
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      transition={{ type: 'spring', stiffness: 200 }}
-                      className="w-20 h-20 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center mx-auto mb-6"
-                    >
-                      <FiSend className="text-white text-3xl" />
-                    </motion.div>
-                    <h3 className={`text-2xl font-bold mb-2 ${
-                      darkMode ? 'text-white' : 'text-gray-900'
-                    }`}>
-                      Message Sent!
-                    </h3>
-                    <p className={`text-lg ${
-                      darkMode ? 'text-gray-300' : 'text-gray-600'
-                    }`}>
-                      We'll get back to you soon.
-                    </p>
-                  </motion.div>
-                ) : (
-                  <motion.form
-                    onSubmit={handleSubmit}
-                    className="space-y-6"
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: 0.2 }}
-                  >
-                    {[
-                      { id: 'name', label: 'Name', type: 'text', icon: FiUser },
-                      { id: 'email', label: 'Email', type: 'email', icon: FiMail },
-                      { id: 'phone', label: 'Phone Number', type: 'tel', icon: FiPhone },
-                    ].map((field, index) => (
-                      <motion.div
-                        key={field.id}
-                        initial={{ opacity: 0, x: -20 }}
-                        whileInView={{ opacity: 1, x: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ delay: 0.3 + index * 0.1 }}
-                      >
-                        <label
-                          htmlFor={field.id}
-                          className={`block text-sm font-medium mb-2 ${
-                            darkMode ? 'text-gray-300' : 'text-gray-700'
-                          }`}
-                        >
-                          {field.label}
-                        </label>
-                        <motion.div
-                          className="relative"
-                          whileFocus={{ scale: 1.02 }}
-                        >
-                          <input
-                            type={field.type}
-                            id={field.id}
-                            name={field.id}
-                            value={formData[field.id]}
-                            onChange={handleChange}
-                            placeholder={`Your ${field.label.toLowerCase()}`}
-                            className={`w-full p-4 pl-12 pr-4 rounded-xl border-2 transition-all duration-300 ${
-                              darkMode
-                                ? 'bg-gray-700 text-white border-gray-600 focus:border-blue-400 focus:ring-2 focus:ring-blue-400/20'
-                                : 'bg-gray-50 text-gray-700 border-gray-300 focus:border-blue-400 focus:ring-2 focus:ring-blue-400/20'
-                            } focus:outline-none`}
-                            required
-                          />
-                          <field.icon
-                            className={`absolute left-4 top-1/2 -translate-y-1/2 ${
-                              darkMode ? 'text-gray-400' : 'text-gray-500'
-                            }`}
-                          />
-                        </motion.div>
-                      </motion.div>
-                    ))}
-
-                    <motion.div
-                      initial={{ opacity: 0, x: -20 }}
-                      whileInView={{ opacity: 1, x: 0 }}
-                      viewport={{ once: true }}
-                      transition={{ delay: 0.6 }}
-                    >
-                      <label
-                        htmlFor="message"
-                        className={`block text-sm font-medium mb-2 ${
-                          darkMode ? 'text-gray-300' : 'text-gray-700'
-                        }`}
-                      >
-                        Message
-                      </label>
-                      <motion.div
-                        className="relative"
-                        whileFocus={{ scale: 1.02 }}
-                      >
-                        <textarea
-                          id="message"
-                          name="message"
-                          value={formData.message}
-                          onChange={handleChange}
-                          rows="6"
-                          placeholder="Your message"
-                          className={`w-full p-4 pl-12 pr-4 rounded-xl border-2 transition-all duration-300 resize-none ${
-                            darkMode
-                              ? 'bg-gray-700 text-white border-gray-600 focus:border-blue-400 focus:ring-2 focus:ring-blue-400/20'
-                              : 'bg-gray-50 text-gray-700 border-gray-300 focus:border-blue-400 focus:ring-2 focus:ring-blue-400/20'
-                          } focus:outline-none`}
-                          required
-                        />
-                        <FiMessageSquare
-                          className={`absolute left-4 top-4 ${
-                            darkMode ? 'text-gray-400' : 'text-gray-500'
-                          }`}
-                        />
-                      </motion.div>
-                    </motion.div>
-
-                    <motion.button
-                      type="submit"
-                      disabled={isSubmitting}
-                      className={`w-full flex items-center justify-center px-6 py-4 rounded-xl font-semibold text-lg transition-all duration-300 ${
-                        darkMode
-                          ? 'bg-gradient-to-r from-blue-600 to-sky-600 hover:from-blue-700 hover:to-sky-700 text-white'
-                          : 'bg-gradient-to-r from-blue-500 to-sky-500 hover:from-blue-600 hover:to-sky-600 text-white'
-                      } disabled:opacity-50 disabled:cursor-not-allowed shadow-lg`}
-                      whileHover={{ scale: 1.02, y: -2 }}
-                      whileTap={{ scale: 0.98 }}
-                      initial={{ opacity: 0, y: 20 }}
-                      whileInView={{ opacity: 1, y: 0 }}
-                      viewport={{ once: true }}
-                      transition={{ delay: 0.7 }}
-                    >
-                      {isSubmitting ? (
-                        <>
-                          <motion.div
-                            className="w-5 h-5 border-2 border-white border-t-transparent rounded-full mr-2"
-                            animate={{ rotate: 360 }}
-                            transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-                          />
-                          Sending...
-                        </>
-                      ) : (
-                        <>
-                          <FiSend className="mr-2" />
-                          Send Message
-                        </>
-                      )}
-                    </motion.button>
-                  </motion.form>
-                )}
-              </div>
-            </motion.div>
-          </ScrollReveal3D>
-
-          {/* Image Section */}
-          <ScrollReveal3D delay={0.4}>
-            <motion.div
-              className="relative h-full min-h-[600px] rounded-3xl overflow-hidden"
-              initial={{ opacity: 0, x: 50, rotateY: 30 }}
-              whileInView={{ opacity: 1, x: 0, rotateY: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8, type: 'spring' }}
-              style={{ transformStyle: 'preserve-3d' }}
-              whileHover={{ scale: 1.02, rotateY: 5 }}
-            >
-              <ImageWithFallback
-                src={image4}
-                alt="Contact Us"
-                className="w-full h-full object-cover"
-                priority={true}
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
-              
-              {/* Overlay Content */}
-              <div className="absolute inset-0 flex flex-col justify-end p-8 text-white">
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                >
-                  <h3 className="text-3xl font-bold mb-4">Let's Connect</h3>
-                  <p className="text-lg mb-6 opacity-90">
-                    We're here to help you plan your next adventure. Reach out and let's make your travel dreams come true.
-                  </p>
-                  <div className="space-y-3">
-                    {[
-                      { icon: FaPhoneSolid, text: '+1 (555) 123-4567' },
-                      { icon: FaEnvelopeSolid, text: 'hello@wanderluxe.com' },
-                      { icon: FaMapMarkerAltSolid, text: 'San Francisco, CA' },
-                    ].map((item, index) => (
-                      <motion.div
-                        key={index}
-                        className="flex items-center space-x-3"
-                        initial={{ opacity: 0, x: -20 }}
-                        whileInView={{ opacity: 1, x: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ delay: 0.2 + index * 0.1 }}
-                        whileHover={{ x: 5 }}
-                      >
-                        <item.icon className="text-xl" />
-                        <span>{item.text}</span>
-                      </motion.div>
-                    ))}
-                  </div>
-                </motion.div>
-              </div>
-            </motion.div>
-          </ScrollReveal3D>
-        </div>
-
-        {/* Additional Info Section */}
-        <ScrollReveal3D delay={0.5}>
-          <div className={`p-8 md:p-12 rounded-3xl shadow-2xl border ${
-            darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
-          }`}>
-            <motion.h2
-              className={`text-3xl md:text-4xl font-bold mb-8 text-center ${
+            <h1
+              className={`text-4xl sm:text-5xl lg:text-7xl font-bold leading-[1.1] mb-8 ${
                 darkMode ? 'text-white' : 'text-gray-900'
               }`}
-              initial={{ scale: 0.5, opacity: 0 }}
-              whileInView={{ scale: 1, opacity: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, type: 'spring' }}
             >
-              Why Choose Us?
-            </motion.h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {[
-                {
-                  title: '24/7 Support',
-                  description: 'Our team is always available to assist you with any questions or concerns.',
-                  icon: FaPhoneSolid,
-                  color: 'from-blue-500 to-cyan-500'
-                },
-                {
-                  title: 'Expert Advice',
-                  description: 'Get personalized recommendations from our experienced travel consultants.',
-                  icon: FaGlobeSolid,
-                  color: 'from-sky-500 to-blue-500'
-                },
-                {
-                  title: 'Best Deals',
-                  description: 'Access exclusive offers and discounts on luxury travel experiences.',
-                  icon: FaRocket,
-                  color: 'from-cyan-500 to-sky-500'
-                },
-              ].map((item, index) => (
+              <StaggerWords text="Let's start a" />
+              <br />
+              <span className="relative inline-block">
+                <StaggerWords text="conversation." />
                 <motion.div
-                  key={index}
-                  className="text-center"
-                  initial={{ opacity: 0, y: 30, rotateX: -15 }}
-                  whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.6, delay: index * 0.1, type: 'spring' }}
-                  whileHover={{ y: -10, rotateY: 5 }}
-                  style={{ transformStyle: 'preserve-3d' }}
-                >
+                  className={`absolute -bottom-2 left-0 h-1 rounded-full ${
+                    darkMode
+                      ? 'bg-gradient-to-r from-sky-400 to-cyan-300'
+                      : 'bg-gradient-to-r from-sky-500 to-cyan-400'
+                  }`}
+                  initial={{ width: 0 }}
+                  animate={{ width: '100%' }}
+                  transition={{ duration: 0.8, delay: 1.1, ease: [0.22, 1, 0.36, 1] }}
+                />
+              </span>
+            </h1>
+
+            <motion.p
+              className={`text-lg sm:text-xl leading-relaxed max-w-xl ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.9 }}
+            >
+              Have an idea, a question, or just want to say hello? We'd love to hear from you.
+            </motion.p>
+          </motion.div>
+        </section>
+
+        {/* ---- Contact methods ---- */}
+        <motion.section
+          className="pb-16 sm:pb-20"
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.3 }}
+          transition={{ duration: 0.7 }}
+        >
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+            {contactMethods.map((item, i) => (
+              <motion.div
+                key={item.label}
+                className={`group relative p-5 sm:p-6 rounded-2xl border transition-all duration-500 cursor-default overflow-hidden ${
+                  darkMode
+                    ? 'bg-white/[0.02] border-white/[0.06] hover:bg-white/[0.05] hover:border-white/10'
+                    : 'bg-white border-gray-200 hover:border-sky-200 hover:shadow-lg hover:shadow-sky-500/5'
+                }`}
+                initial={{ opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: i * 0.1 }}
+                whileHover={{ y: -4 }}
+              >
+                <div className="flex items-center gap-4">
                   <motion.div
-                    className={`w-16 h-16 bg-gradient-to-br ${item.color} rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg`}
-                    whileHover={{ rotate: 360, scale: 1.1 }}
-                    transition={{ duration: 0.6 }}
+                    className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
+                      darkMode ? 'bg-sky-400/10 text-sky-400' : 'bg-sky-50 text-sky-600'
+                    }`}
+                    whileHover={{ rotate: 12, scale: 1.1 }}
+                    transition={{ type: 'spring', stiffness: 300 }}
                   >
-                    <item.icon className="text-white text-2xl" />
+                    <item.icon className="w-5 h-5" />
                   </motion.div>
-                  <h3 className={`text-xl font-bold mb-2 ${
-                    darkMode ? 'text-white' : 'text-gray-900'
-                  }`}>
-                    {item.title}
-                  </h3>
-                  <p className={`text-lg ${
-                    darkMode ? 'text-gray-300' : 'text-gray-600'
-                  }`}>
-                    {item.description}
-                  </p>
-                </motion.div>
-              ))}
-            </div>
+                  <div className="min-w-0">
+                    <p
+                      className={`text-[11px] font-semibold tracking-wider uppercase mb-0.5 ${
+                        darkMode ? 'text-gray-500' : 'text-gray-400'
+                      }`}
+                    >
+                      {item.label}
+                    </p>
+                    <p className={`text-sm font-medium truncate ${darkMode ? 'text-gray-200' : 'text-gray-800'}`}>
+                      {item.value}
+                    </p>
+                  </div>
+                </div>
+                {/* hover accent bar */}
+                <motion.div
+                  className={`absolute bottom-0 left-6 right-6 h-px ${darkMode ? 'bg-sky-400/50' : 'bg-sky-500/40'}`}
+                  initial={{ scaleX: 0 }}
+                  whileHover={{ scaleX: 1 }}
+                  transition={{ duration: 0.35 }}
+                />
+              </motion.div>
+            ))}
           </div>
-        </ScrollReveal3D>
+        </motion.section>
+
+        {/* ---- Multi-step form ---- */}
+        <motion.section
+          className="pb-28 sm:pb-32"
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true, amount: 0.15 }}
+          transition={{ duration: 0.5 }}
+        >
+          <div
+            className={`rounded-3xl border overflow-hidden ${
+              darkMode
+                ? 'bg-white/[0.02] border-white/[0.06]'
+                : 'bg-white border-gray-200 shadow-xl shadow-gray-200/50'
+            }`}
+          >
+            {/* Progress header */}
+            <div className={`px-6 sm:px-8 pt-8 pb-6 border-b ${darkMode ? 'border-white/[0.06]' : 'border-gray-100'}`}>
+              <div className="flex items-center justify-between">
+                {FORM_STEPS.map((s, i) => (
+                  <React.Fragment key={s.id}>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (i < step) {
+                          setDirection(-1);
+                          setStep(i);
+                        }
+                      }}
+                      className={`flex items-center gap-2 sm:gap-3 ${i < step ? 'cursor-pointer' : 'cursor-default'}`}
+                    >
+                      <motion.div
+                        className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold transition-all duration-500 ${
+                          i < step
+                            ? darkMode
+                              ? 'bg-sky-400 text-gray-950'
+                              : 'bg-sky-500 text-white'
+                            : i === step
+                              ? darkMode
+                                ? 'bg-sky-400/15 text-sky-400 ring-2 ring-sky-400/40'
+                                : 'bg-sky-50 text-sky-600 ring-2 ring-sky-500/30'
+                              : darkMode
+                                ? 'bg-gray-800 text-gray-600'
+                                : 'bg-gray-100 text-gray-400'
+                        }`}
+                        layout
+                      >
+                        {i < step ? <FiCheck className="w-4 h-4" /> : i + 1}
+                      </motion.div>
+                      <span
+                        className={`hidden sm:block text-sm font-medium transition-colors ${
+                          i <= step
+                            ? darkMode ? 'text-white' : 'text-gray-900'
+                            : darkMode ? 'text-gray-600' : 'text-gray-400'
+                        }`}
+                      >
+                        {s.title}
+                      </span>
+                    </button>
+                    {i < FORM_STEPS.length - 1 && (
+                      <div className={`flex-1 mx-3 sm:mx-5 h-px relative ${darkMode ? 'bg-gray-800' : 'bg-gray-200'}`}>
+                        <motion.div
+                          className={`absolute inset-y-0 left-0 ${darkMode ? 'bg-sky-400' : 'bg-sky-500'}`}
+                          initial={false}
+                          animate={{ width: i < step ? '100%' : '0%' }}
+                          transition={{ duration: 0.5, ease: 'easeInOut' }}
+                        />
+                      </div>
+                    )}
+                  </React.Fragment>
+                ))}
+              </div>
+            </div>
+
+            {/* Form body */}
+            <div className="px-6 sm:px-8 py-10 sm:py-14 min-h-[380px] sm:min-h-[420px] flex items-center">
+              <div className="w-full max-w-lg mx-auto">
+                <AnimatePresence mode="wait" custom={direction}>
+                  {!submitted ? (
+                    <motion.div
+                      key={step}
+                      custom={direction}
+                      variants={slideVariants}
+                      initial="enter"
+                      animate="center"
+                      exit="exit"
+                      transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+                    >
+                      <div className="mb-8">
+                        <h2
+                          className={`text-2xl sm:text-3xl font-bold mb-2 ${darkMode ? 'text-white' : 'text-gray-900'}`}
+                        >
+                          {FORM_STEPS[step].title}
+                        </h2>
+                        <p className={`text-base ${darkMode ? 'text-gray-500' : 'text-gray-500'}`}>
+                          {FORM_STEPS[step].subtitle}
+                        </p>
+                      </div>
+
+                      {/* Step 0 — name + email */}
+                      {step === 0 && (
+                        <div className="space-y-5">
+                          <div>
+                            <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                              Name
+                            </label>
+                            <div className="relative">
+                              <FiUser className={iconClass('name')} />
+                              <input
+                                ref={nameRef}
+                                type="text"
+                                name="name"
+                                value={formData.name}
+                                onChange={handleChange}
+                                onFocus={() => setFocusedField('name')}
+                                onBlur={() => setFocusedField(null)}
+                                onKeyDown={handleKeyDown}
+                                placeholder="Your name"
+                                className={inputClass('name')}
+                              />
+                            </div>
+                          </div>
+                          <div>
+                            <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                              Email
+                            </label>
+                            <div className="relative">
+                              <FiMail className={iconClass('email')} />
+                              <input
+                                type="email"
+                                name="email"
+                                value={formData.email}
+                                onChange={handleChange}
+                                onFocus={() => setFocusedField('email')}
+                                onBlur={() => setFocusedField(null)}
+                                onKeyDown={handleKeyDown}
+                                placeholder="Your email"
+                                className={inputClass('email')}
+                              />
+                            </div>
+                          </div>
+                          <p className={`text-xs ${darkMode ? 'text-gray-600' : 'text-gray-400'}`}>
+                            Press <kbd className={`px-1.5 py-0.5 rounded text-[11px] font-mono ${darkMode ? 'bg-gray-800 text-gray-400' : 'bg-gray-100 text-gray-500'}`}>Enter</kbd> to continue
+                          </p>
+                        </div>
+                      )}
+
+                      {/* Step 1 — message */}
+                      {step === 1 && (
+                        <div>
+                          <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                            Message
+                          </label>
+                          <div className="relative">
+                            <FiMessageSquare
+                              className={`absolute left-4 top-4 w-5 h-5 transition-colors duration-200 ${
+                                focusedField === 'message'
+                                  ? darkMode ? 'text-sky-400' : 'text-sky-500'
+                                  : darkMode ? 'text-gray-600' : 'text-gray-400'
+                              }`}
+                            />
+                            <textarea
+                              ref={messageRef}
+                              name="message"
+                              value={formData.message}
+                              onChange={handleChange}
+                              onFocus={() => setFocusedField('message')}
+                              onBlur={() => setFocusedField(null)}
+                              rows="6"
+                              placeholder="What's on your mind?"
+                              className={`w-full pl-12 pr-4 py-4 rounded-xl border-2 transition-all duration-300 outline-none resize-none ${
+                                darkMode
+                                  ? 'bg-gray-900/50 text-white border-gray-700 focus:border-sky-400 focus:ring-4 focus:ring-sky-400/10 placeholder-gray-600'
+                                  : 'bg-gray-50 text-gray-900 border-gray-200 focus:border-sky-400 focus:ring-4 focus:ring-sky-500/10 placeholder-gray-400'
+                              }`}
+                            />
+                          </div>
+                          <p className={`mt-2 text-xs ${darkMode ? 'text-gray-600' : 'text-gray-400'}`}>
+                            {formData.message.length > 0
+                              ? `${formData.message.length} characters`
+                              : 'Write your message, then continue'}
+                          </p>
+                        </div>
+                      )}
+
+                      {/* Step 2 — review */}
+                      {step === 2 && (
+                        <div className="space-y-3">
+                          {[
+                            { label: 'Name', value: formData.name, icon: FiUser },
+                            { label: 'Email', value: formData.email, icon: FiMail },
+                            { label: 'Message', value: formData.message, icon: FiMessageSquare },
+                          ].map((item, i) => (
+                            <motion.div
+                              key={item.label}
+                              initial={{ opacity: 0, x: 20 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              transition={{ delay: i * 0.08 }}
+                              className={`flex gap-4 p-4 rounded-xl ${
+                                darkMode
+                                  ? 'bg-gray-900/50 border border-white/[0.05]'
+                                  : 'bg-gray-50 border border-gray-100'
+                              }`}
+                            >
+                              <item.icon
+                                className={`w-4 h-4 shrink-0 mt-0.5 ${darkMode ? 'text-sky-400' : 'text-sky-500'}`}
+                              />
+                              <div className="min-w-0 flex-1">
+                                <p
+                                  className={`text-[11px] font-semibold tracking-wider uppercase mb-1 ${
+                                    darkMode ? 'text-gray-500' : 'text-gray-400'
+                                  }`}
+                                >
+                                  {item.label}
+                                </p>
+                                <p
+                                  className={`text-sm leading-relaxed break-words ${
+                                    darkMode ? 'text-gray-200' : 'text-gray-800'
+                                  } ${item.label === 'Message' ? 'whitespace-pre-wrap' : ''}`}
+                                >
+                                  {item.value}
+                                </p>
+                              </div>
+                            </motion.div>
+                          ))}
+                        </div>
+                      )}
+                    </motion.div>
+                  ) : (
+                    /* ---- Success state ---- */
+                    <motion.div
+                      key="success"
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ duration: 0.5, type: 'spring' }}
+                      className="text-center py-6"
+                    >
+                      <div className="relative w-24 h-24 mx-auto mb-8">
+                        {[0, 1, 2].map((i) => (
+                          <motion.div
+                            key={i}
+                            className={`absolute inset-0 rounded-full border-2 ${
+                              darkMode ? 'border-sky-400/30' : 'border-sky-500/30'
+                            }`}
+                            initial={{ scale: 0.5, opacity: 0 }}
+                            animate={{ scale: [0.5, 2.5], opacity: [0.6, 0] }}
+                            transition={{ duration: 2, delay: i * 0.4, repeat: Infinity, ease: 'easeOut' }}
+                          />
+                        ))}
+                        <motion.div
+                          className={`absolute inset-0 rounded-full flex items-center justify-center ${
+                            darkMode ? 'bg-sky-400' : 'bg-sky-500'
+                          }`}
+                          initial={{ scale: 0 }}
+                          animate={{ scale: 1 }}
+                          transition={{ type: 'spring', stiffness: 200, delay: 0.15 }}
+                        >
+                          <FiCheck className="w-10 h-10 text-white" />
+                        </motion.div>
+                      </div>
+                      <motion.h3
+                        className={`text-2xl font-bold mb-2 ${darkMode ? 'text-white' : 'text-gray-900'}`}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.3 }}
+                      >
+                        Message sent
+                      </motion.h3>
+                      <motion.p
+                        className={`text-base ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.4 }}
+                      >
+                        We'll get back to you within 24 hours.
+                      </motion.p>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            </div>
+
+            {/* Navigation footer */}
+            {!submitted && (
+              <div
+                className={`px-6 sm:px-8 py-5 border-t flex items-center justify-between ${
+                  darkMode ? 'border-white/[0.06]' : 'border-gray-100'
+                }`}
+              >
+                <motion.button
+                  type="button"
+                  onClick={goPrev}
+                  className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                    step === 0
+                      ? 'opacity-0 pointer-events-none'
+                      : darkMode
+                        ? 'text-gray-400 hover:text-white hover:bg-white/5'
+                        : 'text-gray-500 hover:text-gray-900 hover:bg-gray-100'
+                  }`}
+                  whileHover={{ x: -2 }}
+                  whileTap={{ scale: 0.97 }}
+                >
+                  <FiArrowLeft className="w-4 h-4" />
+                  Back
+                </motion.button>
+
+                {step < 2 ? (
+                  <motion.button
+                    type="button"
+                    onClick={goNext}
+                    disabled={!canProceed()}
+                    className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                      canProceed()
+                        ? darkMode
+                          ? 'bg-sky-500 text-white hover:bg-sky-400'
+                          : 'bg-sky-500 text-white hover:bg-sky-600 shadow-lg shadow-sky-500/20'
+                        : darkMode
+                          ? 'bg-gray-800 text-gray-600 cursor-not-allowed'
+                          : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                    }`}
+                    whileHover={canProceed() ? { x: 2 } : {}}
+                    whileTap={canProceed() ? { scale: 0.97 } : {}}
+                  >
+                    Continue
+                    <FiArrowRight className="w-4 h-4" />
+                  </motion.button>
+                ) : (
+                  <motion.button
+                    type="button"
+                    onClick={handleSubmit}
+                    disabled={isSubmitting}
+                    className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                      darkMode
+                        ? 'bg-sky-500 text-white hover:bg-sky-400'
+                        : 'bg-sky-500 text-white hover:bg-sky-600 shadow-lg shadow-sky-500/20'
+                    } disabled:opacity-60 disabled:cursor-not-allowed`}
+                    whileHover={!isSubmitting ? { scale: 1.02 } : {}}
+                    whileTap={!isSubmitting ? { scale: 0.97 } : {}}
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <motion.div
+                          className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full"
+                          animate={{ rotate: 360 }}
+                          transition={{ duration: 0.8, repeat: Infinity, ease: 'linear' }}
+                        />
+                        Sending...
+                      </>
+                    ) : (
+                      <>
+                        <FiSend className="w-4 h-4" />
+                        Send message
+                      </>
+                    )}
+                  </motion.button>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* Response time badge */}
+          <motion.div
+            className="mt-8 text-center"
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.3 }}
+          >
+            <div className="inline-flex items-center gap-3">
+              <PulsingDot darkMode={darkMode} />
+              <p className={`text-sm ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>
+                Average response time:{' '}
+                <span className={`font-medium ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>under 2 hours</span>
+              </p>
+            </div>
+          </motion.div>
+        </motion.section>
       </div>
     </div>
   );
