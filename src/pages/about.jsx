@@ -1,89 +1,190 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { motion, useMotionValue, useTransform } from 'framer-motion';
-import { FaGlobe, FaPen, FaCamera, FaRocket, FaHeart, FaAward, FaUsers, FaStar, FaChevronDown } from 'react-icons/fa';
 import { useTheme } from '../context/themeContext';
 
-// 3D Scroll Reveal Wrapper
-const ScrollReveal3D = ({ children, delay = 0, className = '' }) => {
-  return (
-    <motion.div
-      className={className}
-      initial={{ opacity: 0, y: 100, rotateX: -15 }}
-      whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
-      viewport={{ once: true, amount: 0.2 }}
-      transition={{ duration: 0.8, delay, type: 'spring', stiffness: 100 }}
-      style={{ transformStyle: 'preserve-3d', perspective: '1000px' }}
-    >
-      {children}
-    </motion.div>
-  );
+const MouseGlow = ({ darkMode }) => {
+  const ref = useRef(null);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+
+    const handleMove = (e) => {
+      el.style.background = `radial-gradient(700px circle at ${e.clientX}px ${e.clientY}px, ${
+        darkMode ? 'rgba(56,189,248,0.09)' : 'rgba(14,165,233,0.12)'
+      }, transparent 55%)`;
+    };
+
+    window.addEventListener('pointermove', handleMove);
+    return () => window.removeEventListener('pointermove', handleMove);
+  }, [darkMode]);
+
+  return <div ref={ref} className="pointer-events-none fixed inset-0 z-0" />;
 };
 
-// Floating 3D Card Component
-const Floating3DCard = ({ icon: Icon, title, description, color, index, darkMode }) => {
-  const [hovered, setHovered] = useState(false);
-
-  return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0.8, rotateY: -30 }}
-      whileInView={{ opacity: 1, scale: 1, rotateY: 0 }}
-      viewport={{ once: true, amount: 0.3 }}
-      transition={{ duration: 0.6, delay: index * 0.15, type: 'spring', stiffness: 100 }}
-      whileHover={{ 
-        y: -15, 
-        rotateY: 5,
-        scale: 1.05,
-        transition: { duration: 0.3 }
-      }}
-      onHoverStart={() => setHovered(true)}
-      onHoverEnd={() => setHovered(false)}
-      style={{ transformStyle: 'preserve-3d' }}
-      className="h-full"
-    >
-      <div className={`relative h-full p-8 rounded-3xl shadow-2xl border ${
-        darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
-      } overflow-hidden group cursor-pointer`}>
-        {/* 3D Glow Effect */}
-        <motion.div
-          className={`absolute inset-0 rounded-3xl bg-gradient-to-br ${color} opacity-0 group-hover:opacity-20 blur-xl transition-opacity duration-300`}
-          animate={{ opacity: hovered ? 0.2 : 0 }}
+const BackgroundGrid = ({ darkMode }) => (
+  <svg
+    className="absolute inset-0 w-full h-full pointer-events-none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    <defs>
+      <pattern id="about-grid" width="80" height="80" patternUnits="userSpaceOnUse">
+        <path
+          d="M 80 0 L 0 0 0 80"
+          fill="none"
+          stroke={darkMode ? 'rgba(255,255,255,0.035)' : 'rgba(15,23,42,0.04)'}
+          strokeWidth="1"
         />
-        
-        {/* Icon with 3D rotation */}
-        <motion.div
-          className={`w-16 h-16 bg-gradient-to-br ${color} rounded-2xl flex items-center justify-center mb-6 shadow-lg`}
-          whileHover={{ rotate: 360, scale: 1.1 }}
-          transition={{ duration: 0.6 }}
+      </pattern>
+    </defs>
+    <rect width="100%" height="100%" fill="url(#about-grid)" />
+  </svg>
+);
+
+const FloatingOrb = ({ darkMode, size, x, y, delay, duration }) => (
+  <motion.div
+    className={`absolute rounded-full ${
+      darkMode ? 'bg-sky-400/8' : 'bg-sky-500/7'
+    } blur-3xl`}
+    style={{ width: size, height: size, left: x, top: y }}
+    animate={{
+      y: [0, -28, 0],
+      x: [0, 18, 0],
+      scale: [1, 1.18, 1],
+    }}
+    transition={{ duration, delay, repeat: Infinity, ease: 'easeInOut' }}
+  />
+);
+
+const StaggerWords = ({ text, className }) => {
+  const words = text.split(' ');
+  return (
+    <span className={className}>
+      {words.map((word, i) => (
+        <motion.span
+          key={`${word}-${i}`}
+          className="inline-block mr-[0.3em]"
+          initial={{ opacity: 0, y: 40, rotateX: -50 }}
+          animate={{ opacity: 1, y: 0, rotateX: 0 }}
+          transition={{ duration: 0.7, delay: 0.25 + i * 0.12, ease: [0.22, 1, 0.36, 1] }}
+          style={{ transformStyle: 'preserve-3d' }}
         >
-          <Icon className="text-white text-2xl" />
-        </motion.div>
-
-        <h3 className={`text-2xl font-bold mb-4 ${
-          darkMode ? 'text-white' : 'text-gray-900'
-        }`}>
-          {title}
-        </h3>
-        <p className={`text-lg leading-relaxed ${
-          darkMode ? 'text-gray-300' : 'text-gray-600'
-        }`}>
-          {description}
-        </p>
-
-        {/* Decorative element */}
-        <motion.div
-          className={`absolute bottom-0 right-0 w-32 h-32 bg-gradient-to-br ${color} opacity-10 rounded-tl-full`}
-          animate={{ scale: hovered ? 1.2 : 1 }}
-          transition={{ duration: 0.3 }}
-        />
-      </div>
-    </motion.div>
+          {word}
+        </motion.span>
+      ))}
+    </span>
   );
 };
+
+const TimelineStep = ({ index, title, body, active, darkMode }) => (
+  <motion.div
+    className="relative pl-8 pb-10 last:pb-0"
+    initial={{ opacity: 0, x: 40 }}
+    whileInView={{ opacity: 1, x: 0 }}
+    viewport={{ once: true, amount: 0.4 }}
+    transition={{ duration: 0.5, delay: index * 0.08 }}
+  >
+    <div className="absolute left-0 top-1.5 flex flex-col items-center">
+      <motion.div
+        className={`w-3 h-3 rounded-full border-2 ${
+          active
+            ? darkMode
+              ? 'bg-sky-400 border-sky-300'
+              : 'bg-sky-500 border-sky-400'
+            : darkMode
+              ? 'bg-gray-900 border-gray-600'
+              : 'bg-white border-gray-300'
+        }`}
+        animate={
+          active
+            ? {
+                scale: [1, 1.35, 1],
+              }
+            : {}
+        }
+        transition={{ duration: 1.2, repeat: Infinity, ease: 'easeInOut' }}
+      />
+      <motion.div
+        className={`flex-1 w-px mt-2 origin-top ${
+          darkMode ? 'bg-gray-700' : 'bg-gray-200'
+        }`}
+        animate={{ scaleY: 1 }}
+        initial={{ scaleY: 0 }}
+        transition={{ duration: 0.6, delay: 0.2 + index * 0.08 }}
+      />
+    </div>
+    <div
+      className={`inline-flex items-center rounded-full px-3 py-1 text-[11px] font-semibold tracking-[0.16em] uppercase mb-2 ${
+        darkMode ? 'bg-white/[0.04] text-gray-300' : 'bg-sky-50 text-sky-700'
+      }`}
+    >
+      {String(index + 1).padStart(2, '0')}
+    </div>
+    <h3
+      className={`text-lg sm:text-xl font-semibold mb-1.5 ${
+        darkMode ? 'text-white' : 'text-gray-900'
+      }`}
+    >
+      {title}
+    </h3>
+    <p className={`text-sm sm:text-base leading-relaxed ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+      {body}
+    </p>
+  </motion.div>
+);
+
+const PrincipleCard = ({ title, body, tag, darkMode, index }) => (
+  <motion.div
+    className={`relative p-6 sm:p-7 rounded-3xl border overflow-hidden ${
+      darkMode
+        ? 'bg-white/[0.02] border-white/[0.06] hover:border-white/[0.16]'
+        : 'bg-white border-gray-200 hover:border-sky-200 hover:shadow-xl hover:shadow-sky-500/5'
+    }`}
+    initial={{ opacity: 0, y: 36, rotateX: -18 }}
+    whileInView={{ opacity: 1, y: 0, rotateX: 0 }}
+    viewport={{ once: true, amount: 0.3 }}
+    transition={{ duration: 0.5, delay: index * 0.08, ease: [0.22, 1, 0.36, 1] }}
+    whileHover={{
+      y: -6,
+      rotateX: -2,
+      rotateY: 3,
+      transition: { duration: 0.3 },
+    }}
+    style={{ transformStyle: 'preserve-3d' }}
+  >
+    <motion.div
+      className={`absolute -right-10 -bottom-10 w-40 h-40 rounded-full ${
+        darkMode ? 'bg-sky-500/15' : 'bg-sky-400/10'
+      }`}
+      aria-hidden="true"
+    />
+    <div className="relative z-10">
+      <div
+        className={`inline-flex items-center rounded-full px-3 py-1 text-[11px] font-semibold tracking-[0.18em] uppercase mb-4 ${
+          darkMode ? 'bg-white/[0.04] text-gray-300' : 'bg-sky-50 text-sky-700'
+        }`}
+      >
+        {tag}
+      </div>
+      <h3
+        className={`text-lg sm:text-xl font-semibold mb-2 ${
+          darkMode ? 'text-white' : 'text-gray-900'
+        }`}
+      >
+        {title}
+      </h3>
+      <p className={`text-sm sm:text-base leading-relaxed ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+        {body}
+      </p>
+    </div>
+  </motion.div>
+);
 
 const About = () => {
   const { darkMode } = useTheme();
+  const [activeTimelineIndex, setActiveTimelineIndex] = useState(0);
   const y = useMotionValue(0);
-  const yTransform = useTransform(y, [0, 1000], [0, -150]);
+  const heroY = useTransform(y, [0, 800], [0, -120]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -93,373 +194,338 @@ const About = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [y]);
 
-  const features = [
-    { 
-      icon: FaGlobe, 
-      title: "Explore", 
-      description: "Discover hidden gems and iconic destinations around the world. Our curated guides help you find the most extraordinary places.",
-      color: 'from-blue-500 to-cyan-500'
+  const timeline = [
+    {
+      title: 'An idea on a boarding pass',
+      body: 'WanderLuxe began as notes scribbled in transit lounges — a promise to collect luxury travel wisdom in one place.',
     },
-    { 
-      icon: FaPen, 
-      title: "Share", 
-      description: "Read inspiring stories and expert tips from seasoned travelers. Join our community and share your own adventures.",
-      color: 'from-sky-500 to-blue-500'
+    {
+      title: 'Curating stories, not listings',
+      body: 'Instead of piling on destinations, we obsessed over the feeling each journey creates, building a library of experiences.',
     },
-    { 
-      icon: FaCamera, 
-      title: "Capture", 
-      description: "Immerse yourself in stunning travel photography. Experience destinations through the lens of passionate photographers.",
-      color: 'from-cyan-500 to-sky-500'
-    }
+    {
+      title: 'Designing for the curious',
+      body: 'Every page, animation, and detail is crafted to reward curiosity and make research feel like part of the trip.',
+    },
+    {
+      title: 'Growing with our travelers',
+      body: 'The platform keeps evolving with every story shared, question asked, and itinerary refined with our community.',
+    },
   ];
 
-  const stats = [
-    { icon: FaUsers, label: 'Travelers', value: '50K+', color: 'from-blue-500 to-cyan-500' },
-    { icon: FaGlobe, label: 'Destinations', value: '200+', color: 'from-sky-500 to-blue-500' },
-    { icon: FaStar, label: 'Reviews', value: '10K+', color: 'from-cyan-500 to-sky-500' },
-    { icon: FaAward, label: 'Awards', value: '15+', color: 'from-blue-500 to-sky-500' },
+  const principles = [
+    {
+      title: 'Clarity over noise',
+      body: 'We strip away clutter so you can focus on what matters: where to go, when to go, and how it will feel when you get there.',
+      tag: 'Principle',
+    },
+    {
+      title: 'Depth over trends',
+      body: 'We look beyond viral destinations, surfacing places and perspectives that stay relevant long after the algorithm moves on.',
+      tag: 'Principle',
+    },
+    {
+      title: 'Emotion in the details',
+      body: 'From typography to micro-animations, every detail is tuned to make planning as satisfying as the journey itself.',
+      tag: 'Principle',
+    },
+    {
+      title: 'Respect for your time',
+      body: 'Fast, focused, and intentional — we design so you can move from idea to decision with confidence, not decision fatigue.',
+      tag: 'Principle',
+    },
   ];
+
+  const metrics = [
+    { label: 'Countries featured', value: '42' },
+    { label: 'Itineraries refined with readers', value: '350+' },
+    { label: 'Average read time per visit', value: '6.4 min' },
+    { label: 'Articles in constant iteration', value: '100%' },
+  ];
+
+  const handleTimelineHover = useCallback((index) => {
+    setActiveTimelineIndex(index);
+  }, []);
 
   return (
-    <div className={`min-h-screen ${darkMode ? 'bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900' : 'bg-gradient-to-b from-sky-50 via-white to-sky-50'} scroll-smooth`}>
-      {/* Hero Section with Parallax */}
-      <motion.section
-        className={`relative overflow-hidden pt-32 pb-20 ${
-          darkMode 
-            ? 'bg-gradient-to-br from-blue-900 via-gray-900 to-gray-900' 
-            : 'bg-gradient-to-br from-blue-500 via-sky-400 to-cyan-400'
-        }`}
-        style={{ y: yTransform }}
-      >
-        {/* Animated Background Elements */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          {[...Array(8)].map((_, i) => (
-            <motion.div
-              key={i}
-              className={`absolute w-32 h-32 rounded-full ${
-                darkMode ? 'bg-blue-500/10' : 'bg-white/10'
-              } blur-3xl`}
-              style={{
-                left: `${10 + i * 12}%`,
-                top: `${20 + (i % 3) * 30}%`,
-              }}
-              animate={{
-                y: [0, 30, 0],
-                x: [0, 20, 0],
-                scale: [1, 1.2, 1],
-              }}
-              transition={{
-                duration: 8 + i * 2,
-                repeat: Infinity,
-                ease: 'easeInOut',
-              }}
-            />
-          ))}
-        </div>
+    <div
+      className={`relative min-h-screen overflow-hidden ${
+        darkMode ? 'bg-gray-950' : 'bg-gray-50'
+      }`}
+    >
+      <MouseGlow darkMode={darkMode} />
+      <BackgroundGrid darkMode={darkMode} />
 
-        <div className="container mx-auto px-4 relative z-10">
-          <ScrollReveal3D>
-            <motion.div className="text-center max-w-4xl mx-auto">
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        {[
+          { size: 260, x: '8%', y: '12%', delay: 0, duration: 26 },
+          { size: 180, x: '78%', y: '10%', delay: 1.5, duration: 20 },
+          { size: 160, x: '82%', y: '58%', delay: 3, duration: 22 },
+          { size: 220, x: '3%', y: '68%', delay: 2, duration: 24 },
+          { size: 120, x: '46%', y: '78%', delay: 4, duration: 18 },
+        ].map((orb, i) => (
+          <FloatingOrb key={i} darkMode={darkMode} {...orb} />
+        ))}
+      </div>
+
+      <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Hero */}
+        <section className="pt-28 sm:pt-36 pb-14 sm:pb-20">
+          <motion.div
+            style={{ y: heroY }}
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+          >
+            <div className="max-w-3xl">
               <motion.div
-                className="inline-flex items-center space-x-2 px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full text-white text-sm mb-6"
-                whileHover={{ scale: 1.05 }}
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ type: 'spring', stiffness: 200 }}
+                className={`inline-flex items-center rounded-full px-4 py-1.5 text-[11px] font-semibold tracking-[0.2em] uppercase mb-6 ${
+                  darkMode ? 'bg-white/[0.04] text-gray-300' : 'bg-sky-50 text-sky-700'
+                }`}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.25 }}
               >
-                <FaRocket className="text-yellow-300" />
-                <span>About WanderLuxe</span>
+                Behind the scenes of WanderLuxe
               </motion.div>
 
-              <motion.h1
-                className="text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6"
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.2, duration: 0.8 }}
+              <h1
+                className={`text-4xl sm:text-5xl lg:text-6xl font-bold leading-[1.05] mb-8 ${
+                  darkMode ? 'text-white' : 'text-gray-900'
+                }`}
               >
-                About{' '}
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-200 to-pink-200">
-                  WanderLuxe
+                <StaggerWords text="We design journeys" />
+                <br />
+                <span className="relative inline-block">
+                  <StaggerWords text="before they exist." />
+                  <motion.div
+                    className={`absolute -bottom-2 left-0 h-[3px] rounded-full ${
+                      darkMode
+                        ? 'bg-gradient-to-r from-sky-400 via-cyan-300 to-blue-400'
+                        : 'bg-gradient-to-r from-sky-500 via-cyan-400 to-blue-500'
+                    }`}
+                    initial={{ width: 0 }}
+                    animate={{ width: '100%' }}
+                    transition={{ duration: 0.8, delay: 1.2, ease: [0.22, 1, 0.36, 1] }}
+                  />
                 </span>
-              </motion.h1>
+              </h1>
 
               <motion.p
-                className="text-xl text-white/90 mb-8 max-w-2xl mx-auto leading-relaxed"
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.4, duration: 0.8 }}
-              >
-                Your gateway to extraordinary travel experiences and luxurious adventures around the globe.
-              </motion.p>
-
-              {/* Scroll Indicator */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
+                className={`text-base sm:text-lg leading-relaxed max-w-xl ${
+                  darkMode ? 'text-gray-400' : 'text-gray-600'
+                }`}
+                initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.8, duration: 0.8 }}
-                className="flex flex-col items-center mt-12"
+                transition={{ delay: 0.9, duration: 0.6 }}
               >
-                <motion.div
-                  animate={{ y: [0, 8, 0] }}
-                  transition={{ duration: 2, repeat: Infinity }}
-                >
-                  <FaChevronDown className="text-white/60 text-xl" />
-                </motion.div>
-                <span className="text-white/60 text-xs mt-3 font-light tracking-wide">Scroll to explore</span>
-              </motion.div>
-            </motion.div>
-          </ScrollReveal3D>
-        </div>
-      </motion.section>
+                WanderLuxe is a digital studio for luxury travel research. We blend editorial
+                storytelling, interface design, and obsessive curation to help you choose your next
+                journey with confidence.
+              </motion.p>
+            </div>
+          </motion.div>
+        </section>
 
-      {/* Main Content */}
-      <div className="container mx-auto px-4 py-20">
-        {/* Features Section */}
-        <ScrollReveal3D delay={0.2}>
-          <div className="text-center mb-16">
-            <motion.h2
-              className={`text-4xl md:text-5xl font-bold mb-6 ${
-                darkMode ? 'text-white' : 'text-gray-900'
+        {/* Story timeline + snapshot */}
+        <section className="pb-18 sm:pb-24">
+          <div className="grid md:grid-cols-[minmax(0,1.4fr),minmax(0,1fr)] gap-10 lg:gap-14 items-start">
+            <div
+              className={`rounded-3xl border p-6 sm:p-8 ${
+                darkMode
+                  ? 'bg-white/[0.02] border-white/[0.06]'
+                  : 'bg-white border-gray-200 shadow-lg shadow-gray-200/60'
               }`}
-              initial={{ scale: 0.5, opacity: 0 }}
-              whileInView={{ scale: 1, opacity: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, type: 'spring' }}
             >
-              What We Offer
-            </motion.h2>
-            <motion.p
-              className={`text-lg md:text-xl max-w-2xl mx-auto ${
-                darkMode ? 'text-gray-300' : 'text-gray-600'
-              }`}
-              initial={{ y: 20, opacity: 0 }}
-              whileInView={{ y: 0, opacity: 1 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.2 }}
-            >
-              Discover our core values and what makes WanderLuxe unique
-            </motion.p>
-          </div>
-        </ScrollReveal3D>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-24">
-          {features.map((feature, index) => (
-            <Floating3DCard
-              key={index}
-              icon={feature.icon}
-              title={feature.title}
-              description={feature.description}
-              color={feature.color}
-              index={index}
-              darkMode={darkMode}
-            />
-          ))}
-        </div>
-
-        {/* Stats Section */}
-        <ScrollReveal3D delay={0.4}>
-          <div className={`rounded-3xl p-12 mb-24 ${
-            darkMode 
-              ? 'bg-gradient-to-r from-gray-800 to-gray-700' 
-              : 'bg-gradient-to-r from-blue-500 to-sky-500'
-          } text-white relative overflow-hidden`}>
-            {/* Animated Background */}
-            <motion.div
-              className="absolute inset-0 opacity-20"
-              animate={{
-                backgroundPosition: ['0% 0%', '100% 100%'],
-              }}
-              transition={{
-                duration: 20,
-                repeat: Infinity,
-                repeatType: 'reverse',
-              }}
-              style={{
-                backgroundImage: 'radial-gradient(circle, white 2px, transparent 2px)',
-                backgroundSize: '50px 50px',
-              }}
-            />
-
-            <div className="relative z-10">
-              <motion.h2
-                className="text-3xl md:text-4xl font-bold mb-12 text-center"
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
+              <h2
+                className={`text-xl sm:text-2xl font-semibold mb-1 ${
+                  darkMode ? 'text-white' : 'text-gray-900'
+                }`}
               >
-                Our Impact
-              </motion.h2>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-                {stats.map((stat, index) => (
-                  <motion.div
-                    key={index}
-                    className="text-center"
-                    initial={{ opacity: 0, scale: 0.5, rotateY: -90 }}
-                    whileInView={{ opacity: 1, scale: 1, rotateY: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.6, delay: index * 0.1, type: 'spring' }}
-                    whileHover={{ scale: 1.1, rotateY: 10 }}
-                    style={{ transformStyle: 'preserve-3d' }}
+                How this all started
+              </h2>
+              <p className={`text-sm sm:text-base mb-6 ${darkMode ? 'text-gray-500' : 'text-gray-500'}`}>
+                A quiet collection of notes that became a living map for people who love slow,
+                intentional, beautifully-planned travel.
+              </p>
+
+              <div className="mt-4">
+                {timeline.map((item, index) => (
+                  <div
+                    key={item.title}
+                    onMouseEnter={() => handleTimelineHover(index)}
+                    onFocus={() => handleTimelineHover(index)}
+                    className="outline-none"
+                    tabIndex={0}
                   >
-                    <motion.div
-                      className={`w-16 h-16 bg-gradient-to-br ${stat.color} rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg`}
-                      whileHover={{ rotate: 360 }}
-                      transition={{ duration: 0.6 }}
-                    >
-                      <stat.icon className="text-white text-2xl" />
-                    </motion.div>
-                    <div className="text-4xl font-bold mb-2">{stat.value}</div>
-                    <div className="text-sm opacity-90">{stat.label}</div>
-                  </motion.div>
+                    <TimelineStep
+                      index={index}
+                      title={item.title}
+                      body={item.body}
+                      active={index === activeTimelineIndex}
+                      darkMode={darkMode}
+                    />
+                  </div>
                 ))}
               </div>
             </div>
-          </div>
-        </ScrollReveal3D>
 
-        {/* Mission Section */}
-        <ScrollReveal3D delay={0.3}>
-          <div className={`p-8 md:p-12 rounded-3xl shadow-2xl mb-24 ${
-            darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
-          } border relative overflow-hidden`}>
-            {/* 3D Background Pattern */}
-            <div className="absolute inset-0 opacity-5">
-              <div className="absolute inset-0" style={{
-                backgroundImage: 'linear-gradient(45deg, transparent 25%, rgba(59, 130, 246, 0.1) 25%, rgba(59, 130, 246, 0.1) 50%, transparent 50%, transparent 75%, rgba(59, 130, 246, 0.1) 75%)',
-                backgroundSize: '40px 40px'
-              }} />
-            </div>
-
-            <div className="relative z-10">
-              <motion.div
-                className="flex items-center mb-6"
-                initial={{ opacity: 0, x: -20 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-              >
-                <motion.div
-                  className={`w-12 h-12 bg-gradient-to-br from-blue-500 to-sky-500 rounded-xl flex items-center justify-center mr-4`}
-                  whileHover={{ rotate: 360 }}
-                  transition={{ duration: 0.6 }}
-                >
-                  <FaHeart className="text-white text-xl" />
-                </motion.div>
-                <h2 className={`text-3xl md:text-4xl font-bold ${
-                  darkMode ? 'text-white' : 'text-gray-900'
-                }`}>
-                  Our Mission
-                </h2>
-              </motion.div>
-
-              <motion.div
-                className="space-y-6"
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.2 }}
-              >
-                <p className={`text-lg md:text-xl leading-relaxed ${
-                  darkMode ? 'text-gray-300' : 'text-gray-700'
-                }`}>
-                  At WanderLuxe Ventures, we believe that travel is more than just visiting new places – it's about creating unforgettable memories, broadening horizons, and indulging in the world's finest experiences.
-                </p>
-                <p className={`text-lg md:text-xl leading-relaxed ${
-                  darkMode ? 'text-gray-300' : 'text-gray-700'
-                }`}>
-                  Our mission is to inspire and guide luxury travelers, providing insider knowledge, expert recommendations, and curated content that elevates your journey from ordinary to extraordinary.
-                </p>
-                <p className={`text-lg md:text-xl leading-relaxed ${
-                  darkMode ? 'text-gray-300' : 'text-gray-700'
-                }`}>
-                  Whether you're dreaming of a serene beach retreat, an adventurous safari, or a culturally rich city escape, WanderLuxe Ventures is your trusted companion in crafting the perfect luxury getaway.
-                </p>
-              </motion.div>
-            </div>
-          </div>
-        </ScrollReveal3D>
-
-        {/* Values Section */}
-        <ScrollReveal3D delay={0.5}>
-          <div className="text-center mb-16">
-            <motion.h2
-              className={`text-4xl md:text-5xl font-bold mb-6 ${
-                darkMode ? 'text-white' : 'text-gray-900'
-              }`}
-              initial={{ scale: 0.5, opacity: 0 }}
-              whileInView={{ scale: 1, opacity: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, type: 'spring' }}
-            >
-              Our Values
-            </motion.h2>
-          </div>
-        </ScrollReveal3D>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-24">
-          {[
-            {
-              title: 'Excellence',
-              description: 'We strive for perfection in every detail, ensuring that every travel experience exceeds expectations.',
-              icon: FaStar,
-              color: 'from-yellow-400 to-orange-500'
-            },
-            {
-              title: 'Authenticity',
-              description: 'We believe in genuine experiences that connect you with local cultures and traditions.',
-              icon: FaGlobe,
-              color: 'from-blue-500 to-cyan-500'
-            },
-            {
-              title: 'Innovation',
-              description: 'We continuously evolve our offerings to provide cutting-edge travel solutions and experiences.',
-              icon: FaRocket,
-              color: 'from-sky-500 to-blue-500'
-            },
-            {
-              title: 'Community',
-              description: 'We foster a vibrant community of travelers who share their passion for exploration and discovery.',
-              icon: FaUsers,
-              color: 'from-cyan-500 to-sky-500'
-            },
-          ].map((value, index) => (
             <motion.div
-              key={index}
-              initial={{ opacity: 0, x: index % 2 === 0 ? -50 : 50, rotateY: -30 }}
-              whileInView={{ opacity: 1, x: 0, rotateY: 0 }}
-              viewport={{ once: true, amount: 0.3 }}
-              transition={{ duration: 0.6, delay: index * 0.1, type: 'spring' }}
-              whileHover={{ 
-                y: -10, 
-                rotateY: 5,
-                scale: 1.02,
-                transition: { duration: 0.3 }
-              }}
+              className="relative rounded-3xl border overflow-hidden min-h-[260px] sm:min-h-[320px]"
+              initial={{ opacity: 0, y: 24, scale: 0.97 }}
+              whileInView={{ opacity: 1, y: 0, scale: 1 }}
+              viewport={{ once: true, amount: 0.4 }}
+              transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
               style={{ transformStyle: 'preserve-3d' }}
-              className={`p-8 rounded-3xl shadow-xl border ${
-                darkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'
-              }`}
             >
+              <div
+                className={`absolute inset-0 ${
+                  darkMode ? 'bg-gradient-to-br from-sky-900 via-gray-900 to-gray-950' : 'bg-gradient-to-br from-sky-100 via-white to-cyan-100'
+                }`}
+              />
               <motion.div
-                className={`w-14 h-14 bg-gradient-to-br ${value.color} rounded-xl flex items-center justify-center mb-4`}
-                whileHover={{ rotate: 360, scale: 1.1 }}
-                transition={{ duration: 0.6 }}
-              >
-                <value.icon className="text-white text-xl" />
-              </motion.div>
-              <h3 className={`text-2xl font-bold mb-3 ${
-                darkMode ? 'text-white' : 'text-gray-900'
-              }`}>
-                {value.title}
-              </h3>
-              <p className={`text-lg ${
-                darkMode ? 'text-gray-300' : 'text-gray-600'
-              }`}>
-                {value.description}
-              </p>
+                className="absolute inset-0 opacity-20"
+                animate={{ backgroundPosition: ['0% 0%', '100% 100%'] }}
+                transition={{ duration: 24, repeat: Infinity, repeatType: 'reverse' }}
+                style={{
+                  backgroundImage:
+                    'radial-gradient(circle at 0 0, rgba(56,189,248,0.8) 0, transparent 55%), radial-gradient(circle at 100% 100%, rgba(14,165,233,0.9) 0, transparent 55%)',
+                  backgroundSize: '240px 240px',
+                }}
+              />
+
+              <div className="relative z-10 h-full flex flex-col justify-between p-6 sm:p-7">
+                <div>
+                  <p
+                    className={`text-xs font-semibold tracking-[0.2em] uppercase mb-3 ${
+                      darkMode ? 'text-sky-200' : 'text-sky-700'
+                    }`}
+                  >
+                    What we are in one sentence
+                  </p>
+                  <p
+                    className={`text-lg sm:text-xl leading-relaxed ${
+                      darkMode ? 'text-sky-50' : 'text-slate-900'
+                    }`}
+                  >
+                    A calm, opinionated space on the internet for people who treat trip planning as
+                    part of the experience, not just a chore.
+                  </p>
+                </div>
+
+                <div className="mt-6">
+                  <p className={`text-xs mb-1 ${darkMode ? 'text-sky-200/80' : 'text-sky-700/80'}`}>
+                    How we measure success
+                  </p>
+                  <p className={`text-sm ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                    If you close the tab with fewer options but more certainty, we have done our job.
+                  </p>
+                </div>
+              </div>
             </motion.div>
-          ))}
-        </div>
+          </div>
+        </section>
+
+        {/* Metrics band */}
+        <section className="pb-18 sm:pb-22">
+          <motion.div
+            className={`rounded-3xl border px-5 sm:px-7 py-5 sm:py-6 ${
+              darkMode
+                ? 'bg-white/[0.02] border-white/[0.06]'
+                : 'bg-white border-gray-200 shadow-md shadow-gray-200/60'
+            }`}
+            initial={{ opacity: 0, y: 26 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.3 }}
+            transition={{ duration: 0.5 }}
+          >
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6">
+              {metrics.map((item, i) => (
+                <motion.div
+                  key={item.label}
+                  className="flex flex-col gap-1"
+                  initial={{ opacity: 0, y: 18 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.06, duration: 0.4 }}
+                >
+                  <p
+                    className={`text-[11px] font-semibold tracking-[0.2em] uppercase ${
+                      darkMode ? 'text-gray-500' : 'text-gray-400'
+                    }`}
+                  >
+                    {item.label}
+                  </p>
+                  <p
+                    className={`text-base sm:text-lg font-semibold ${
+                      darkMode ? 'text-white' : 'text-gray-900'
+                    }`}
+                  >
+                    {item.value}
+                  </p>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
+        </section>
+
+        {/* Principles grid */}
+        <section className="pb-24 sm:pb-32">
+          <div className="max-w-3xl mb-10">
+            <motion.h2
+              className={`text-2xl sm:text-3xl font-semibold mb-3 ${
+                darkMode ? 'text-white' : 'text-gray-900'
+              }`}
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.4 }}
+              transition={{ duration: 0.5 }}
+            >
+              How we make every page feel intentional
+            </motion.h2>
+            <motion.p
+              className={`text-sm sm:text-base leading-relaxed ${
+                darkMode ? 'text-gray-500' : 'text-gray-600'
+              }`}
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.4 }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+            >
+              The interface you see is the surface of a lot of small decisions about pacing,
+              typography, motion, and focus. These are the principles that guide those decisions.
+            </motion.p>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-6 lg:gap-8">
+            {principles.map((p, index) => (
+              <PrincipleCard
+                key={p.title}
+                title={p.title}
+                body={p.body}
+                tag={p.tag}
+                darkMode={darkMode}
+                index={index}
+              />
+            ))}
+          </div>
+
+          <motion.div
+            className="mt-10 border-t pt-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.3 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
+          >
+            <p className={`text-xs sm:text-sm ${darkMode ? 'text-gray-500' : 'text-gray-500'}`}>
+              Everything you see here is designed, written, and iterated with the same care we bring
+              to every itinerary and story.
+            </p>
+            <p className={`text-xs sm:text-sm ${darkMode ? 'text-gray-500' : 'text-gray-500'}`}>
+              This page will change over time &mdash; just like the journeys it helps create.
+            </p>
+          </motion.div>
+        </section>
       </div>
     </div>
   );
