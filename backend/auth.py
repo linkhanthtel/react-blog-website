@@ -18,8 +18,8 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 30
 # Password hashing
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-# OAuth2 scheme
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
+# OAuth2 scheme (path from API root; used by OpenAPI / Swagger "Authorize")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     """Verify a password against its hash"""
@@ -38,8 +38,10 @@ def get_user_by_email(db: Session, email: str) -> Optional[User]:
     return db.query(User).filter(User.email == email).first()
 
 def authenticate_user(db: Session, username: str, password: str) -> Optional[User]:
-    """Authenticate user with username and password"""
+    """Authenticate user with username or email and password"""
     user = get_user_by_username(db, username)
+    if not user and "@" in username:
+        user = get_user_by_email(db, username)
     if not user:
         return None
     if not verify_password(password, user.hashed_password):
