@@ -887,22 +887,12 @@ function Home() {
   const [scrollY, setScrollY] = useState(0);
   const { darkMode } = useTheme();
   const { posts } = usePosts();
-  const [isLoading, setIsLoading] = useState(true);
   const heroRef = useRef(null);
 
   useEffect(() => {
     const handleScroll = () => setScrollY(window.scrollY);
     window.addEventListener('scroll', handleScroll);
-    
-    // Initial loading animation
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 1500);
-    
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-      clearTimeout(timer);
-    };
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   // Static content for hero section
@@ -925,42 +915,6 @@ function Home() {
 
   return (
     <div className={`min-h-screen ${darkMode ? 'bg-gray-900 text-white' : 'bg-sky-50 text-gray-900'} scroll-smooth`}>
-      {/* Loading Screen */}
-      <AnimatePresence>
-        {isLoading && (
-          <motion.div
-            initial={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.5 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-gradient-to-br from-blue-900 via-sky-800 to-cyan-800"
-          >
-            <div className="text-center">
-              <motion.div
-                animate={{ rotate: 360 }}
-                transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-                className="w-16 h-16 border-4 border-white border-t-transparent rounded-full mx-auto mb-4"
-              />
-              <motion.h1
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.5 }}
-                className="text-4xl font-bold text-white mb-2"
-              >
-                WanderLuxe
-              </motion.h1>
-              <motion.p
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 1 }}
-                className="text-white/80"
-              >
-                Preparing your journey...
-              </motion.p>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
       {/* Hero Section with Background Image */}
       <div ref={heroRef} className="relative min-h-screen flex items-center justify-center pt-16 md:pt-20">
         {/* Background Image */}
