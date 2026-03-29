@@ -5,7 +5,7 @@ from database import get_db
 from models import User, Post
 from schemas import PostCreate, PostUpdate, PostResponse, PostListResponse, CommentCreate, CommentResponse, CommentListResponse
 from crud import get_posts, get_post, create_post, update_post, delete_post, like_post, get_comments, create_comment, delete_comment
-from routers.auth import get_current_active_user
+from auth import get_current_active_user
 
 router = APIRouter(prefix="/posts", tags=["posts"])
 
