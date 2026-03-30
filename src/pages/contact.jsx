@@ -85,8 +85,8 @@ const shapes = [
 
 const contactMethods = [
   { label: 'Email', value: 'hello@wanderluxe.com', icon: FiMail },
-  { label: 'Phone', value: '+1 (555) 123-4567', icon: FiPhone },
-  { label: 'Location', value: 'San Francisco, CA', icon: FiMapPin },
+  { label: 'Phone', value: '+65 8762 5331', icon: FiPhone },
+  { label: 'Location', value: 'Braddell, Singapore', icon: FiMapPin },
 ];
 
 const Contact = () => {
