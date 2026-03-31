@@ -13,7 +13,7 @@ import image7 from '../images/image7.jpg';
 // Dynamic content will be generated from backend data
 
 // Minimal Button Component
-function MinimalButton({ icon: Icon, text, variant }) {
+function MinimalButton({ icon: Icon, text, variant, onClick }) {
   const variants = {
     primary: "bg-white text-slate-900 hover:bg-slate-100 shadow-lg",
     secondary: "bg-slate-800/50 text-white border border-white/20 hover:bg-slate-700/50 backdrop-blur-sm",
@@ -22,6 +22,7 @@ function MinimalButton({ icon: Icon, text, variant }) {
 
   return (
     <motion.button
+      onClick={onClick}
       whileHover={{ scale: 1.02, y: -1 }}
       whileTap={{ scale: 0.98 }}
       className={`px-6 sm:px-8 py-3 rounded-full font-light text-xs sm:text-sm flex items-center justify-center transition-all duration-300 w-full sm:w-auto ${variants[variant]}`}
@@ -885,6 +886,7 @@ function CleanWeatherWidget({ weatherData, isLoading }) {
 
 function Home() {
   const [scrollY, setScrollY] = useState(0);
+  const [serviceNotice, setServiceNotice] = useState(false);
   const { darkMode } = useTheme();
   const { posts } = usePosts();
   const heroRef = useRef(null);
@@ -913,8 +915,31 @@ function Home() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [y]);
 
+  const showUnavailableServiceNotice = () => {
+    setServiceNotice(true);
+    setTimeout(() => setServiceNotice(false), 2200);
+  };
+
   return (
     <div className={`min-h-screen ${darkMode ? 'bg-gray-900 text-white' : 'bg-sky-50 text-gray-900'} scroll-smooth`}>
+      <AnimatePresence>
+        {serviceNotice && (
+          <motion.div
+            initial={{ opacity: 0, y: -16 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -16 }}
+            transition={{ duration: 0.25 }}
+            className={`fixed top-20 right-4 z-[70] rounded-xl border px-4 py-3 text-sm shadow-lg backdrop-blur-md ${
+              darkMode
+                ? 'border-cyan-400/40 bg-sky-950/90 text-cyan-100'
+                : 'border-sky-300 bg-white/95 text-sky-900'
+            }`}
+          >
+            This service is not available yet.
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Hero Section with Background Image */}
       <div ref={heroRef} className="relative min-h-screen flex items-center justify-center pt-16 md:pt-20">
         {/* Background Image */}
@@ -987,11 +1012,13 @@ function Home() {
               icon={FaMapMarkerAlt}
               text="Plan Trip"
               variant="secondary"
+              onClick={showUnavailableServiceNotice}
             />
             <MinimalButton
               icon={FaCalendarAlt}
               text="Book Now"
               variant="outline"
+              onClick={showUnavailableServiceNotice}
             />
           </motion.div>
 
