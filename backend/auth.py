@@ -3,7 +3,7 @@ from typing import Optional
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 from fastapi import HTTPException, status, Depends
-from fastapi.security import OAuth2PasswordBearer
+from fastapi.security import OAuth2PasswordBearer, HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
 from database import get_db
 from models import User
@@ -20,6 +20,9 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 # OAuth2 scheme (path from API root; used by OpenAPI / Swagger "Authorize")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
+
+# Optional bearer — no 401 if missing (used for optional account linking on booking)
+http_bearer_optional = HTTPBearer(auto_error=False)
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     """Verify a password against its hash"""
@@ -85,3 +88,23 @@ async def get_current_active_user(current_user: User = Depends(get_current_user)
     if not current_user.is_active:
         raise HTTPException(status_code=400, detail="Inactive user")
     return current_user
+
+
+async def get_optional_current_user(
+    credentials: Optional[HTTPAuthorizationCredentials] = Depends(http_bearer_optional),
+    db: Session = Depends(get_db),
+) -> Optional[User]:
+    """Return logged-in user if valid Bearer token is sent; otherwise None."""
+    if credentials is None:
+        return None
+    try:
+        payload = jwt.decode(credentials.credentials, SECRET_KEY, algorithms=[ALGORITHM])
+        username: str = payload.get("sub")
+        if username is None:
+            return None
+        user = get_user_by_username(db, username=username)
+        if user is None or not user.is_active:
+            return None
+        return user
+    except JWTError:
+        return None

@@ -1,8 +1,8 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 from typing import List, Optional
-from models import Post, User, Comment
-from schemas import PostCreate, PostUpdate, CommentCreate
+from models import Post, User, Comment, Appointment
+from schemas import PostCreate, PostUpdate, CommentCreate, AppointmentCreate
 
 def get_posts(db: Session, skip: int = 0, limit: int = 10, search: str = ""):
     """Get posts with pagination and search"""
@@ -163,3 +163,36 @@ def delete_comment(db: Session, comment_id: int, user_id: int) -> bool:
     db.delete(db_comment)
     db.commit()
     return True
+
+
+def create_appointment(
+    db: Session,
+    data: AppointmentCreate,
+    user_id: Optional[int] = None,
+) -> Appointment:
+    appt = Appointment(
+        full_name=data.full_name,
+        email=data.email,
+        phone=data.phone,
+        appointment_date=data.appointment_date,
+        appointment_time=data.appointment_time,
+        service_type=data.service_type,
+        notes=data.notes,
+        status="pending",
+        user_id=user_id,
+    )
+    db.add(appt)
+    db.commit()
+    db.refresh(appt)
+    return appt
+
+
+def get_appointments_for_user(db: Session, user_id: int, skip: int = 0, limit: int = 50):
+    q = (
+        db.query(Appointment)
+        .filter(Appointment.user_id == user_id)
+        .order_by(Appointment.appointment_date.desc(), Appointment.created_at.desc())
+    )
+    total = q.count()
+    rows = q.offset(skip).limit(limit).all()
+    return {"appointments": rows, "total": total}

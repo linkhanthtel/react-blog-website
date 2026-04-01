@@ -1,6 +1,6 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, validator
 from typing import Optional, List
-from datetime import datetime
+from datetime import datetime, date
 
 # User schemas
 class UserBase(BaseModel):
@@ -83,4 +83,54 @@ class CommentResponse(CommentBase):
 
 class CommentListResponse(BaseModel):
     comments: List[CommentResponse]
+    total: int
+
+
+# Appointment / booking
+ALLOWED_SERVICE_TYPES = frozenset({"plan_trip", "book_now", "consultation", "general"})
+
+
+class AppointmentCreate(BaseModel):
+    full_name: str
+    email: EmailStr
+    phone: str
+    appointment_date: date
+    appointment_time: str
+    service_type: str = "general"
+    notes: Optional[str] = None
+
+    @validator("full_name", "phone")
+    def strip_strings(cls, v):
+        if isinstance(v, str):
+            v = v.strip()
+        if not v:
+            raise ValueError("must not be empty")
+        return v
+
+    @validator("service_type")
+    def validate_service(cls, v):
+        if v not in ALLOWED_SERVICE_TYPES:
+            raise ValueError(f"service_type must be one of: {', '.join(sorted(ALLOWED_SERVICE_TYPES))}")
+        return v
+
+
+class AppointmentResponse(BaseModel):
+    id: int
+    full_name: str
+    email: EmailStr
+    phone: str
+    appointment_date: date
+    appointment_time: str
+    service_type: str
+    notes: Optional[str] = None
+    status: str
+    user_id: Optional[int] = None
+    created_at: datetime
+
+    class Config:
+        orm_mode = True
+
+
+class AppointmentListResponse(BaseModel):
+    appointments: List[AppointmentResponse]
     total: int

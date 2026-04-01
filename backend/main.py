@@ -13,13 +13,13 @@ from fastapi.staticfiles import StaticFiles
 from fastapi import UploadFile, File
 from fastapi.responses import FileResponse
 from database import engine, Base
-from routers import auth, users, posts
+from routers import auth, users, posts, appointments
 import uuid
 from PIL import Image, ImageDraw, ImageFont
 import io
 
 # Import models to ensure they are registered with SQLAlchemy
-from models import User, Post, Comment
+from models import User, Post, Comment, Appointment
 
 # Create database tables
 Base.metadata.create_all(bind=engine)
@@ -61,6 +61,7 @@ app.mount("/uploads", StaticFiles(directory=UPLOAD_DIR), name="uploads")
 app.include_router(auth.router)
 app.include_router(users.router)
 app.include_router(posts.router)
+app.include_router(appointments.router)
 
 @app.get("/")
 async def root():
