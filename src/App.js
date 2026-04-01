@@ -13,6 +13,7 @@ const Home = lazy(() => import("./pages/home"));
 const Blogs = lazy(() => import("./pages/blogs"));
 const Join = lazy(() => import("./pages/join"));
 const Contact = lazy(() => import("./pages/contact"));
+const Booking = lazy(() => import("./pages/booking"));
 const SinglePost = lazy(() => import("./pages/singlepost"));
 const About = lazy(() => import("./pages/about"));
 const BlogManagement = lazy(() => import("./pages/blogManagement"));
@@ -44,6 +45,7 @@ function App() {
                   <Route path="/blogs/singlepost/:id" element={<SinglePost />} />
                   <Route path="/join" element={<Join />} />
                   <Route path="/contact" element={<Contact />} />
+                  <Route path="/book" element={<Booking />} />
                   <Route 
                     path="/manage-blogs" 
                     element={

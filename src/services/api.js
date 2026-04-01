@@ -1,5 +1,6 @@
 // API service for backend communication
-const API_BASE_URL = 'https://wanderluxe-ventures.onrender.com';
+const API_BASE_URL =
+  process.env.REACT_APP_API_URL || 'https://wanderluxe-ventures.onrender.com';
 
 class ApiService {
   constructor() {
@@ -45,7 +46,11 @@ class ApiService {
       
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.detail || `HTTP error! status: ${response.status}`);
+        let detail = errorData.detail;
+        if (Array.isArray(detail)) {
+          detail = detail.map((e) => e.msg || JSON.stringify(e)).join(' ');
+        }
+        throw new Error(detail || `HTTP error! status: ${response.status}`);
       }
 
       return await response.json();
@@ -187,6 +192,37 @@ class ApiService {
   // Health check
   async healthCheck() {
     return this.request('/health');
+  }
+
+  /**
+   * Book a travel consultation / appointment (public; optional auth via stored token).
+   * @param {Object} data - appointment fields (camelCase); converted to API shape.
+   */
+  async createAppointment(data) {
+    const body = {
+      full_name: data.fullName,
+      email: data.email,
+      phone: data.phone,
+      appointment_date: data.appointmentDate,
+      appointment_time: data.appointmentTime,
+      service_type: data.serviceType || 'general',
+    };
+    if (data.notes != null && String(data.notes).trim() !== '') {
+      body.notes = data.notes.trim();
+    }
+    return this.request('/appointments/', {
+      method: 'POST',
+      body: JSON.stringify(body),
+    });
+  }
+
+  /** List appointments for the logged-in user (requires Bearer token). */
+  async getMyAppointments(skip = 0, limit = 50) {
+    const params = new URLSearchParams({
+      skip: String(skip),
+      limit: String(limit),
+    });
+    return this.request(`/appointments/me?${params.toString()}`);
   }
 }
 

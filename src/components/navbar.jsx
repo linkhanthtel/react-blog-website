@@ -9,6 +9,7 @@ import AuthModal from './authModal';
 const NAV = [
   { label: 'Home', path: '/' },
   { label: 'Blogs', path: '/blogs' },
+  { label: 'Book', path: '/book' },
   { label: 'About', path: '/about' },
   { label: 'Contact', path: '/contact' },
 ];

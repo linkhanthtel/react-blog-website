@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence, useMotionValue, useTransform } from 'framer-motion';
 import { FaHeart, FaComments, FaShare, FaChevronDown, FaPlane, FaHotel, FaUmbrellaBeach, FaSearch, FaMapMarkerAlt, FaCalendarAlt, FaSun, FaUser, FaClock, FaStar, FaRocket, FaGlobe, FaCompass, FaMountain, FaWater, FaLeaf } from 'react-icons/fa';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useTheme } from '../context/themeContext';
 import { usePosts } from '../context/postsContext';
 import { getImageAlt } from '../utils/imageUtils';
@@ -886,7 +886,7 @@ function CleanWeatherWidget({ weatherData, isLoading }) {
 
 function Home() {
   const [scrollY, setScrollY] = useState(0);
-  const [serviceNotice, setServiceNotice] = useState(false);
+  const navigate = useNavigate();
   const { darkMode } = useTheme();
   const { posts } = usePosts();
   const heroRef = useRef(null);
@@ -915,31 +915,8 @@ function Home() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [y]);
 
-  const showUnavailableServiceNotice = () => {
-    setServiceNotice(true);
-    setTimeout(() => setServiceNotice(false), 2200);
-  };
-
   return (
     <div className={`min-h-screen ${darkMode ? 'bg-gray-900 text-white' : 'bg-sky-50 text-gray-900'} scroll-smooth`}>
-      <AnimatePresence>
-        {serviceNotice && (
-          <motion.div
-            initial={{ opacity: 0, y: -16 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -16 }}
-            transition={{ duration: 0.25 }}
-            className={`fixed top-20 right-4 z-[70] rounded-xl border px-4 py-3 text-sm shadow-lg backdrop-blur-md ${
-              darkMode
-                ? 'border-cyan-400/40 bg-sky-950/90 text-cyan-100'
-                : 'border-sky-300 bg-white/95 text-sky-900'
-            }`}
-          >
-            This service is not available yet.
-          </motion.div>
-        )}
-      </AnimatePresence>
-
       {/* Hero Section with Background Image */}
       <div ref={heroRef} className="relative min-h-screen flex items-center justify-center pt-16 md:pt-20">
         {/* Background Image */}
@@ -1007,18 +984,19 @@ function Home() {
               icon={FaSearch}
               text="Explore"
               variant="primary"
+              onClick={() => navigate('/blogs')}
             />
             <MinimalButton
               icon={FaMapMarkerAlt}
               text="Plan Trip"
               variant="secondary"
-              onClick={showUnavailableServiceNotice}
+              onClick={() => navigate('/book?service=plan_trip')}
             />
             <MinimalButton
               icon={FaCalendarAlt}
               text="Book Now"
               variant="outline"
-              onClick={showUnavailableServiceNotice}
+              onClick={() => navigate('/book?service=book_now')}
             />
           </motion.div>
 
